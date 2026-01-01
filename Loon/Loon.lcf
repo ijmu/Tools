@@ -2,7 +2,7 @@
 # IP 模式: ipv4-only / dual / ipv4-preferred / ipv6-preferred
 ip-mode = v4-only
 # DNS 服务，system 表示系统自带 DNS 服务器
-dns-server = 223.5.5.5,119.29.29.29
+dns-server = 223.5.5.5,8.8.8.8
 allow-wifi-access = true
 wifi-access-http-port = 7222
 wifi-access-socks5-port = 7221
@@ -36,6 +36,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
+机场名称 = 订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=false,flexible-sni=false
 
 [Remote Filter]
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
