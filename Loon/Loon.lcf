@@ -1,55 +1,35 @@
 [General]
-# IP查询模式
+# IP 模式: ipv4-only / dual / ipv4-preferred / ipv6-preferred
 ip-mode = v4-only
-# TUN IPv6配置
-ipv6-vif = off
-# DNS server
-dns-server = system,223.5.5.5,8.8.8.8
-# DoH server
-doh-server = https://dns.alidns.com/dns-query,https://doh.pub/dns-query
-# DoH3 server
-doh3-server = h3://dns.alidns.com/dns-query
-# DoQ server
-doq-server = quic://dns.alidns.com:853
-# Wi-Fi共享开启时http服务的端口
-wifi-access-http-port = 6154
-# Wi-Fi共享开启时socks5服务的端口
-wifi-access-socks5-port = 6153
-# 是否允许Wi-Fi下共享网络
-allow-wifi-access = false
-# 是否开启对局域网中其他设备的请求进行MITM
-mitm-on-wifi-access = false
-# 节点测速时的超时秒数
-test-timeout = 3
-# 网络接口
-interface-mode = auto
+# DNS 服务，system 表示系统自带 DNS 服务器
+dns-server = 223.5.5.5,119.29.29.29
+allow-wifi-access = true
+wifi-access-http-port = 7222
+wifi-access-socks5-port = 7221
+# 节点延迟测试
+proxy-test-url = http://1.1.1.1/generate_204
+# 互联网联通性测试
+internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
+# 策略切换时关闭连接
+disconnect-on-policy-change = true
+# 默认节点超时时间（秒）
+test-timeout = 5
 # 域名拦截行为
 domain-reject-mode = DNS
-# DNS拦截方式
+# DNS 拒绝行为
 dns-reject-mode = LoopbackIP
-# SNI辅助规则匹配
+# SNI 辅助规则匹配
 sni-sniffing = true
-# 直连时丢弃STUN
-disable-stun = true
-# UDP回落策略
+# UDP 回落策略
 udp-fallback-mode = REJECT
-# 策略切换时关闭连接
-disconnect-on-policy-change = false
-# 直连测试URL
-internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
-# 节点测试URL
-proxy-test-url = http://www.google.com/blank.html
-# proxy-test-url = http://www.apple.com/library/test/success.html
-# 资源解析器
-resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-parser.loon.min.js
-# GeoIP数据库
-geoip-url = https://raw.githubusercontent.com/sooyaaabo/Loon/main/GeoData/Country-Masaiki.mmdb
-# ASN数据库
-ipasn-url = https://raw.githubusercontent.com/sooyaaabo/Loon/main/GeoData/GeoLite2-ASN-P3TERX.mmdb
-# 绕过代理
-skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,e.crashlynatics.com
-# 绕过路由
-bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32
+# 网络接口
+interface-mode = auto
+# 自定义 GeoIP 数据库
+geoip-url = https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country.mmdb
+# 自定义 ASN 数据库
+ipasn-url = https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+# Always Real IP Hosts
+real-ip = *.lan,*.direct,*.cmpassport.com,id6.me,open.e.189.cn,mdn.open.wo.cn,opencloud.wostore.cn,auth.wosms.cn,*.10099.com.cn,*.msftconnecttest.com,*.msftncsi.com,lancache.steamcontent.com
 
 [Proxy]
 
@@ -102,7 +82,7 @@ https://github.com/Repcz/Tool/raw/X/Loon/Rules/Direct.list, policy=DIRECT, tag=D
 https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/rejectAd.list, policy=REJECT, tag=去广告规则@奶思, enabled=true
 https://rule.kelee.one/Loon/Line.lsr, policy=Media, tag=Line, enabled=false
 https://github.com/EAlyce/conf/raw/refs/heads/main/Rule/Crypto.list, policy=Crypto, tag=Crypto, enabled=true
-https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=Whatsapp, enabled=true
+https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=WhatsApp, enabled=true
 https://rule.kelee.one/Loon/Stripe.lsr, policy=Stripe, tag=Stripe, enabled=true
 https://rule.kelee.one/Loon/PayPal.lsr, policy=PayPal, tag=PayPal, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Telegram.list, policy=Media, tag=Telegram, enabled=true
@@ -110,7 +90,7 @@ https://github.com/Repcz/Tool/raw/X/Loon/Rules/YouTube.list, policy=Media, tag=Y
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Twitter.list, policy=Media, tag=Twitter, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/TikTok.list, policy=Tiktok, tag=TikTok, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Spotify.list, policy=Spotify, tag=Spotify, enabled=true
-https://raw.githubusercontent.com/mist-whisper/Loon/master/Lsr/AI/AI.lsr, policy=AI, tag=AI, enabled=true
+https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AI.list, policy=AI, tag=AI, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/AppleServers.list, policy=Apple, tag=AppleProxy, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/AppleCN.list, policy=DIRECT, tag=AppleCN, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Lan.list, policy=DIRECT, tag=Lan, enabled=true
@@ -130,7 +110,6 @@ iosapps.itunes.apple.com = iosapps.itunes.apple.com.download.ks-cdn.com
 https://kelee.one/Tool/Loon/Lpx/SodaMusic_remove_ads.lpx, tag=汽水音乐, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/blockAds.plugin, tag=去广告合集@奶思, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/weibo.plugin, tag=Weibo@奶思, enabled=true
-https://raw.githubusercontent.com/sooyaaabo/Loon/main/Plugin/BaiduNetDisk.lpx, tag=百度网盘, enabled=false
 https://github.com/NSRingo/LocationService/releases/latest/download/iRingo.LocationService.plugin, tag=Location@iRingo, enabled=true
 https://github.com/NSRingo/Maps/releases/latest/download/iRingo.Maps.plugin, tag=Maps@iRingo, enabled=true
 https://github.com/NSRingo/WeatherKit/releases/latest/download/iRingo.WeatherKit.plugin, tag=Weather@iRingo, enabled=true
