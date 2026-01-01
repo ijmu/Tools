@@ -36,7 +36,6 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
-机场名称 = 订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=false,flexible-sni=false
 
 [Remote Filter]
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
@@ -87,12 +86,14 @@ https://rule.kelee.one/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://rule.kelee.one/Loon/Stripe.lsr, policy=Stripe, tag=Stripe, enabled=true
 https://rule.kelee.one/Loon/PayPal.lsr, policy=PayPal, tag=PayPal, enabled=true
 https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=WhatsApp, enabled=true
+https://rule.kelee.one/Loon/Instagram.lsr, policy=Media, tag=Instagram, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
 https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=true
 https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AI.list, policy=AI, tag=AI, enabled=true
-https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/AppleServers.list, policy=Apple, tag=AppleProxy, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/AppleCN.list, policy=DIRECT, tag=AppleCN, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Lan.list, policy=DIRECT, tag=Lan, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/FILTER_REGION.list, policy=DIRECT, tag=CN, enabled=true
 
