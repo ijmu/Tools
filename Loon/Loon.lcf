@@ -54,6 +54,7 @@ Auto = select,HK,US,TW,JP,SG,UK,DE,PH,TR,NG,url = http://1.1.1.1/generate_204,im
 AI = select,US,TW,SG,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/ChatGPT-green.png
 Apple = select,DIRECT,US,HK,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
 Crypto = select,HK,US,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+Google = select,HK,US,SG,TR,NG,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
 Media = select,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
 Stripe = select,HK,US,DE,UK,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/stripe.png
 PayPal = select,DIRECT,HK,US,UK,DE,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
@@ -83,6 +84,7 @@ https://github.com/Repcz/Tool/raw/X/Loon/Rules/Direct.list, policy=DIRECT, tag=D
 https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/rejectAd.list, policy=REJECT, tag=去广告规则合集@奶思, enabled=false
 https://rule.kelee.one/Loon/Line.lsr, policy=Media, tag=Line, enabled=false
 https://rule.kelee.one/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
+https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
 https://rule.kelee.one/Loon/Stripe.lsr, policy=Stripe, tag=Stripe, enabled=true
 https://rule.kelee.one/Loon/PayPal.lsr, policy=PayPal, tag=PayPal, enabled=true
 https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=WhatsApp, enabled=true
