@@ -119,3 +119,5 @@ https://kelee.one/Tool/Loon/Lpx/Spotify_remove_ads.lpx, tag=Spotify, enabled=tru
 https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, tag=YouTube, enabled=true
 
 [MITM]
+hostname =
+skip-server-cert-verify = false
