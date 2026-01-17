@@ -98,8 +98,6 @@ https://github.com/Repcz/Tool/raw/X/Loon/Rules/Lan.list, policy=DIRECT, tag=Lan,
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/FILTER_REGION.list, policy=DIRECT, tag=CN, enabled=true
 
 [Host]
-# App Store 下载请求解析 金山CDN
-iosapps.itunes.apple.com = iosapps.itunes.apple.com.download.ks-cdn.com
 
 [Rewrite]
 
