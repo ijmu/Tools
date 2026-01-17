@@ -36,6 +36,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
+机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=false,flexible-sni=false
 
 [Remote Filter]
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
@@ -51,7 +52,7 @@ Nigeria = NameRegex, FilterKey = "🇳🇬|尼日利亚"
 
 [Proxy Group]
 Auto = select,HK,US,TW,JP,SG,UK,DE,PH,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Loon.png
-AI = select,US,TW,SG,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/ChatGPT-green.png
+AI = select,US,TW,SG,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatGPT-green.png
 Apple = select,DIRECT,US,HK,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
 Crypto = select,HK,US,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 Google = select,HK,US,SG,TR,NG,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
@@ -74,9 +75,6 @@ NG = url-test,Nigeria,url = http://1.1.1.1/generate_204,interval = 60,tolerance 
 [Proxy Chain]
 
 [Rule]
-DOMAIN-SUFFIX,gjfzpt.cn,REJECT
-DOMAIN-KEYWORD,96110,REJECT
-DOMAIN,prpr.96110.cn.com,DIRECT
 FINAL,Auto
 
 [Remote Rule]
@@ -110,18 +108,14 @@ iosapps.itunes.apple.com = iosapps.itunes.apple.com.download.ks-cdn.com
 [Remote Script]
 
 [Plugin]
-https://kelee.one/Tool/Loon/Lpx/SodaMusic_remove_ads.lpx, tag=汽水音乐, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/blockAds.plugin, tag=去广告插件合集@奶思, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/weibo.plugin, tag=Weibo@奶思, enabled=true
-https://github.com/NSRingo/LocationService/releases/latest/download/iRingo.LocationService.plugin, tag=Location@iRingo, enabled=true
-https://github.com/NSRingo/Maps/releases/latest/download/iRingo.Maps.plugin, tag=Maps@iRingo, enabled=true
-https://github.com/NSRingo/WeatherKit/releases/latest/download/iRingo.WeatherKit.plugin, tag=Weather@iRingo, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Script-Hub.lpx, policy=Auto, tag=Script-Hub, enabled=false
-https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, policy=Auto, tag=Sub-Store, enabled=false
-https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=Auto, tag=BoxJS, enabled=false
+https://kelee.one/Tool/Loon/Lpx/Weibo_remove_ads.lpx, tag=Weibo, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Bilibili_remove_ads.lpx, policy=Auto, tag=Bilibili, enabled=true
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, tag=广告平台拦截器, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, tag=HTTPDNS拦截器, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/FenBi_remove_ads.lpx, tag=粉笔, enabled=true
+https://kelee.one/Tool/Loon/Lpx/RedPaper_remove_ads.lpx, tag=小红书, enabled=true
+https://kelee.one/Tool/Loon/Lpx/MeetYou_remove_ads.lpx, tag=美柚, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Spotify_remove_ads.lpx, tag=Spotify, enabled=true
+https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, tag=YouTube, enabled=true
 
 [MITM]
-hostname =
-skip-server-cert-verify = false
