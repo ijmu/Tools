@@ -36,7 +36,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
-机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=false,flexible-sni=false
+机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
@@ -81,11 +81,11 @@ FINAL,Auto
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Direct.list, policy=DIRECT, tag=Direct Fix, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/rejectAd.list, policy=REJECT, tag=去广告规则合集@奶思, enabled=false
 https://rule.kelee.one/Loon/Line.lsr, policy=Media, tag=Line, enabled=false
+https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=WhatsApp, enabled=false
 https://rule.kelee.one/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
 https://rule.kelee.one/Loon/Stripe.lsr, policy=Stripe, tag=Stripe, enabled=true
 https://rule.kelee.one/Loon/PayPal.lsr, policy=PayPal, tag=PayPal, enabled=true
-https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Media, tag=WhatsApp, enabled=true
 https://rule.kelee.one/Loon/Instagram.lsr, policy=Media, tag=Instagram, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
 https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
@@ -104,6 +104,8 @@ https://github.com/Repcz/Tool/raw/X/Loon/Rules/FILTER_REGION.list, policy=DIRECT
 [Script]
 
 [Remote Script]
+https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=脚本工具合集, enabled=true
+https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
 https://kelee.one/Tool/Loon/Lpx/Weibo_remove_ads.lpx, tag=Weibo, enabled=true
