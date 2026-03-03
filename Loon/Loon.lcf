@@ -34,7 +34,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
-机场名称 = 订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
+机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
@@ -74,7 +74,6 @@ NG = url-test,Nigeria,url = http://1.1.1.1/generate_204,interval = 60,tolerance 
 [Proxy Chain]
 
 [Rule]
-URL-REGEX,"\.log\.",REJECT
 GEOIP,CN,DIRECT
 DOMAIN-SUFFIX,gjfzpt.cn,REJECT
 DOMAIN-KEYWORD,96110,REJECT
@@ -91,8 +90,7 @@ https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
 https://rule.kelee.one/Loon/YouTube.lsr, policy=Google, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=true
 https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AI.list, policy=AI, tag=AIGC, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AppleAll.list, policy=Apple, tag=Apple, enabled=true
+https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
 https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=Lan, enabled=true
 
 [Host]
@@ -106,12 +104,9 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
-https://raw.githubusercontent.com/chxm1023/Advertising/Loon/AppAD.plugin, tag=App广告, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/blockAds.plugin, policy=Auto, tag=去广告合集, enabled=true
 https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/weibo.plugin, tag=微博@奶思, enabled=true
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, tag=广告平台拦截器, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, tag=HTTPDNS拦截器, pin=true, enabled=true
 
 [MITM]
-hostname =
-skip-server-cert-verify = false
