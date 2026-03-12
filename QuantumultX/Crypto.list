@@ -3,14 +3,12 @@
 # 原版提取日期：2026-03-12（基于仓库最新内容）
 # 用途：覆盖 Pionex 全球/大陆流量、Bybit 主站及全球变体、Bitget 主站及 App 流量
 # 推荐：全部走 Proxy 或独立策略组（加速、稳定行情、避免直连延迟/封锁）
-# GitHub Raw ：https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/QuantumultX/Crypto.list
-
+# GitHub Raw ：https://github.com/ijmu/Tools/raw/main/QuantumultX/Crypto.list
 # ── Pionex ──
 DOMAIN-SUFFIX,pionex.com
 DOMAIN-SUFFIX,picolzh.com
 DOMAIN-SUFFIX,picol.com
 DOMAIN-SUFFIX,pioneerex.org
-
 # ── Bybit ──
 DOMAIN-SUFFIX,bybit.com
 DOMAIN-SUFFIX,bybitglobal.com
@@ -18,12 +16,38 @@ DOMAIN-SUFFIX,bybit-global.com
 DOMAIN-SUFFIX,bybit.biz
 DOMAIN-SUFFIX,bybit.org
 DOMAIN-SUFFIX,bybit.cloud
-
 # ── Bitget ──
 DOMAIN-SUFFIX,bitget.com
 DOMAIN-SUFFIX,bitgetapp.com
-
 # 备注：
 # - DOMAIN-SUFFIX 已覆盖所有常见子域名（如 api. ws. stream. www. 等）
 # - 未添加 DOMAIN-KEYWORD / DOMAIN 等额外规则，保持原版极简风格
 # - 如未来抓包出现遗漏域名，可直接在对应区块追加一行 DOMAIN-SUFFIX,xxx.com
+
+# ── 新增：OKX 交易所（完整版） ──
+DOMAIN-SUFFIX,okx.com
+DOMAIN-SUFFIX,okex.com
+DOMAIN-SUFFIX,oklink.com
+DOMAIN-SUFFIX,okxcloud.com
+DOMAIN,api.okx.com
+DOMAIN,ws.okx.com
+DOMAIN,trading.okx.com
+DOMAIN,static.okx.com
+DOMAIN,www.okx.com
+
+# ── 新增：Binance（币安）（完整版） ──
+DOMAIN-SUFFIX,binance.com
+DOMAIN-SUFFIX,binance.me
+DOMAIN-SUFFIX,binance.cloud
+DOMAIN,api.binance.com
+DOMAIN,ws.binance.com
+
+# ── 新增：TokenPocket 钱包（完整版） ──
+DOMAIN-SUFFIX,tokenpocket.pro
+DOMAIN-SUFFIX,tpwallet.io
+DOMAIN-SUFFIX,tp.xyz
+DOMAIN,help.tokenpocket.pro
+DOMAIN,www.tokenpocket.pro
+
+# ── 新增：TradingView 平台（完整版） ──
+DOMAIN-SUFFIX,tradingview.com
