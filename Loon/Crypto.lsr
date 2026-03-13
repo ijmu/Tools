@@ -1,0 +1,55 @@
+# Crypto Exchanges 分流 - Pionex + Bybit + Bitget + OKX + Binance + TokenPocket + TradingView
+# 来源：基于 Quantumult X Crypto.list 转换，兼容 Loon 规则集
+# 更新：2026-03
+# 用途：Loon 远程规则集 / RULE-SET 使用，建议关联到 Proxy 或 Exchange 策略组
+
+# ── Pionex ──
+DOMAIN-SUFFIX,pionex.com
+DOMAIN-SUFFIX,picolzh.com
+DOMAIN-SUFFIX,picol.com
+DOMAIN-SUFFIX,pioneerex.org
+
+# ── Bybit ──
+DOMAIN-SUFFIX,bybit.com
+DOMAIN-SUFFIX,bybitglobal.com
+DOMAIN-SUFFIX,bybit-global.com
+DOMAIN-SUFFIX,bybit.biz
+DOMAIN-SUFFIX,bybit.org
+DOMAIN-SUFFIX,bybit.cloud
+
+# ── Bitget ──
+DOMAIN-SUFFIX,bitget.com
+DOMAIN-SUFFIX,bitgetapp.com
+
+# ── OKX ──
+DOMAIN-SUFFIX,okx.com
+DOMAIN-SUFFIX,okex.com
+DOMAIN-SUFFIX,oklink.com
+DOMAIN-SUFFIX,okxcloud.com
+DOMAIN,api.okx.com
+DOMAIN,ws.okx.com
+DOMAIN,trading.okx.com
+DOMAIN,static.okx.com
+DOMAIN,www.okx.com
+
+# ── Binance（币安） ──
+DOMAIN-SUFFIX,binance.com
+DOMAIN-SUFFIX,binance.me
+DOMAIN-SUFFIX,binance.cloud
+DOMAIN,api.binance.com
+DOMAIN,ws.binance.com
+
+# ── TokenPocket 钱包 ──
+DOMAIN-SUFFIX,tokenpocket.pro
+DOMAIN-SUFFIX,tpwallet.io
+DOMAIN-SUFFIX,tp.xyz
+DOMAIN,help.tokenpocket.pro
+DOMAIN,www.tokenpocket.pro
+
+# ── TradingView 平台 ──
+DOMAIN-SUFFIX,tradingview.com
+
+# 备注：
+# - 所有规则均为 DOMAIN-SUFFIX / DOMAIN，已覆盖常见子域名（api/ws/stream 等）
+# - 在 Loon 中使用时，可在 [Rule] 部分添加： RULE-SET,https://你的raw链接,你的策略组
+# - 如需更严格匹配，可在每行末尾加 ,Proxy（但远程规则集通常不加，留本地配置）
