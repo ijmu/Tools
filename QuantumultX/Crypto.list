@@ -3,7 +3,6 @@
 # 原版提取日期：2026-03-12（基于仓库最新内容）
 # 用途：覆盖 Pionex 全球/大陆流量、Bybit 主站及全球变体、Bitget 主站及 App 流量
 # 推荐：全部走 Proxy 或独立策略组（加速、稳定行情、避免直连延迟/封锁）
-# GitHub Raw ：https://github.com/ijmu/Tools/raw/main/QuantumultX/Crypto.list
 
 # ── Pionex ──
 DOMAIN-SUFFIX,pionex.com
