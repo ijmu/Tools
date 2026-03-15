@@ -37,6 +37,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
+Self-built = NameRegex, FilterKey = "-"
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
 United States = NameRegex, FilterKey = "🇺🇸|美国"
 Taiwan = NameRegex, FilterKey = "🇨🇳|台湾"
@@ -49,17 +50,14 @@ Turkey = NameRegex, FilterKey = "🇹🇷|土耳其"
 Nigeria = NameRegex, FilterKey = "🇳🇬|尼日利亚"
 
 [Proxy Group]
-Auto = select,HK,US,TW,JP,SG,UK,DE,PH,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Loon.png
-AI = select,Auto,US,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatGPT-green.png
-Apple = select,DIRECT,HK,US,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
-Crypto = select,TW,JP,SG,Auto,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
-Chat = select,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
-Google = select,Auto,HK,US,TR,NG,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-Media = select,Auto,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-Stripe = select,HK,US,DE,UK,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/stripe.png
-PayPal = select,DIRECT,HK,US,UK,DE,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
-Spotify = select,Auto,PH,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
-Tiktok = select,Auto,US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
+Daily = select,Self-built,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
+Auto = select,Daily,DIRECT,HK,CC-US,TW,JP,SG,UK,DE,PH,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Loon.png
+Apple = select,Daily,Auto,DIRECT,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
+AI = select,Daily,Auto,CC-US,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatGPT-green.png
+Crypto = select,Daily,Auto,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+Chat = select,Daily,Auto,HK,CC-US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
+Media = select,Daily,Auto,HK,CC-US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+Tiktok = select,Daily,Auto,CC-US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
 HK = url-test,Hong Kong,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
 US = url-test,United States,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
 TW = url-test,Taiwan,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
@@ -74,24 +72,21 @@ NG = url-test,Nigeria,url = http://1.1.1.1/generate_204,interval = 60,tolerance 
 [Proxy Chain]
 
 [Rule]
-GEOIP,CN,DIRECT
 DOMAIN-SUFFIX,gjfzpt.cn,REJECT
 DOMAIN-KEYWORD,96110,REJECT
 FINAL,Auto
 
 [Remote Rule]
+https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
+https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
+https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
 https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Chat, tag=WhatsApp, enabled=true
-https://rule.kelee.one/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
-https://rule.kelee.one/Loon/Stripe.lsr, policy=Stripe, tag=Stripe, enabled=true
-https://rule.kelee.one/Loon/PayPal.lsr, policy=PayPal, tag=PayPal, enabled=true
-https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
-https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
-https://rule.kelee.one/Loon/YouTube.lsr, policy=Google, tag=YouTube, enabled=true
-https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=true
-https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
+https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
-https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=Lan, enabled=true
+https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
+https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/LAN.list, policy=DIRECT, tag=LAN, enabled=true
+https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/GeoIP_CN.list, policy=DIRECT, tag=CN, enabled=true
 
 [Host]
 
@@ -104,9 +99,14 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
-https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/blockAds.plugin, policy=Auto, tag=去广告合集, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/weibo.plugin, tag=微博@奶思, enabled=true
+https://github.com/NSRingo/Maps/releases/latest/download/iRingo.Maps.plugin, tag=Maps, enabled=true
+https://github.com/NSRingo/LocationService/releases/latest/download/iRingo.LocationService.plugin, tag=Location, enabled=true
+https://github.com/NSRingo/WeatherKit/releases/latest/download/iRingo.WeatherKit.plugin, tag=Weather, enabled=true
+https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, tag=YouTube, enabled=true
+https://kelee.one/Tool/Loon/Lpx/MeetYou_remove_ads.lpx, tag=美柚, enabled=true
+https://github.com/fmz200/wool_scripts/raw/main/Loon/plugin/weibo.plugin, tag=微博, enabled=false
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, tag=广告平台拦截器, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, tag=HTTPDNS拦截器, pin=true, enabled=true
 
 [MITM]
+skip-server-cert-verify = false
