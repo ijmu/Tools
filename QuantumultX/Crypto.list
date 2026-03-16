@@ -25,15 +25,9 @@ DOMAIN-SUFFIX,bitgetapp.com
 # - 如未来抓包出现遗漏域名，可直接在对应区块追加一行 DOMAIN-SUFFIX,xxx.com
 
 # ── 新增：OKX 交易所（完整版） ──
-DOMAIN-SUFFIX,okx.com
-DOMAIN-SUFFIX,okex.com
-DOMAIN-SUFFIX,oklink.com
-DOMAIN-SUFFIX,okxcloud.com
-DOMAIN,api.okx.com
-DOMAIN,ws.okx.com
-DOMAIN,trading.okx.com
-DOMAIN,static.okx.com
-DOMAIN,www.okx.com
+HOST-SUFFIX,okex.com
+HOST-SUFFIX,oklink.com
+HOST-SUFFIX,okx.com
 
 # ── 新增：TokenPocket 钱包（完整版） ──
 DOMAIN-SUFFIX,tokenpocket.pro
