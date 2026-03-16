@@ -35,13 +35,6 @@ DOMAIN,trading.okx.com
 DOMAIN,static.okx.com
 DOMAIN,www.okx.com
 
-# ── 新增：Binance（币安）（完整版） ──
-DOMAIN-SUFFIX,binance.com
-DOMAIN-SUFFIX,binance.me
-DOMAIN-SUFFIX,binance.cloud
-DOMAIN,api.binance.com
-DOMAIN,ws.binance.com
-
 # ── 新增：TokenPocket 钱包（完整版） ──
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,tpwallet.io
