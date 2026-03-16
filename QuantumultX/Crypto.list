@@ -33,8 +33,7 @@ HOST-SUFFIX,okx.com
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,tpwallet.io
 DOMAIN-SUFFIX,tp.xyz
-DOMAIN,help.tokenpocket.pro
-DOMAIN,www.tokenpocket.pro
+DOMAIN-SUFFIX,token.im
 
 # ── 新增：TradingView 平台（完整版） ──
 DOMAIN-SUFFIX,tradingview.com
