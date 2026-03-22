@@ -13,6 +13,9 @@ DOMAIN-SUFFIX,hyperliquid.xyz
 # ── Polymarket ──
 DOMAIN-SUFFIX,polymarket.com
 
+# ── Polymarket ──
+DOMAIN-SUFFIX,websea.com
+
 # ── Bybit ──
 DOMAIN-SUFFIX,bybit.com
 DOMAIN-SUFFIX,bybitglobal.com
