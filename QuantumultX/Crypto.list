@@ -2,33 +2,17 @@
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/Crypto.list
 
 # ── Pionex ──
-HOST-SUFFIX,pionex.com
-HOST-SUFFIX,picolzh.com
-HOST-SUFFIX,picol.com
-HOST-SUFFIX,pioneerex.org
+HOST-KEYWORD,pionex
+HOST-KEYWORD,pioneerex
 
 # ── Bybit ──
-HOST-SUFFIX,bybit.com
-HOST-SUFFIX,bybitglobal.com
-HOST-SUFFIX,bybit-global.com
-HOST-SUFFIX,bybit.biz
-HOST-SUFFIX,bybit.org
-HOST-SUFFIX,bybit.cloud
+HOST-KEYWORD,bybit
 
 # ── Bitget ──
-HOST-SUFFIX,bitget.com
-HOST-SUFFIX,bitgetapp.com
+HOST-KEYWORD,bitget
 
-# ── 新增：OKX 交易所（完整版） ──
-HOST-SUFFIX,okex.com
-HOST-SUFFIX,oklink.com
-HOST-SUFFIX,okx.com
+# ── TokenPocket ──
+HOST-KEYWORD,tokenpocket
 
-# ── 新增：TokenPocket 钱包（完整版） ──
-HOST-SUFFIX,tokenpocket.pro
-HOST-SUFFIX,tpwallet.io
-HOST-SUFFIX,tp.xyz
-HOST-SUFFIX,token.im
-
-# ── 新增：TradingView 平台（完整版） ──
-HOST-SUFFIX,tradingview.com
+# ── 新增：TradingView ──
+HOST-KEYWORD,tradingview
