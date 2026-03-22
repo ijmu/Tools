@@ -7,6 +7,12 @@ DOMAIN-SUFFIX,tokenpocket.pro
 # ── Tradingview ──
 DOMAIN-SUFFIX,tradingview.com
 
+# ── Hyperliquid ──
+DOMAIN-SUFFIX,hyperliquid.xyz
+
+# ── Polymarket ──
+DOMAIN-SUFFIX,polymarket.com
+
 # ── Bybit ──
 DOMAIN-SUFFIX,bybit.com
 DOMAIN-SUFFIX,bybitglobal.com
