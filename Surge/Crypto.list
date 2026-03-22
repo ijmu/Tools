@@ -1,2 +1,26 @@
-DOMAIN-KEYWORD,tokenpocket
-DOMAIN-KEYWORD,tradingview
+# Crypto
+#URL:
+
+# ── TokenPocket ──
+DOMAIN-SUFFIX,tokenpocket.pro
+
+# ── Tradingview ──
+DOMAIN-SUFFIX,tradingview.com
+
+# ── Bybit ──
+DOMAIN-SUFFIX,bybit.com
+DOMAIN-SUFFIX,bybitglobal.com
+DOMAIN-SUFFIX,bybit-global.com
+DOMAIN-SUFFIX,bybit.biz
+DOMAIN-SUFFIX,bybit.org
+DOMAIN-SUFFIX,bybit.cloud
+
+# ── Bitget ──
+DOMAIN-SUFFIX,bitget.com
+DOMAIN-SUFFIX,bitgetapp.com
+
+# ── Pionex ──
+DOMAIN-SUFFIX,pionex.com
+DOMAIN-SUFFIX,picolzh.com
+DOMAIN-SUFFIX,picol.com
+DOMAIN-SUFFIX,pioneerex.org
