@@ -2,10 +2,10 @@
 # URL:https://github.com/ijmu/Tools/raw/main/Surge/Crypto.list
 
 # ── TokenPocket ──
-DOMAIN-SUFFIX,tokenpocket.pro
+DOMAIN-KEYWORD,tokenpocket
 
 # ── Tradingview ──
-DOMAIN-SUFFIX,tradingview.com
+DOMAIN-KEYWORD,tradingview
 
 # ── Hyperliquid ──
 DOMAIN-SUFFIX,hyperliquid.xyz
@@ -13,7 +13,7 @@ DOMAIN-SUFFIX,hyperliquid.xyz
 # ── Polymarket ──
 DOMAIN-SUFFIX,polymarket.com
 
-# ── Polymarket ──
+# ── Websea ──
 DOMAIN-SUFFIX,websea.com
 
 # ── Bybit ──
