@@ -3,6 +3,8 @@
 
 # ── TokenPocket ──
 DOMAIN-KEYWORD,tokenpocket
+DOMAIN-KEYWORD,dapp
+DOMAIN-KEYWORD,pancakeswap
 
 # ── Tradingview ──
 DOMAIN-KEYWORD,tradingview
