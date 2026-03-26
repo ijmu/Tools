@@ -36,7 +36,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
-机场名称 = 订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
+机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=true,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
 Built = NameRegex,Local, FilterKey = "Built"
@@ -58,12 +58,8 @@ Apple = select,Daily,Auto,DIRECT,img-url = https://raw.githubusercontent.com/lig
 AI = select,Daily,Auto,US,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/grok.png
 Crypto = select,Daily,Auto,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 Chat = select,Daily,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
-GitHub = select,Daily,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/github(1).png
-Google = select,Daily,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-Microsoft = select,Daily,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
 Media = select,Daily,Auto,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-Spotify = select,Daily,Auto,DIRECT,TW,JP,PH,TR,NG,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
-Tiktok = select,Daily,Auto,US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
+Tiktok = select,Daily,Auto,US,TW,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
 HK = url-test,Hong Kong,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
 US = url-test,United States,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
 TW = url-test,Taiwan,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
@@ -86,13 +82,8 @@ FINAL,Auto
 [Remote Rule]
 https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
-https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=true
 https://rule.kelee.one/Loon/Whatsapp.lsr, policy=Chat, tag=WhatsApp, enabled=true
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
-https://rule.kelee.one/Loon/Microsoft.lsr, policy=Microsoft, tag=Microsoft, enabled=true
-https://rule.kelee.one/Loon/YouTube.lsr, policy=Google, tag=YouTube, enabled=true
-https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
-https://rule.kelee.one/Loon/GitHub.lsr, policy=GitHub, tag=GitHub, enabled=true
 https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
 https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
@@ -109,6 +100,7 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
+https://kelee.one/Tool/Loon/Lpx/Spotify_remove_ads.lpx, tag=Spotify, enabled=true
 https://kelee.one/Tool/Loon/Lpx/MeetYou_remove_ads.lpx, tag=美柚, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, tag=Sub-Store, enabled=false
 https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, tag=BoxJs, enabled=false
