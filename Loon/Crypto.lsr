@@ -1,37 +1,88 @@
 # Crypto
-# URL:https://github.com/ijmu/Tools/raw/main/Loon/Crypto.list
-
-# ── TokenPocket ──
-DOMAIN-KEYWORD,tokenpocket
-DOMAIN-KEYWORD,dapp
-DOMAIN-KEYWORD,pancakeswap
-
-# ── Tradingview ──
-DOMAIN-KEYWORD,tradingview
-
-# ── Hyperliquid ──
-DOMAIN-SUFFIX,hyperliquid.xyz
-
-# ── Polymarket ──
-DOMAIN-SUFFIX,polymarket.com
-
-# ── Websea ──
-DOMAIN-SUFFIX,websea.com
+# URL:https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr
 
 # ── Bybit ──
-DOMAIN-SUFFIX,bybit.com
-DOMAIN-SUFFIX,bybitglobal.com
-DOMAIN-SUFFIX,bybit-global.com
+DOMAIN,m3ond3-launches.appsflyersdk.com
+DOMAIN,api.ffbbbdc6d3c353211fe2ba39c9f744cd.com
+DOMAIN,sc-datasink.ffe390afd658c19dcbf707e0597b846d.de
+DOMAIN,relay.walletconnect.com
 DOMAIN-SUFFIX,bybit.biz
 DOMAIN-SUFFIX,bybit.org
+DOMAIN-SUFFIX,bybit.com
+DOMAIN-SUFFIX,byd3c3.com
+DOMAIN-SUFFIX,bybdc6.com
 DOMAIN-SUFFIX,bybit.cloud
+DOMAIN-SUFFIX,ada.support
+DOMAIN-SUFFIX,byabcde.com
+DOMAIN-SUFFIX,bitverse.zone
+DOMAIN-SUFFIX,bybitglobal.com
+DOMAIN-SUFFIX,bybit-global.com
+DOMAIN-SUFFIX,byapps.net
+DOMAIN-SUFFIX,byffbb.com
+DOMAIN-SUFFIX,bycsi.com
+DOMAIN-KEYWORD,bybit
+DOMAIN-KEYWORD,bybitglobal
+DOMAIN-KEYWORD,bybit-global
 
 # ── Bitget ──
 DOMAIN-SUFFIX,bitget.com
 DOMAIN-SUFFIX,bitgetapp.com
+DOMAIN-KEYWORD,bitget
+DOMAIN-KEYWORD,bitgetapp
+
+# ── Gate ──
+DOMAIN-SUFFIX,gate.ac
+DOMAIN-SUFFIX,gate.io
+DOMAIN-SUFFIX,gatexsecurity.com
+DOMAIN-SUFFIX,gatetrace.com
+DOMAIN-SUFFIX,gatedata.org
+DOMAIN-SUFFIX,gateio.services
+DOMAIN-SUFFIX,gateimg.com
+DOMAIN-SUFFIX,gateio.im
+DOMAIN-SUFFIX,gateio.live
+DOMAIN-KEYWORD,gateio
+
+# ── HTX ──
+DOMAIN-SUFFIX,htx.com
+DOMAIN-SUFFIX,hbabit.com
+DOMAIN-SUFFIX,hbfile.net
+DOMAIN-SUFFIX,huobi.com
+DOMAIN-SUFFIX,huobi.me
+DOMAIN-SUFFIX,huobi.pro
+DOMAIN-SUFFIX,huobi.sc
+DOMAIN-SUFFIX,huobiasia.vip
+DOMAIN-SUFFIX,huobigroup.com
+DOMAIN-SUFFIX,huobitoken.com
+DOMAIN-SUFFIX,heco-scan.com
+DOMAIN-SUFFIX,hecoview.com
+DOMAIN-SUFFIX,hbfile.net
+DOMAIN-SUFFIX,huobi.br.com
+DOMAIN-SUFFIX,bitderiv.com
+DOMAIN-SUFFIX,hecochain.com
+DOMAIN-SUFFIX,huobi.ws
+DOMAIN-SUFFIX,huobi.ug
+DOMAIN-SUFFIX,huobi.co.ma
+DOMAIN-SUFFIX,huobi.br.com
+DOMAIN-KEYWORD,huobi
+DOMAIN-KEYWORD,hbfile
+
+# ── MEXC ──
+DOMAIN,futures.greentreeone.com
+DOMAIN-SUFFIX,mexc.com
+DOMAIN-SUFFIX,mexcsensors.com
+DOMAIN-SUFFIX,gotoda.co
+DOMAIN-SUFFIX,greentreeone.com
+DOMAIN-SUFFIX,mocortech.com
+DOMAIN-SUFFIX,365huo.xyz
 
 # ── Pionex ──
 DOMAIN-SUFFIX,pionex.com
 DOMAIN-SUFFIX,picolzh.com
 DOMAIN-SUFFIX,picol.com
 DOMAIN-SUFFIX,pioneerex.org
+
+# ── TokenPocket ──
+DOMAIN-KEYWORD,tokenpocket
+
+# ── TradingView ──
+DOMAIN-KEYWORD,tradingview
