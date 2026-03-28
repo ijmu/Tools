@@ -1,15 +1,85 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/Crypto.list
 
-# ── Pionex ──
-HOST-KEYWORD,pionex
-HOST-KEYWORD,pioneerex
-
 # ── Bybit ──
+HOST,m3ond3-launches.appsflyersdk.com
+HOST,api.ffbbbdc6d3c353211fe2ba39c9f744cd.com
+HOST,sc-datasink.ffe390afd658c19dcbf707e0597b846d.de
+HOST,relay.walletconnect.com
+HOST-SUFFIX,bybit.biz
+HOST-SUFFIX,bybit.org
+HOST-SUFFIX,bybit.com
+HOST-SUFFIX,byd3c3.com
+HOST-SUFFIX,bybdc6.com
+HOST-SUFFIX,bybit.cloud
+HOST-SUFFIX,ada.support
+HOST-SUFFIX,byabcde.com
+HOST-SUFFIX,bitverse.zone
+HOST-SUFFIX,bybitglobal.com
+HOST-SUFFIX,bybit-global.com
+HOST-SUFFIX,byapps.net
+HOST-SUFFIX,byffbb.com
+HOST-SUFFIX,bycsi.com
 HOST-KEYWORD,bybit
+HOST-KEYWORD,bybitglobal
+HOST-KEYWORD,bybit-global
 
 # ── Bitget ──
+HOST-SUFFIX,bitget.com
+HOST-SUFFIX,bitgetapp.com
 HOST-KEYWORD,bitget
+HOST-KEYWORD,bitgetapp
+
+# ── Gate ──
+HOST-SUFFIX,gate.ac
+HOST-SUFFIX,gate.io
+HOST-SUFFIX,gatexsecurity.com
+HOST-SUFFIX,gatetrace.com
+HOST-SUFFIX,gatedata.org
+HOST-SUFFIX,gateio.services
+HOST-SUFFIX,gateimg.com
+HOST-SUFFIX,gateio.im
+HOST-SUFFIX,gateio.live
+HOST-KEYWORD,gateio
+
+# ── HTX ──
+HOST-SUFFIX,htx.com
+HOST-SUFFIX,hbabit.com
+HOST-SUFFIX,hbfile.net
+HOST-SUFFIX,huobi.com
+HOST-SUFFIX,huobi.me
+HOST-SUFFIX,huobi.pro
+HOST-SUFFIX,huobi.sc
+HOST-SUFFIX,huobiasia.vip
+HOST-SUFFIX,huobigroup.com
+HOST-SUFFIX,huobitoken.com
+HOST-SUFFIX,heco-scan.com
+HOST-SUFFIX,hecoview.com
+HOST-SUFFIX,hbfile.net
+HOST-SUFFIX,huobi.br.com
+HOST-SUFFIX,bitderiv.com
+HOST-SUFFIX,hecochain.com
+HOST-SUFFIX,huobi.ws
+HOST-SUFFIX,huobi.ug
+HOST-SUFFIX,huobi.co.ma
+HOST-SUFFIX,huobi.br.com
+HOST-KEYWORD,huobi
+HOST-KEYWORD,hbfile
+
+# ── MEXC ──
+HOST,futures.greentreeone.com
+HOST-SUFFIX,mexc.com
+HOST-SUFFIX,mexcsensors.com
+HOST-SUFFIX,gotoda.co
+HOST-SUFFIX,greentreeone.com
+HOST-SUFFIX,mocortech.com
+HOST-SUFFIX,365huo.xyz
+
+# ── Pionex ──
+HOST-SUFFIX,pionex.com
+HOST-SUFFIX,picolzh.com
+HOST-SUFFIX,picol.com
+HOST-SUFFIX,pioneerex.org
 
 # ── TokenPocket ──
 HOST-KEYWORD,tokenpocket
