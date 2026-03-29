@@ -184,11 +184,15 @@ DOMAIN-SUFFIX,pionex.com
 DOMAIN-SUFFIX,picolzh.com
 DOMAIN-SUFFIX,picol.com
 DOMAIN-SUFFIX,pioneerex.org
+DOMAIN-KEYWORD,pionex
+DOMAIN-KEYWORD,pioneerex
 
 # ── TokenPocket ──
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,mytokenpocket.vip
 DOMAIN-KEYWORD,tokenpocket
+DOMAIN-KEYWORD,dapp
+DOMAIN-KEYWORD,rpc
 
 # ── TradingView ──
 DOMAIN-SUFFIX,tradingview.com
