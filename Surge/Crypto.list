@@ -186,7 +186,9 @@ DOMAIN-SUFFIX,picol.com
 DOMAIN-SUFFIX,pioneerex.org
 
 # ── TokenPocket ──
+DOMAIN-SUFFIX,mytokenpocket.vip
 DOMAIN-KEYWORD,tokenpocket
 
 # ── TradingView ──
+DOMAIN-SUFFIX,tradingview.com
 DOMAIN-KEYWORD,tradingview
