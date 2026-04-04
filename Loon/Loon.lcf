@@ -39,7 +39,6 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 机场名称 = 你的订阅地址,parser-enabled = true,udp=true,block-quic=default,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
-Built = NameRegex,Local, FilterKey = "Built"
 Hong Kong = NameRegex, FilterKey = "🇭🇰|香港"
 United States = NameRegex, FilterKey = "🇺🇸|美国"
 Taiwan = NameRegex, FilterKey = "🇨🇳|台湾"
@@ -78,15 +77,14 @@ DOMAIN-KEYWORD,96110,REJECT
 FINAL,Auto
 
 [Remote Rule]
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/YouTube/YouTube.list, policy=Media, tag=YouTube, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Twitter/Twitter.list, policy=Media, tag=Twitter, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/TikTok/TikTok.list, policy=Tiktok, tag=TikTok, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Whatsapp/Whatsapp.list, policy=Chat, tag=WhatsApp, enabled=true
-https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Loon/Telegram/Telegram.list, policy=Chat, tag=Telegram, enabled=true
+https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
+https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
+https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
+https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
 https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AI.list, policy=AI, tag=AIGC, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AppleAll.list, policy=Apple, tag=Apple, enabled=true
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/LAN.list, policy=DIRECT, tag=LAN, enabled=true
+https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
+https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
+https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=LAN, enabled=true
 https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list, policy=DIRECT, tag=ChinaASN, enabled=true
 
 [Host]
