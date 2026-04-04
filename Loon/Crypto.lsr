@@ -1,11 +1,13 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr
 
+DOMAIN-KEYWORD,dapp
+DOMAIN-KEYWORD,web3
+DOMAIN-KEYWORD,wallet
+
 # ── TokenPocket ──
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,mytokenpocket.vip
-DOMAIN-KEYWORD,tokenpocket
-DOMAIN-KEYWORD,dapp
 
 # ── TradingView ──
 DOMAIN-SUFFIX,tradingview.com
