@@ -1,5 +1,5 @@
 # Crypto
-# URL:https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr
+# URL:https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lcf
 
 # ── Binance ──
 DOMAIN,www.binance.com
@@ -184,9 +184,15 @@ DOMAIN-SUFFIX,pionex.com
 DOMAIN-SUFFIX,picolzh.com
 DOMAIN-SUFFIX,picol.com
 DOMAIN-SUFFIX,pioneerex.org
+DOMAIN-KEYWORD,pionex
+DOMAIN-KEYWORD,pioneerex
 
 # ── TokenPocket ──
+DOMAIN-SUFFIX,tokenpocket.pro
+DOMAIN-SUFFIX,mytokenpocket.vip
 DOMAIN-KEYWORD,tokenpocket
+DOMAIN-KEYWORD,dapp
 
 # ── TradingView ──
+DOMAIN-SUFFIX,tradingview.com
 DOMAIN-KEYWORD,tradingview
