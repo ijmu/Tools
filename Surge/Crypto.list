@@ -11,3 +11,6 @@ DOMAIN-SUFFIX,mytokenpocket.vip
 
 # ── TradingView ──
 DOMAIN-SUFFIX,tradingview.com
+
+# ── WEEX ──
+DOMAIN-SUFFIX,weex.com
