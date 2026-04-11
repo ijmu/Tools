@@ -8,6 +8,8 @@ DOMAIN-KEYWORD,wallet
 # ── TokenPocket ──
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,mytokenpocket.vip
+DOMAIN-KEYWORD,tokenpocket
 
 # ── TradingView ──
 DOMAIN-SUFFIX,tradingview.com
+DOMAIN-KEYWORD,tradingview
