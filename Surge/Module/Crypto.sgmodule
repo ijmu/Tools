@@ -1,11 +1,15 @@
 #!name=Crypto (加密货币) 分流
-#!desc=为 Web3、钱包、交易所等提供独立的策略组。
-#!category=RushB
-
-[Proxy Group]
-# 在这里列出你想在加密场景下调用的策略组名称
-Crypto = select, "Proxy", "节点选择", "美国节点", DIRECT
+#!desc=为 Web3、钱包、交易所分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
+#!system=ios
+# 定义参数 Policy，默认值为 Proxy
+#!arguments=Policy=Proxy
 
 [Rule]
-# 你可以替换为你原配置里的 Crypto 规则链接
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Crypto/Crypto.list,Crypto
+# TokenPocket 专属规则
+DOMAIN-SUFFIX,tokenpocket.pro,%Policy%
+DOMAIN-SUFFIX,tp.xyz,%Policy%
+DOMAIN-SUFFIX,mytokenpocket.vip,%Policy%
+DOMAIN-SUFFIX,tpwallet.io,%Policy%
+DOMAIN-KEYWORD,tokenpocket,%Policy%
+# 通用加密货币规则集
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Crypto/Crypto.list,%Policy%
