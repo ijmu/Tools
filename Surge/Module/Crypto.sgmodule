@@ -2,7 +2,7 @@
 #!desc=为 Web3、钱包、交易所分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
 #!system=ios
 # 定义参数 Policy，默认值为 Proxy
-#!arguments=Policy=Proxy
+#!arguments=Policy=Auto
 
 [Rule]
 # TokenPocket 专属规则
