@@ -1,13 +1,11 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/Surge/Crypto.list
 
-DOMAIN-KEYWORD,dapp
-DOMAIN-KEYWORD,web3
-DOMAIN-KEYWORD,wallet
-
 # ── TokenPocket ──
 DOMAIN-SUFFIX,tokenpocket.pro
+DOMAIN-SUFFIX,tp.xyz
 DOMAIN-SUFFIX,mytokenpocket.vip
+DOMAIN-SUFFIX,tpwallet.io
 DOMAIN-KEYWORD,tokenpocket
 
 # ── TradingView ──
