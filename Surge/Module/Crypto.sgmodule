@@ -2,15 +2,9 @@
 #!desc=为 Web3、钱包、交易所分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
 #!system=ios
 #!category=薄荷朴乐思
-# 定义参数 Policy，默认值为 Proxy
-#!arguments=Policy=Auto
+#!arguments=播放器名称:lenna, 自定义Scheme:完整的URLscheme, URL编码:auto
+#!arguments-desc=播放器支持: lenna, SenPlayer, SenPlayer-dl, Infuse, Fileball, VidHub, Alook, VLC, KMPlayer, IINA, NPlayer, Safari\n自定义Scheme优先级最高，例如: myplayer://play?url=\nURL编码: auto(自动), yes(强制编码), no(不编码)\n\n推荐使用BoxJS配置，无需填写参数！\nBoxJS订阅: https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/pear.boxjs.json
 
 [Rule]
-# TokenPocket 专属规则
-DOMAIN-SUFFIX,tokenpocket.pro,%Policy%
-DOMAIN-SUFFIX,tp.xyz,%Policy%
-DOMAIN-SUFFIX,mytokenpocket.vip,%Policy%
-DOMAIN-SUFFIX,tpwallet.io,%Policy%
-DOMAIN-KEYWORD,tokenpocket,%Policy%
-# 通用加密货币规则集
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Crypto/Crypto.list,%Policy%
+
+,%Policy%
