@@ -6,5 +6,4 @@
 #!arguments-desc=播放器支持: lenna, SenPlayer, SenPlayer-dl, Infuse, Fileball, VidHub, Alook, VLC, KMPlayer, IINA, NPlayer, Safari\n自定义Scheme优先级最高，例如: myplayer://play?url=\nURL编码: auto(自动), yes(强制编码), no(不编码)\n\n推荐使用BoxJS配置，无需填写参数！\nBoxJS订阅: https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/pear.boxjs.json
 
 [Rule]
-
-,%Policy%
+RULE-SET,https://github.com/ijmu/Tools/raw/main/Surge/List/Crypto.list,%Policy%
