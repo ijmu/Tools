@@ -1,0 +1,11 @@
+#!name=Crypto (加密货币) 分流
+#!desc=为 Web3、钱包、交易所等提供独立的策略组。
+#!system=ios
+
+[Proxy Group]
+# 自动抓取所有节点供选择
+Crypto = select, DIRECT, Proxy, policy-regex-filter=.*
+
+[Rule]
+# 你可以替换为你原配置里的 Crypto 规则链接
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Crypto/Crypto.list,Crypto
