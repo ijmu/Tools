@@ -2,8 +2,7 @@
 #!desc=为 Web3、钱包、交易所分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
 #!system=ios
 #!category=薄荷朴乐思
-#!arguments=播放器名称:lenna, 自定义Scheme:完整的URLscheme, URL编码:auto
-#!arguments-desc=播放器支持: lenna, SenPlayer, SenPlayer-dl, Infuse, Fileball, VidHub, Alook, VLC, KMPlayer, IINA, NPlayer, Safari\n自定义Scheme优先级最高，例如: myplayer://play?url=\nURL编码: auto(自动), yes(强制编码), no(不编码)\n\n推荐使用BoxJS配置，无需填写参数！\nBoxJS订阅: https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/pear.boxjs.json
-
+#!arguments=Policy:type=select,options=Auto|DIRECT|HK|US|TW|JP|SG|UK|DE|PH|TR|NG,default=Auto
+#!arguments-desc=Policy: 请在下拉菜单中选择 Crypto 模块要使用的策略组
 [Rule]
 RULE-SET,https://github.com/ijmu/Tools/raw/main/Surge/List/Crypto.list,%Policy%
