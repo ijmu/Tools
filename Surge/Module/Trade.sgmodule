@@ -1,0 +1,13 @@
+#!name=Trade (金融交易) 分流
+#!desc=为传统金融、股票券商等交易软件提供独立的策略组。
+#!system=ios
+
+[Proxy Group]
+# 自动抓取所有节点供选择
+Trade = select, DIRECT, Proxy, policy-regex-filter=.*
+
+[Rule]
+# 这里预留了位置，请将你 Surge.conf 中对应 trade 的规则行（DOMAIN-SUFFIX 或 RULE-SET）直接粘贴到下方，并将策略指向 Trade
+# 例如：
+# RULE-SET,https://example.com/rule/trade.list,Trade
+# DOMAIN-SUFFIX,futu5.com,Trade
