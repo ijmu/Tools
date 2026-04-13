@@ -2,7 +2,7 @@
 #!desc=为 Web3、钱包、交易所分流。
 #!system=ios
 #!category=薄荷朴乐思
-#!arguments=Policy=Proxy
+#!arguments=Policy=Crypto
 #!arguments-desc=Policy: 策略组名称（默认为 Proxy，可手动修改为 Auto、HK 等）
 
 [Rule]
