@@ -1,6 +1,6 @@
 #!name=Crypto (加密货币) 分流
 #!desc=为 Web3、钱包、交易所等提供独立的策略组。
-#!system=ios
+#!category=Own Used
 
 [Proxy Group]
 # 自动抓取所有节点供选择
