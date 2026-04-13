@@ -6,4 +6,4 @@
 #!arguments-desc=Policy: 策略组名称（默认为 Proxy，可手动修改为 Auto、HK 等）
 
 [Rule]
-RULE-SET,https://github.com/ijmu/Tools/raw/main/Surge/List/Crypto.list,%Policy%
+RULE-SET,https://github.com/ijmu/Tools/raw/main/Surge/List/Crypto.list
