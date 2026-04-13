@@ -1,11 +1,8 @@
 #!name=Pay (支付) 分流
-#!desc=为支付相关服务独立分流，允许自由选择代理节点或直连。
+#!desc=为支付服务分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
 #!system=ios
-
-[Proxy Group]
-# 自动抓取所有节点供选择，默认选项包含 DIRECT
-Pay = select, DIRECT, Proxy, policy-regex-filter=.*
+# 定义参数 Policy，默认值为 Proxy
+#!arguments=Policy=Proxy
 
 [Rule]
-# 你可以替换为你原配置里的 Pay 规则链接
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list,Pay
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/PayPal/PayPal.list,%Policy%
