@@ -1,10 +1,10 @@
 #!name=Crypto (加密货币) 分流
 #!desc=为 Web3、钱包、交易所等提供独立的策略组。
-#!category=Own Used
+#!category=RushB
 
 [Proxy Group]
-# 自动抓取所有节点供选择
-Crypto = select, DIRECT, Proxy, policy-regex-filter=.*
+# 在这里列出你想在加密场景下调用的策略组名称
+Crypto = select, "Proxy", "节点选择", "美国节点", DIRECT
 
 [Rule]
 # 你可以替换为你原配置里的 Crypto 规则链接
