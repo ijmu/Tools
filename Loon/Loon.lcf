@@ -57,6 +57,7 @@ AI = select,Auto,US,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://ra
 Crypto = select,Auto,HK,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 Chat = select,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
 Media = select,Auto,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+Trade = select,Auto,HK,US,TW,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/USDT.png
 Tiktok = select,Auto,US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
 HK = url-test,Hong Kong,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
 US = url-test,United States,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
@@ -81,6 +82,7 @@ https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
 https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
+https://github.com/ijmu/Tools/raw/main/Loon/Trade.lsr, policy=Trade, tag=Trade, enabled=true
 https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
 https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
@@ -99,9 +101,9 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=�
 
 [Plugin]
 https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/insav.tv.lpx, tag=insav, enabled=true
-https://rucu6.pages.dev/Plugins/weibo.lpx, tag=Weibo, enabled=true
-https://rucu6.pages.dev/Plugins/xiaohongshu.lpx, tag=小红书, enabled=true
-https://rucu6.pages.dev/Plugins/bilibili.lpx, tag=哔哩哔哩, enabled=true
+https://rucu6.pages.dev/Plugins/weibo.lpx, tag=Weibo, enabled=false
+https://rucu6.pages.dev/Plugins/xiaohongshu.lpx, tag=小红书, enabled=false
+https://rucu6.pages.dev/Plugins/bilibili.lpx, tag=哔哩哔哩, enabled=false
 https://rucu6.pages.dev/Plugins/youtube.lpx, tag=YouTube, enabled=true
 https://rucu6.pages.dev/Plugins/webpage.lpx, policy=Auto, tag=WebPages, enabled=false
 https://rucu6.pages.dev/Plugins/myblockads.lpx, tag=MyBlockAds, enabled=false
