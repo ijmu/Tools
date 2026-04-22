@@ -1,0 +1,22 @@
+# > TokenPocket 官方主站及备用域名
+HOST-SUFFIX,tokenpocket.pro
+HOST-SUFFIX,tokenpocket.vip
+HOST-SUFFIX,tokenpocket.net
+HOST-SUFFIX,tpwallet.io
+HOST-SUFFIX,tp.xyz
+
+# > TokenPocket 服务端节点、API 及静态资源 (RPC节点、价格数据、DApp图标等)
+HOST-SUFFIX,tp-node.com
+HOST-SUFFIX,tp-api.com
+HOST-SUFFIX,tp-statics.com
+
+# > TokenPocket 开发者文档与 GitHub Pages
+HOST-SUFFIX,tokenpocket.github.io
+HOST-SUFFIX,tp-lab.github.io
+
+# > Transit Swap (TokenPocket 官方内置跨链桥与去中心化交易聚合器)
+HOST-SUFFIX,transit.finance
+
+# > 关键字泛匹配兜底
+HOST-KEYWORD,tokenpocket
+HOST-KEYWORD,tpwallet
