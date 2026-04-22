@@ -2,7 +2,7 @@
 # IP 模式: ipv4-only / dual / ipv4-preferred / ipv6-preferred
 ip-mode = v4-only
 # DNS 服务，system 表示系统自带 DNS 服务器
-dns-server = 223.5.5.5,8.8.8.8
+dns-server = 223.5.5.5,119.29.29.29
 allow-wifi-access = true
 wifi-access-http-port = 7222
 wifi-access-socks5-port = 7221
@@ -56,6 +56,7 @@ Apple = select,DIRECT,Auto,US,img-url = https://raw.githubusercontent.com/lige47
 AI = select,Auto,US,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/grok.png
 Crypto = select,Auto,HK,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 Chat = select,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
+Game = select,Auto,HK,US,TW,JP,SG,img-url = gamecontroller
 Media = select,Auto,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
 Trade = select,Auto,HK,US,TW,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/USDT.png
 Tiktok = select,Auto,US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
@@ -78,12 +79,13 @@ DOMAIN-KEYWORD,96110,REJECT
 FINAL,Auto
 
 [Remote Rule]
+https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/HonorOfKings.list, policy=Game, tag=HOK, enabled=true
 https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
 https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
-https://github.com/ijmu/Tools/raw/main/Loon/Trade.lsr, policy=Trade, tag=Trade, enabled=true
-https://github.com/ijmu/Tools/raw/main/Loon/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
+https://github.com/ijmu/Tools/raw/main/Loon/List/Trade.lsr, policy=Trade, tag=Trade, enabled=true
+https://github.com/ijmu/Tools/raw/main/Loon/List/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
 https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
 https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
 https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=LAN, enabled=true
@@ -100,6 +102,7 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
+https://raw.githubusercontent.com/Amlabort/MY_clash/refs/heads/main/files/lpx/spot-NoAd.lpx, tag=Spotify, enabled=true
 https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/insav.tv.lpx, tag=insav, enabled=true
 https://rucu6.pages.dev/Plugins/weibo.lpx, tag=Weibo, enabled=false
 https://rucu6.pages.dev/Plugins/xiaohongshu.lpx, tag=小红书, enabled=false
