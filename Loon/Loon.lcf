@@ -56,9 +56,8 @@ Apple = select,DIRECT,Auto,US,img-url = https://raw.githubusercontent.com/lige47
 AI = select,Auto,US,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/grok.png
 Crypto = select,Auto,HK,TW,JP,SG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 Chat = select,Auto,HK,US,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/whatsapp(1).png
-Game = select,Auto,HK,US,TW,JP,SG,img-url = gamecontroller
 Media = select,Auto,HK,US,TR,NG,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-Trade = select,Auto,HK,US,TW,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/USDT.png
+Spotify = select,Auto,HK,US,TW,PH,TR,NG,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
 Tiktok = select,Auto,US,TW,JP,url = http://1.1.1.1/generate_204,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
 HK = url-test,Hong Kong,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
 US = url-test,United States,url = http://1.1.1.1/generate_204,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
@@ -79,13 +78,11 @@ DOMAIN-KEYWORD,96110,REJECT
 FINAL,Auto
 
 [Remote Rule]
-https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/HonorOfKings.list, policy=Game, tag=HOK, enabled=true
 https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
-https://rule.kelee.one/Loon/YouTube.lsr, policy=Media, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/Twitter.lsr, policy=Media, tag=Twitter, enabled=true
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Chat, tag=Telegram, enabled=true
-https://github.com/ijmu/Tools/raw/main/Loon/List/Trade.lsr, policy=Trade, tag=Trade, enabled=true
-https://github.com/ijmu/Tools/raw/main/Loon/List/Crypto.lsr, policy=Crypto, tag=Crypto, enabled=true
+https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=true
+https://github.com/ijmu/Tools/raw/main/Loon/List/Pionex.lsr, policy=Crypto, tag=Pionex, enabled=true
 https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AIGC, enabled=true
 https://rule.kelee.one/Loon/Apple.lsr, policy=Apple, tag=Apple, enabled=true
 https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=LAN, enabled=true
@@ -102,16 +99,13 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
-https://raw.githubusercontent.com/Amlabort/MY_clash/refs/heads/main/files/lpx/spot-NoAd.lpx, tag=Spotify, enabled=true
 https://raw.githubusercontent.com/Yu9191/Rewrite/refs/heads/main/insav.tv.lpx, tag=insav, enabled=true
-https://rucu6.pages.dev/Plugins/weibo.lpx, tag=Weibo, enabled=false
-https://rucu6.pages.dev/Plugins/xiaohongshu.lpx, tag=小红书, enabled=false
-https://rucu6.pages.dev/Plugins/bilibili.lpx, tag=哔哩哔哩, enabled=false
+https://raw.githubusercontent.com/Yu9191/NeteasemusicAd/main/wyy.lpx, tag=wyyyy, enabled=false
+https://raw.githubusercontent.com/Amlabort/MY_clash/refs/heads/main/files/lpx/spot-NoAd.lpx, tag=Spotify, enabled=false
+https://rucu6.pages.dev/Plugins/bilibili.lpx, policy=Auto, tag=哔哩哔哩, enabled=true
 https://rucu6.pages.dev/Plugins/youtube.lpx, tag=YouTube, enabled=true
-https://rucu6.pages.dev/Plugins/webpage.lpx, policy=Auto, tag=WebPages, enabled=false
-https://rucu6.pages.dev/Plugins/myblockads.lpx, tag=MyBlockAds, enabled=false
-https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, tag=Sub-Store, enabled=false
-https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, tag=BoxJs, enabled=false
+https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, policy=Auto, tag=Sub-Store, enabled=false
+https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=Auto, tag=BoxJs, enabled=false
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, tag=广告平台拦截器, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, tag=HTTPDNS拦截器, pin=true, enabled=true
 https://github.com/NSRingo/WeatherKit/releases/latest/download/iRingo.WeatherKit.plugin, tag=Weather, pin=true, enabled=true
