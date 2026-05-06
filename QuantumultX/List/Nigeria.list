@@ -1,0 +1,144 @@
+# Nigeria Bank
+
+# ALAT BY WEMA
+HOST,apibox.alat.ng
+HOST,abujaralatsignalr.azurewebsites.net
+HOST-SUFFIX,alat.ng
+HOST-SUFFIX,altbank.ng
+HOST-KEYWORD,alat
+
+# Access
+HOST-SUFFIX,accessbankplc.com
+HOST-KEYWORD,accessbankplc
+
+# BlinkCash
+HOST-SUFFIX,blinkcash.no
+
+# Busha
+HOST-SUFFIX,busha.team
+HOST-KEYWORD,busha
+
+# Chipper Cash
+HOST,compliance.chippercash.com
+HOST,auth.chippercash.com
+HOST,api.chippercash.com
+HOST-SUFFIX,chippercash.com
+HOST-KEYWORD,chippercash
+
+# Cabon
+HOST,api.paylater.ng
+HOST,salesiq.zoho.com
+HOST,vts.zohopublic.com
+HOST-SUFFIX,paylater.ng
+HOST-SUFFIX,zoho.com
+HOST-SUFFIX,zohopublic.com
+
+# CashEx
+HOST,www.cashex.app
+HOST,cashex-gateway-34bf7qxe.ue.gateway.dev
+HOST-SUFFIX,cashex.app
+HOST-KEYWORD,cashex
+
+# Cardtonic
+HOST-SUFFIX,cardtonic.com
+
+# Flutterwave
+HOST-SUFFIX,flutterwave.com
+HOST-KEYWORD,flutterwave
+
+# GT
+HOST-SUFFIX,gtbank.com
+HOST-KEYWORD,gtbank
+
+# Globus
+HOST-SUFFIX,globusbank.com
+HOST-KEYWORD,globusbank
+
+# Klasha
+HOST-SUFFIX,kcookery.com
+
+# Kredi
+HOST-SUFFIX,lendsqr.com
+HOST-SUFFIX,obscudo.com
+
+# KUDA
+HOST,retailapigateway.kuda.com
+HOST-SUFFIX,kuda.com
+HOST-SUFFIX,kudabank.com
+HOST-KEYWORD,kuda
+HOST-KEYWORD,kudabank
+
+# LOMA
+HOST-SUFFIX,lomabank.com
+HOST-KEYWORD,lomabank
+
+# Luno
+HOST-SUFFIX,luno.com
+
+# Moniepoint
+HOST-SUFFIX,mab.console.teamapt.com
+HOST-SUFFIX,moniepoint.com
+
+# NALA
+HOST-SUFFIX,nala.ninja
+HOST-SUFFIX,nala-api.com
+
+# Opay
+HOST-SUFFIX,opayweb.com
+
+# One Bank
+HOST-SUFFIX,sterling.ng
+HOST-SUFFIX,netcoresmartech.com
+HOST-SUFFIX,onesignal.com
+
+# PocketApp
+HOST,api.okhi.io
+HOST,pocketapp.com
+HOST,www.polarisbanklimited.com
+HOST-SUFFIX,okhi.io
+HOST-SUFFIX,pocketapp.com
+HOST-SUFFIX,polarisbanklimited.com
+HOST-KEYWORD,okhi
+HOST-KEYWORD,pocketapp
+HOST-KEYWORD,polarisbanklimited
+
+# Quidax
+HOST,98fl44-gcdsdk.appsflyersdk.com
+HOST-SUFFIX,quidax.io
+HOST-KEYWORD,quidax
+
+# Roqqu
+HOST-SUFFIX,roqqupay.com
+
+# Remitano
+HOST-SUFFIX,remitano.com
+HOST-SUFFIX,remitano.net
+
+# Sterling
+HOST-SUFFIX,sterling.ng
+HOST-KEYWORD,sterling
+HOST-KEYWORD,onebank
+
+# Stateside Bank
+HOST-SUFFIX,statesidebank.com
+
+# SparkleApp
+HOST,sparkleapp.com
+HOST,apigateway.sparkleapp.in
+HOST-SUFFIX,sparkleapp.com
+HOST-SUFFIX,sparkleapp.in
+
+# Spenda
+HOST-SUFFIX,spenda.africa
+HOST-KEYWORD,spenda
+
+# Titan
+HOST-SUFFIX,titantrustbank.com
+HOST-KEYWORD,titantrustbank
+
+# VBank
+HOST-SUFFIX,vbank.ng
+HOST-SUFFIX,vfdbank.systems
+
+# Wema
+HOST-SUFFIX,wemabank.com
