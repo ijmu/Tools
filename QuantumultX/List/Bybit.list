@@ -1,41 +1,41 @@
 # > Bybit
 
 # --- EU & Global ---
-DOMAIN-SUFFIX,bybit.com
-DOMAIN-SUFFIX,bybit.eu
-DOMAIN-SUFFIX,bybit-eu.com
-DOMAIN-SUFFIX,bybit.nl
-DOMAIN-SUFFIX,bybit.fr
-DOMAIN-SUFFIX,bybit.io
-DOMAIN-SUFFIX,bybit.net
-DOMAIN-SUFFIX,bybit.biz
-DOMAIN-SUFFIX,bybit.org
-DOMAIN-SUFFIX,bybit.cloud
-DOMAIN-SUFFIX,bybitapi.com
-DOMAIN-SUFFIX,bybit-static.com
-DOMAIN-SUFFIX,bybitglobal.com
-DOMAIN-SUFFIX,bybit-global.com
-DOMAIN-SUFFIX,bytick.com
-DOMAIN-SUFFIX,byapps.net
+HOST-SUFFIX,bybit.com
+HOST-SUFFIX,bybit.eu
+HOST-SUFFIX,bybit-eu.com
+HOST-SUFFIX,bybit.nl
+HOST-SUFFIX,bybit.fr
+HOST-SUFFIX,bybit.io
+HOST-SUFFIX,bybit.net
+HOST-SUFFIX,bybit.biz
+HOST-SUFFIX,bybit.org
+HOST-SUFFIX,bybit.cloud
+HOST-SUFFIX,bybitapi.com
+HOST-SUFFIX,bybit-static.com
+HOST-SUFFIX,bybitglobal.com
+HOST-SUFFIX,bybit-global.com
+HOST-SUFFIX,bytick.com
+HOST-SUFFIX,byapps.net
 
-# --- Sub-brands & Obfuscated Domains ---
-DOMAIN-SUFFIX,byabcde.com
-DOMAIN-SUFFIX,byd3c3.com
-DOMAIN-SUFFIX,bybdc6.com
-DOMAIN-SUFFIX,byffbb.com
-DOMAIN-SUFFIX,bycsi.com
-DOMAIN-SUFFIX,by-csi.com
-DOMAIN-SUFFIX,bitverse.zone
+# --- Sub-brands & Obfuscated HOSTs ---
+HOST-SUFFIX,byabcde.com
+HOST-SUFFIX,byd3c3.com
+HOST-SUFFIX,bybdc6.com
+HOST-SUFFIX,byffbb.com
+HOST-SUFFIX,bycsi.com
+HOST-SUFFIX,by-csi.com
+HOST-SUFFIX,bitverse.zone
 
 # --- Keywords ---
-DOMAIN-KEYWORD,bybit
-DOMAIN-KEYWORD,bybitglobal
-DOMAIN-KEYWORD,bybit-global
+HOST-KEYWORD,bybit
+HOST-KEYWORD,bybitglobal
+HOST-KEYWORD,bybit-global
 
 # --- Specific Endpoints & Third-party ---
-DOMAIN,api-eu.bybit.com
-DOMAIN,sc-datasink.ffe390afd658c19dcbf707e0597b846d.de
-DOMAIN,api.ffbbbdc6d3c353211fe2ba39c9f744cd.com
-DOMAIN,m3ond3-launches.appsflyersdk.com
-DOMAIN,relay.walletconnect.com
-DOMAIN-SUFFIX,ada.support
+HOST,api-eu.bybit.com
+HOST,sc-datasink.ffe390afd658c19dcbf707e0597b846d.de
+HOST,api.ffbbbdc6d3c353211fe2ba39c9f744cd.com
+HOST,m3ond3-launches.appsflyersdk.com
+HOST,relay.walletconnect.com
+HOST-SUFFIX,ada.support
