@@ -1,0 +1,9 @@
+# 盈透证券
+
+HOST-SUFFIX,ibllc.com
+HOST-SUFFIX,ibkr.com
+HOST-SUFFIX,interactivebrokers.com.hk
+HOST-SUFFIX,interactivebrokers.com
+HOST-KEYWORD,interactivebrokers
+HOST-KEYWORD,ibkr
+USER-AGENT,interactivebrokers*
