@@ -1,0 +1,91 @@
+# HK bank
+
+# 众安银行
+HOST,bank.za.group
+HOST,cdn.zaticdn.com
+HOST,alicdn.zaticdn.com
+HOST,zaip-aic.za.group
+HOST,athena.za.group
+HOST,xman-xflow-sdk.za.group
+HOST-SUFFIX,za.group
+HOST-SUFFIX,zaticdn.com
+HOST-SUFFIX,zajourney.com
+
+# 理慧银行
+HOST,mcxymt1vz-smy-nsfkm9-07xj6-8.device.marketingcloudapis.com
+HOST-SUFFIX,livibank.com
+HOST-KEYWORD,livibank
+
+# 中银（香港）
+HOST-SUFFIX,etnet.com.hk
+HOST-SUFFIX,bochk.com
+HOST-SUFFIX,bochkonline.com
+HOST-KEYWORD,bochk
+
+# 滙丰香港
+HOST,lptag.liveperson.net
+HOST,collect-ap-northeast-1.tealiumiq.com
+HOST,visitor-service-ap-northeast-1.tealiumiq.com
+HOST,lpcdn.lpsnmedia.net
+HOST,cdn.hsbc.com.hk
+HOST,log-58144bf0.we-stats.com
+HOST,mobile.eum-appdynamics.com
+HOST,tags.tiqcdn.com
+HOST,cdn.appdynamics.com
+HOST,eapi.preferences.prod.ap-east-1.vam-hk.cloud1.vv1865.com
+HOST-SUFFIX,hsbc.com.hk
+HOST-SUFFIX,tealiumiq.com
+HOST-KEYWORD,hsbc
+
+# 恒生香港
+HOST-SUFFIX,hangseng.com
+HOST-KEYWORD,hangseng
+
+# 花旗香港
+HOST-SUFFIX,citibank.com.hk
+
+# HKMU
+HOST-SUFFIX,hkmu.edu.hk
+HOST-KEYWORD,hkmu
+
+# 天星银行
+HOST-SUFFIX,airstarbank.com
+HOST-KEYWORD,airstarbank
+
+# 交银香港
+HOST-SUFFIX,hk.bankcomm.com
+
+# 富邦香港
+HOST-SUFFIX,fusionbank.com
+
+# MOX香港
+HOST-SUFFIX,prod-mox.com
+HOST-SUFFIX,mox.com
+HOST-KEYWORD,mox
+
+# Tap N Go
+HOST-SUFFIX,tapngo.com.hk
+HOST-KEYWORD,tapngo
+
+# 渣打银行
+HOST-SUFFIX,sc.com
+HOST-KEYWORD,standchartbank
+
+# 信银国际
+HOST-SUFFIX,cncbinternational.com
+HOST-KEYWORD,cncbinternational
+
+# 汇立银行
+HOST-SUFFIX,welab.bank
+HOST-KEYWORD,welab
+
+# Futu富途
+HOST,v1d3dx-skadsdkless.appsflyersdk.com
+HOST-SUFFIX,futu5.com
+HOST-SUFFIX,futunn.com
+HOST-SUFFIX,futuhn.com
+HOST-KEYWORD,futu
+
+# Clubsim
+HOST-SUFFIX,clubsim.com.hk
+HOST-SUFFIX,pccw.com
