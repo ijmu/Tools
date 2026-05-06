@@ -1,0 +1,86 @@
+# UK Service
+
+# Babb
+HOST-SUFFIX,getbabb.com
+
+# Blockchain
+HOST,h8jurz-skadsdkless.appsflyersdk.com
+HOST,ezp90twkd8ytqadkcy96nc0l38f6a87k.d.sardine.ai
+HOST-SUFFIX,blockchain.info
+HOST-SUFFIX,blockchain.com
+HOST-KEYWORD,blockchain
+
+# Capitalone
+HOST-SUFFIX,capitalone.co.uk
+
+# Cashplus
+HOST-SUFFIX,cashplus.com
+
+# Chaes 
+HOST-SUFFIX,chase.co.uk
+
+# Clearscore
+HOST-SUFFIX,clearscore.com
+
+# Citibank
+HOST-SUFFIX,citibank.co.uk
+
+# Deutsche Bank
+HOST-SUFFIX,db.com
+
+# ee
+HOST-SUFFIX,ee.co.uk
+
+# Equifax
+HOST-SUFFIX,equifax.co.uk
+
+# Halifax
+HOST-SUFFIX,halifax-online.co.uk
+
+# Hyperjar
+HOST-SUFFIX,hyperjar.com
+HOST-SUFFIX,hyperjardev.com
+
+# ipcheck
+HOST,ptest-7.ipcheck.ing
+
+# Kroo
+HOST-SUFFIX,kroo.com
+
+# Monzo
+HOST-SUFFIX,monzo.com
+HOST-SUFFIX,monzo-alt.net
+
+# Nala
+HOST-SUFFIX,nala.ninja
+HOST-SUFFIX,nala-api.com
+HOST-SUFFIX,nala.com
+
+# Sumup
+HOST-SUFFIX,sumup.io
+HOST-KEYWORD,sumup
+
+# Trading212
+HOST,yrkm8m-launches.appsflyersdk.com
+HOST,trading212equities.s3.eu-central-1.amazonaws.com
+HOST-SUFFIX,trading212.com
+HOST-KEYWORD,trading212
+
+# Tsb
+HOST-SUFFIX,tsb.co.uk
+
+# Vodafone
+HOST-SUFFIX,vodafone.co.uk
+
+# Worldremit
+HOST-SUFFIX,worldremit.com
+
+# Yonder
+HOST,tcqe0qwu-ios.mobile-messenger.eu.intercom.io
+HOST,o438986.ingest.sentry.io
+HOST,o2129.ingest.sentry.io
+HOST-SUFFIX,yondercard.com
+
+# Zilch
+HOST-SUFFIX,zilch.com
+HOST-SUFFIX,payzilch.com
