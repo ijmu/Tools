@@ -1,0 +1,196 @@
+# Turkey Service
+
+# Ahlpay
+HOST,api64.ipify.org
+HOST,ahlatcistrg.blob.core.windows.net
+HOST-SUFFIX,ahlpay.com.tr
+
+# Colendibank
+HOST,o4509190758662144.ingest.de.sentry.io
+HOST-SUFFIX,colendibank.com
+
+# Epic
+HOST-SUFFIX,razer.com
+
+# EPIN services
+HOST-SUFFIX,epin.com.tr
+HOST,www.epin.com.tr
+HOST,epin-cdn.s3.eu-central-1.amazonaws.com
+HOST,epin-static.ams3.digitaloceanspaces.com
+HOST,inter-vpos.com.tr
+HOST-KEYWORD,epin-cdn
+HOST-KEYWORD,epin-static
+
+# Fastpay
+HOST,fastpay.com.tr
+HOST-SUFFIX,fastpay.com.tr
+
+# Fups
+HOST-SUFFIX,fups.com
+HOST-KEYWORD,fups
+
+# Gaijin
+HOST-SUFFIX,gaijin.net
+
+# GPay
+HOST,gpay.com.tr
+HOST-SUFFIX,gpay.com.tr
+
+# Hadi
+HOST,app.tr.adjust.com
+HOST-SUFFIX,tombank.com.tr
+HOST-SUFFIX,tomdigital.com.tr
+HOST-KEYWORD,tombank
+HOST-KEYWORD,hadi
+
+# Hayhay
+HOST-SUFFIX,hayhaycuzdan.com
+HOST-KEYWORD,hayhay
+
+# ininal
+HOST-SUFFIX,ininal.com
+HOST-KEYWORD,ininal
+
+# Isbank and related services
+HOST,isbank.com.tr
+HOST-SUFFIX,isbank.com.tr
+HOST,vpos2.isbank.com.tr
+HOST-SUFFIX,vpos2.isbank.com.tr
+
+# iyzico and related services
+HOST,static.iyzipay.com
+HOST,countly.iyzico.com
+HOST,lb.iyzico.com
+HOST-KEYWORD,iyzipay
+HOST-SUFFIX,iyzipay.com
+HOST-KEYWORD,iyzico
+HOST-SUFFIX,iyzico.com
+
+# iyzipay API and services
+HOST,iyzipay.com
+HOST-SUFFIX,iyzipay.com
+HOST,api.iyzipay.com
+HOST-SUFFIX,api.iyzipay.com
+
+# Letim
+HOST,letim.birlesikodeme.com
+HOST-KEYWORD,letim
+
+# Masterpass
+HOST-SUFFIX,masterpassturkiye.com
+
+# Mars
+HOST-SUFFIX,marsneo.com
+HOST-KEYWORD,vsynmu
+
+# Moka
+HOST-SUFFIX,mokaunited.com
+
+# Moneytolia
+HOST-SUFFIX,moneytolia.com
+HOST-KEYWORD,moneytolia
+
+# Other specific HOSTs
+HOST,*.com.tr
+HOST,www.paytr.com
+HOST-SUFFIX,paytr.com
+HOST-SUFFIX,com.tr
+HOST-SUFFIX,tawk.to
+HOST-SUFFIX,trendyol.com
+HOST-SUFFIX,m.trendyol.com
+HOST,pos.payby.me
+HOST-SUFFIX,pos.payby.me
+HOST,denizbank.com
+HOST,*.denizbank.com
+HOST,spos.denizbank.com
+HOST-SUFFIX,denizbank.com
+HOST-SUFFIX,spos.denizbank.com
+
+# Oyunfor
+HOST-SUFFIX,oyunfor.com
+
+# Oyunfor and related HOSTs
+HOST-SUFFIX,oyunfor.com
+
+# Ozan
+HOST-SUFFIX,ozan.com
+HOST-KEYWORD,ozan
+
+# On Mobil
+HOST-SUFFIX,burgan.com.tr
+
+# Papara
+HOST-SUFFIX,papara.com
+HOST-KEYWORD,papara
+
+# Paycell
+HOST-SUFFIX,paycell.com.tr
+
+# Payten 3D Secure
+HOST,3d.payten.com.tr
+HOST-SUFFIX,3d.payten.com.tr
+
+# Poca
+HOST-SUFFIX,birlesikodeme.com
+HOST-KEYWORD,poca
+
+# Popypara
+HOST-SUFFIX,popypara.com
+HOST-KEYWORD,popypara
+
+# Pokus
+HOST-SUFFIX,pokus.com.tr
+
+# S Wallet
+HOST,samsung-wallet.mokaunited.com
+
+# Sipay
+HOST-SUFFIX,walletgate.io
+HOST-KEYWORD,sipay
+
+# Tami
+HOST-SUFFIX,tami.com.tr
+HOST-SUFFIX,garantibbva.com.tr
+HOST-KEYWORD,garantibbva
+
+# Turan
+HOST-SUFFIX,turan.app
+HOST-KEYWORD,turan
+HOST-KEYWORD,jfrp4f
+
+# Turgame
+HOST-SUFFIX,turgame.com
+
+# Turgame and related services
+HOST,turgame.com
+HOST-SUFFIX,turgame.com
+
+# Turkcell
+HOST-SUFFIX,turkcell.com.tr
+HOST-SUFFIX,eturkcell.netmera.com
+
+# Turktelekom
+HOST-SUFFIX,turktelekom.com.tr
+
+# Tutarla
+HOST-SUFFIX,tutarla.com
+
+# Uption
+HOST,analytics.tr.adjust.com
+HOST-SUFFIX,netmera.com
+HOST-SUFFIX,aktifbank.com.tr
+
+# Vodafone Pay
+HOST,vodafonetr.sc.omtrdc.net
+HOST,vpay.vodafone.com.tr
+
+# Verified by Visa 3D Secure
+HOST,aacsw.3ds.verifiedbyvisa.com
+HOST-SUFFIX,aacsw.3ds.verifiedbyvisa.com
+
+# Wist
+HOST-SUFFIX,ist-pay.com
+
+# Zeepay
+HOST-SUFFIX,zeepay.com.tr
+HOST-KEYWORD,zeepay
