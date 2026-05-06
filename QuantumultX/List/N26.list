@@ -1,0 +1,13 @@
+# N26
+
+HOST,n26-admedia.s3.eu-central-1.amazonaws.com
+HOST,sdk.fra-02.braze.eu
+HOST,featureassets.org
+HOST,prodregistryv2.org
+HOST,usercentrics.eu
+HOST-SUFFIX,featureassets.org
+HOST-SUFFIX,prodregistryv2.org
+HOST-SUFFIX,tech26.de
+HOST-SUFFIX,number26.de
+HOST-SUFFIX,n26.com
+HOST-KEYWORD,n26
