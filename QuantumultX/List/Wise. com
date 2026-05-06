@@ -1,0 +1,10 @@
+# Wise
+
+HOST,gtm.wise.com
+HOST,api.moscwise.com
+HOST-SUFFIX,wise.com
+HOST-SUFFIX,moscwise.com
+HOST-SUFFIX,transferwise.com
+HOST-KEYWORD,wise
+HOST-KEYWORD,moscwise
+HOST-KEYWORD,transferwise
