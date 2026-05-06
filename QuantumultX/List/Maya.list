@@ -1,0 +1,13 @@
+# Maya
+
+HOST,940c5ecf154a2dd669454fc022ed18283a8196d9.csftr.com
+HOST-SUFFIX,maya.ph
+HOST-SUFFIX,paymaya.com
+HOST-SUFFIX,mayabank.ph
+HOST-KEYWORD,paymaya
+HOST-KEYWORD,mayabank
+
+# 安全检测
+
+HOST-SUFFIX,voyagerapis.com
+HOST-SUFFIX,voyagerinnovation.com
