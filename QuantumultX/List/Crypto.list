@@ -1,13 +1,6 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Crypto.list
 
-# ── TokenPocket ──
-HOST-SUFFIX,tokenpocket.pro
-HOST-SUFFIX,tp.xyz
-HOST-SUFFIX,mytokenpocket.vip
-HOST-SUFFIX,tpwallet.io
-HOST-KEYWORD,tokenpocket
-
 # ── TradingView ──
 HOST-SUFFIX,tradingview.com
 HOST-KEYWORD,tradingview
