@@ -1,6 +1,10 @@
 # Trade
 # URL:https://github.com/ijmu/Tools/raw/main/Surge/List/Trade.list
 
+# ---  Tradingview ---
+DOMAIN-SUFFIX,tradingview.com
+DOMAIN-KEYWORD,tradingview
+
 # --- MetaQuotes / MT5 ---
 DOMAIN-SUFFIX,mql5.com
 DOMAIN-SUFFIX,metaquotes.net
