@@ -10,3 +10,7 @@ HOST-SUFFIX,pioneerex.org
 # Bybit
 HOST-SUFFIX,bybit.com
 HOST-KEYWORD,bybit
+
+# SafePal
+HOST-SUFFIX,safepal.com
+HOST-KEYWORD,safepal
