@@ -1,17 +1,17 @@
 # Trade
 # URL:https://github.com/ijmu/Tools/raw/main/Surge/List/Trade.list
 
-# ---  Tradingview ---
+# Tradingview
 DOMAIN-SUFFIX,tradingview.com
 DOMAIN-KEYWORD,tradingview
 
-# --- MetaQuotes / MT5 ---
+# MT5
 DOMAIN-SUFFIX,mql5.com
 DOMAIN-SUFFIX,metaquotes.net
 DOMAIN-SUFFIX,metatrader5.com
 DOMAIN-KEYWORD,metaquotes
 
-# --- TMGM (TradeMax) ---
+# TMGM
 DOMAIN-SUFFIX,tmgm.com
 DOMAIN-SUFFIX,tmgm.com.au
 DOMAIN-SUFFIX,tmgm.pro
@@ -19,3 +19,10 @@ DOMAIN-SUFFIX,tmgm.ltd
 DOMAIN-SUFFIX,trademax.com.au
 DOMAIN-SUFFIX,trademax.global
 DOMAIN-KEYWORD,tmgm
+
+# BIT
+DOMAIN-SUFFIX,bit.com
+
+# SafePal
+DOMAIN-SUFFIX,safepal.com
+DOMAIN-KEYWORD,safepal
