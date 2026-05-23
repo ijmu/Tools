@@ -11,3 +11,7 @@ DOMAIN-KEYWORD,tokenpocket
 # ── TradingView ──
 DOMAIN-SUFFIX,tradingview.com
 DOMAIN-KEYWORD,tradingview
+
+# SafePal
+DOMAIN-SUFFIX,safepal.com
+DOMAIN-KEYWORD,safepal
