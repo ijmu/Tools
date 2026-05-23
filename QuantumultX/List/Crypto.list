@@ -1,0 +1,12 @@
+# Crypto
+# URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Crypto.list
+
+# Pionex
+HOST-SUFFIX,pionex.com
+HOST-SUFFIX,picolzh.com
+HOST-SUFFIX,picol.com
+HOST-SUFFIX,pioneerex.org
+
+# Bybit
+HOST-SUFFIX,bybit.com
+HOST-KEYWORD,bybit
