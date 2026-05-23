@@ -1,17 +1,17 @@
 # Trade
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Trade.list
 
-# ---  Tradingview ---
+# Tradingview
 HOST-SUFFIX,tradingview.com
 HOST-KEYWORD,tradingview
 
-# --- MetaQuotes / MT5 ---
+# MT5
 HOST-SUFFIX,mql5.com
 HOST-SUFFIX,metaquotes.net
 HOST-SUFFIX,metatrader5.com
 HOST-KEYWORD,metaquotes
 
-# --- TMGM (TradeMax) ---
+# TMGM
 HOST-SUFFIX,tmgm.com
 HOST-SUFFIX,tmgm.com.au
 HOST-SUFFIX,tmgm.pro
@@ -19,3 +19,6 @@ HOST-SUFFIX,tmgm.ltd
 HOST-SUFFIX,trademax.com.au
 HOST-SUFFIX,trademax.global
 HOST-KEYWORD,tmgm
+
+# BIT
+HOST-SUFFIX,bit.com
