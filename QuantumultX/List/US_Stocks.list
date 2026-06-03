@@ -1,9 +1,6 @@
 # US Stocks
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/US_Stocks.list
 
-# BIT
-HOST-SUFFIX,bit.com
-
 # 盈透证券
 HOST-SUFFIX,ibllc.com
 HOST-SUFFIX,ibkr.com
@@ -12,3 +9,10 @@ HOST-SUFFIX,interactivebrokers.com
 HOST-KEYWORD,interactivebrokers
 HOST-KEYWORD,ibkr
 USER-AGENT,interactivebrokers*
+
+# Neverless
+HOST-SUFFIX,neverless.com
+HOST-KEYWORD,yivd8v
+
+# BIT
+HOST-SUFFIX,bit.com
