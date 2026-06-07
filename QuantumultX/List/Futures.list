@@ -1,9 +1,5 @@
-# Trading
-# URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Trading.list
-
-# Tradingview
-HOST-SUFFIX,tradingview.com
-HOST-KEYWORD,tradingview
+# Futures
+# URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Futures.list
 
 # MT5
 HOST-SUFFIX,mql5.com
