@@ -1,6 +1,10 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/QuantumultX/List/Crypto.list
 
+# Tradingview
+HOST-SUFFIX,tradingview.com
+HOST-KEYWORD,tradingview
+
 # Pionex
 HOST-SUFFIX,pionex.com
 HOST-SUFFIX,picolzh.com
