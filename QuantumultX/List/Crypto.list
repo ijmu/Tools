@@ -5,6 +5,34 @@
 HOST-SUFFIX,tradingview.com
 HOST-KEYWORD,tradingview
 
+# OKX
+DOMAIN-SUFFIX,okx.com
+DOMAIN-KEYWORD,okx
+
+# Bitget
+DOMAIN,h1dz7f.cdn-settings.appsflyersdk.com
+DOMAIN-SUFFIX,abcdstable.com
+DOMAIN-SUFFIX,bgstatic.com
+DOMAIN-SUFFIX,bitget.com
+DOMAIN-SUFFIX,bitgetapp.com
+DOMAIN-SUFFIX,bitgetapps.com
+DOMAIN-SUFFIX,bitgetimg.com
+DOMAIN-SUFFIX,krbitget.com
+DOMAIN-KEYWORD,bitget
+DOMAIN-KEYWORD,bitgetapp
+
+# Gate
+DOMAIN-SUFFIX,gate.ac
+DOMAIN-SUFFIX,gate.io
+DOMAIN-SUFFIX,gatexsecurity.com
+DOMAIN-SUFFIX,gatetrace.com
+DOMAIN-SUFFIX,gatedata.org
+DOMAIN-SUFFIX,gateio.services
+DOMAIN-SUFFIX,gateimg.com
+DOMAIN-SUFFIX,gateio.im
+DOMAIN-SUFFIX,gateio.live
+DOMAIN-KEYWORD,gateio
+
 # Pionex
 HOST-SUFFIX,pionex.com
 HOST-SUFFIX,picolzh.com
