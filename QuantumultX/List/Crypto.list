@@ -5,6 +5,9 @@
 HOST-SUFFIX,tradingview.com
 HOST-KEYWORD,tradingview
 
+# ave.ai
+HOST-SUFFIX,ave.ai
+
 # OKX
 DOMAIN-SUFFIX,okx.com
 DOMAIN-KEYWORD,okx
