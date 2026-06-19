@@ -1,6 +1,11 @@
 # Crypto
 # URL:https://github.com/ijmu/Tools/raw/main/Surge/List/Crypto.list
 
+# TradingView
+DOMAIN-SUFFIX,tradingview.com
+DOMAIN-SUFFIX,tradingview-widget.com
+DOMAIN-KEYWORD,tradingview
+
 # TokenPocket 
 DOMAIN-SUFFIX,tokenpocket.pro
 DOMAIN-SUFFIX,tp.xyz
@@ -11,3 +16,30 @@ DOMAIN-KEYWORD,tokenpocket
 # SafePal
 DOMAIN-SUFFIX,safepal.com
 DOMAIN-KEYWORD,safepal
+
+# Binance
+DOMAIN-SUFFIX,binance.com
+DOMAIN-SUFFIX,bnbstatic.com
+DOMAIN-SUFFIX,binance.info
+DOMAIN-SUFFIX,binance.me
+DOMAIN-KEYWORD,binance
+
+# OKX
+DOMAIN-SUFFIX,okx.com
+DOMAIN-SUFFIX,okx.cab
+DOMAIN-SUFFIX,okxusercontent.com
+DOMAIN-SUFFIX,okx-dns.com
+DOMAIN-SUFFIX,okg.com
+DOMAIN-SUFFIX,oklink.com
+DOMAIN-KEYWORD,okx
+DOMAIN-KEYWORD,okex
+
+# WEEX
+DOMAIN-SUFFIX,weex.com
+DOMAIN-SUFFIX,weex.io
+DOMAIN-KEYWORD,weex
+
+# Bitget
+DOMAIN-SUFFIX,bitget.com
+DOMAIN-SUFFIX,bitgetapi.com
+DOMAIN-KEYWORD,bitget
