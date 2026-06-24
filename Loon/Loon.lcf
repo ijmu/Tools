@@ -89,6 +89,8 @@ https://rule.kelee.one/Loon/Lan.lsr, policy=DIRECT, tag=LAN, enabled=true
 https://raw.githubusercontent.com/VirgilClyne/GetSomeFries/main/ruleset/ASN.China.list, policy=DIRECT, tag=ChinaASN, enabled=true
 
 [Host]
+# App Store 下载请求解析 金山CDN
+iosapps.itunes.apple.com = iosapps.itunes.apple.com.download.ks-cdn.com
 
 [Rewrite]
 
