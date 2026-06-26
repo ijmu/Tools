@@ -38,8 +38,7 @@ resource-parser = https://github.com/sub-store-org/Sub-Store/releases/latest/dow
 [Proxy]
 
 [Remote Proxy]
-机场1 = 地址1,parser-enabled = true,udp=true,block-quic=default,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
-机场2 = 地址2,parser-enabled = true,udp=true,block-quic=default,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
+名称1 = 地址1,parser-enabled = true,udp=true,block-quic=default,fast-open=default,vmess-aead=true,skip-cert-verify=true,enabled=true,flexible-sni=false
 
 [Remote Filter]
 Subscribe = NameRegex, FilterKey = "^((?!(套餐|订阅|到期|客户端|支持)).)*$"
@@ -84,15 +83,15 @@ DOMAIN-KEYWORD,96110,REJECT
 FINAL,Auto
 
 [Remote Rule]
+https://www.naiixi.com/Extra_Crypto.list, policy=Crypto, tag=Crypto, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Porn.list, policy=MP4, tag=Porn, enabled=true
-https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/loon/crypto.list, policy=Crypto, tag=crypto, enabled=true
-https://rule.kelee.one/Loon/Telegram.lsr, policy=Telegram, tag=Telegram, enabled=true
-https://rule.kelee.one/Loon/Twitter.lsr, policy=Twitter, tag=Twitter, enabled=true
-https://rule.kelee.one/Loon/TikTok.lsr, policy=Tiktok, tag=TikTok, enabled=true
-https://rule.kelee.one/Loon/YouTube.lsr, policy=Google, tag=YouTube, enabled=true
-https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
-https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI, tag=AI, enabled=true
-https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/loon/apns.list, policy=Apple, tag=apns, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/Telegram.list, policy=Telegram, tag=Telegram, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/Twitter.list, policy=Twitter, tag=Twitter, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/TikTok.list, policy=Tiktok, tag=TikTok, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/YouTube.list, policy=Google, tag=YouTube, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/Google.list, policy=Google, tag=Google, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/AI.list, policy=AI, tag=AIGC, enabled=true
+https://github.com/Repcz/Tool/raw/X/Loon/Rules/APNs.list, policy=Apple, tag=APNs, enabled=true
 https://github.com/Repcz/Tool/raw/X/Loon/Rules/Lan.list, policy=DIRECT, tag=LAN, enabled=true
 https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list, policy=DIRECT, tag=ChinaASN, enabled=true
 
@@ -109,11 +108,15 @@ https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tools.scripts, tag=�
 https://github.com/fmz200/wool_scripts/raw/main/Loon/script/tasks.scripts, tag=定时任务合集, enabled=true
 
 [Plugin]
-https://kelee.one/Tool/Loon/Lpx/Spotify_remove_ads.lpx, tag=Spotify, enabled=false
+https://kelee.one/Tool/Loon/Lpx/NeteaseCloudMusic_remove_ads.lpx, tag=网易云音乐, enabled=false
+https://kelee.one/Tool/Loon/Lpx/SodaMusic_remove_ads.lpx, tag=汽水音乐, enabled=false
+https://kelee.one/Tool/Loon/Lpx/MeetYou_remove_ads.lpx, tag=美柚, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Bilibili_remove_ads.lpx, tag=bilibili, enabled=true
 https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, tag=YouTube, enabled=true
-https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=Auto, tag=BoxJs, enabled=true
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, tag=广告平台拦截器, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, tag=HTTPDNS拦截器, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Remove_ads_by_keli.lpx, tag=可莉广告过滤器, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=Auto, tag=BoxJs, pin=true, enabled=true
+https://oics.net/download/oixcloud.sgmodule, tag=oixcloud, pin=true, enabled=true
 
 [MITM]
-skip-server-cert-verify = false
