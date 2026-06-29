@@ -1,0 +1,270 @@
+ipv6: false
+vif_only: false
+dns:
+  proxy_nameservers:
+  - 223.5.5.5
+policy_groups:
+- external:
+    name: Add1
+    type: select
+    urls:
+    - 地址1
+    update_interval: 10800
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Surge(11).png
+    hidden: false
+- external:
+    name: Add2
+    type: select
+    urls:
+    - 地址2
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Surge(15).png
+    hidden: false
+- select:
+    name: AllSub
+    policies:
+    - Add2
+    - Add1
+    flatten: true
+    filter: ^((?!(套餐|订阅|到期|客户端|支持|剩余)).)*$
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
+    hidden: false
+- smart:
+    name: AutoSub
+    policies:
+    - AllSub
+    flatten: true
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/02ProxySoftLogo/Egern.png
+    hidden: false
+- select:
+    name: Auto
+    policies:
+    - NG
+    - TR
+    - PH
+    - DE
+    - UK
+    - SG
+    - JP
+    - TW
+    - US
+    - HK
+    - AutoSub
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
+    hidden: false
+- select:
+    name: Apple
+    policies:
+    - US
+    - HK
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
+    hidden: false
+- select:
+    name: AIGC
+    policies:
+    - SG
+    - JP
+    - US
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatGPT-green.png
+    hidden: false
+- select:
+    name: Crypto
+    policies:
+    - SG
+    - JP
+    - TW
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+    hidden: false
+- select:
+    name: Google
+    policies:
+    - US
+    - HK
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+    hidden: false
+- select:
+    name: Twitter
+    policies:
+    - US
+    - HK
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+    hidden: false
+- select:
+    name: TikTok
+    policies:
+    - SG
+    - JP
+    - TW
+    - US
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
+    hidden: false
+- select:
+    name: MP4
+    policies:
+    - JP
+    - TW
+    - US
+    - HK
+    - AllSub
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/fileball.png
+    hidden: false
+- smart:
+    name: HK
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇭🇰|香港
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
+    hidden: false
+- smart:
+    name: US
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇺🇸|美国
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
+    hidden: false
+- smart:
+    name: TW
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇨🇳|台湾
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
+    hidden: false
+- smart:
+    name: JP
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇯🇵|日本
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
+    hidden: false
+- smart:
+    name: SG
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇸🇬|新加坡|狮
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
+    hidden: false
+- smart:
+    name: UK
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇬🇧|英国
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
+    hidden: false
+- smart:
+    name: DE
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇩🇪|德国
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
+    hidden: false
+- smart:
+    name: PH
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇵🇭|菲律宾
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/RepublicofthePhilippines(1).png
+    hidden: false
+- smart:
+    name: TR
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇹🇷|土耳其
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Turkey.png
+    hidden: false
+- smart:
+    name: NG
+    policies:
+    - AllSub
+    flatten: true
+    filter: 🇳🇬|尼日利亚
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/FederalRepublicofNigeria.png
+    hidden: false
+rules:
+- rule_set:
+    name: Porn
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    policy: MP4
+    disabled: false
+- rule_set:
+    name: TikTok
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
+    policy: TikTok
+    disabled: false
+- rule_set:
+    name: Twitter
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    policy: Twitter
+    disabled: false
+- rule_set:
+    name: YouTube
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
+    policy: Google
+    disabled: false
+- rule_set:
+    name: Google
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    policy: Google
+    disabled: false
+- rule_set:
+    name: Crypto
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Crypto.yaml
+    policy: Crypto
+    disabled: false
+- rule_set:
+    name: AI
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    policy: AIGC
+    disabled: false
+- rule_set:
+    name: APNs
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/APNs.yaml
+    policy: Apple
+    disabled: false
+- rule_set:
+    name: ChinaASN
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaASN.yaml
+    policy: DIRECT
+    disabled: false
+- default:
+    name: Final
+    policy: Auto
+mitm:
+
+modules:
+- name: YouTube去广告
+  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+  enabled: true
+- name: 可莉广告过滤器
+  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Beta/%E5%8F%AF%E8%8E%89%E5%B9%BF%E5%91%8A%E8%BF%87%E6%BB%A4%E5%99%A8.beta.sgmodule
+  enabled: true
+- name: HTTPDNS拦截器
+  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Beta/HTTPDNS%E6%8B%A6%E6%88%AA%E5%99%A8.beta.sgmodule
+  enabled: true
+- name: 广告平台拦截器
+  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Beta/%E5%B9%BF%E5%91%8A%E5%B9%B3%E5%8F%B0%E6%8B%A6%E6%88%AA%E5%99%A8.beta.sgmodule
+  enabled: true
+default_subscription_group: 订阅
+default_proxy_group: PROXY
