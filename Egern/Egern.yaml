@@ -37,6 +37,10 @@ policy_groups:
 - select:
     name: TikTok
     policies:
+    - AllServers
+    - SG
+    - JP
+    - TW
     - US
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
@@ -114,6 +118,7 @@ policy_groups:
 - select:
     name: AIGC
     policies:
+    - AllServers
     - SG
     - JP
     - US
@@ -161,7 +166,6 @@ policy_groups:
 - smart:
     name: PH
     policies:
-    - US
     - AllServers
     flatten: true
     filter: 🇵🇭|菲律宾
@@ -234,6 +238,39 @@ policy_groups:
     hidden: false
 rules:
 - rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cn.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cdn.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Reject.yaml
+    policy: REJECT
+    disabled: false
+- and:
+    name: Fuck Telegram
+    match:
+    - dest_port:
+        match: '6153'
+    - rule_set:
+        match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
+    policy: REJECT
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
+    policy: Telegram
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/tiktok.yaml
+    policy: TikTok
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/douyin.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
     match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Porn.yaml
     policy: Media
     disabled: false
@@ -262,30 +299,6 @@ rules:
     policy: Google
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/tiktok.yaml
-    policy: TikTok
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/douyin.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/speedtest.yaml
-    policy: SpeedTest
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cdn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/crypto.yaml
-    policy: Crypto
-    disabled: false
-- rule_set:
     match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/apns.yaml
     policy: Apple
     disabled: false
@@ -297,7 +310,19 @@ rules:
     match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/ai.yaml
     policy: AIGC
     disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/speedtest.yaml
+    policy: SpeedTest
+    disabled: false
 - domain_keyword:
+    match: liangxin
+    policy: Mainland
+    disabled: false
+- domain_suffix:
+    match: egernlicense.com
+    policy: Mainland
+    disabled: false
+- domain:
     name: 农行拦截检测
     match: msmp.abchina.com.cn
     policy: REJECT
@@ -311,17 +336,21 @@ rules:
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Lan.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/missuo/ASN-China@main/ASN.China.list
     policy: Mainland
     disabled: false
 - geoip:
     match: CN
     policy: Mainland
     no_resolve: false
-    disabled: false
+    disabled: true
 - default:
     name: Final
-    policy: AllServers
+    policy: Automatic
 mitm:
   
 modules:
