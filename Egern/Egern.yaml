@@ -237,17 +237,30 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
     hidden: false
 rules:
+- ssid:
+    match: MLGS_5G
+    policy: DIRECT
+    disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cn.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/meta/cn.list
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/cdn.yaml
+    name: Direct Fix
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Direct.yaml
     policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/httpdns.yaml
+    policy: REJECT
     disabled: false
 - rule_set:
     match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Reject.yaml
     policy: REJECT
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
+    policy: Telegram
     disabled: false
 - and:
     name: Fuck Telegram
@@ -259,27 +272,27 @@ rules:
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
-    policy: Telegram
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/tiktok.yaml
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/TikTok.yaml
     policy: TikTok
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/douyin.yaml
-    policy: Mainland
     disabled: false
 - rule_set:
     match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Porn.yaml
     policy: Media
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/socialmedia.yaml
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Twitter.yaml
     policy: Media
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/socialmedia-cn.yaml
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Instagram.yaml
+    policy: Meta
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Facebook.yaml
+    policy: Meta
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/microsoft-cn.yaml
     policy: Mainland
     disabled: false
 - rule_set:
@@ -287,16 +300,16 @@ rules:
     policy: Microsoft
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/microsoft-cn.yaml
-    policy: Mainland
+    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/google.yaml
+    policy: Google
     disabled: false
 - rule_set:
     match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/youtube.yaml
     policy: Media
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/google.yaml
-    policy: Google
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/meta/crypto.list
+    policy: Crypto
     disabled: false
 - rule_set:
     match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/apns.yaml
@@ -314,8 +327,8 @@ rules:
     match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/speedtest.yaml
     policy: SpeedTest
     disabled: false
-- domain_keyword:
-    match: liangxin
+- domain_suffix:
+    match: liangxin.xyz
     policy: Mainland
     disabled: false
 - domain_suffix:
@@ -354,7 +367,11 @@ rules:
 mitm:
   
 modules:
-- url: https://raw.githubusercontent.com/Keywos/rule/main/script/wy/wy.sgmodule
-  enabled: false
+- url: https://cdn.jsdelivr.net/gh/Yuheng0101/X@main/Scripts/GitRawAutoCDN/surge.sgmodule
+  enabled: true
 - url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   enabled: true
+- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+  enabled: true
+- url: https://raw.githubusercontent.com/Keywos/rule/main/script/wy/wy.sgmodule
+  enabled: false
