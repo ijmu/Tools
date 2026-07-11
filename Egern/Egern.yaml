@@ -189,35 +189,35 @@ policy_groups:
     policies:
     - AllServers
     flatten: true
-    filter: 🇸🇬|新加坡
+    filter: (?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)
     hidden: true
 - smart:
     name: JP
     policies:
     - AllServers
     flatten: true
-    filter: 🇯🇵|日本
+    filter: (?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)
     hidden: true
 - smart:
     name: TW
     policies:
     - AllServers
     flatten: true
-    filter: 🇨🇳|台湾
+    filter: (?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)
     hidden: true
 - smart:
     name: US
     policies:
     - AllServers
     flatten: true
-    filter: 🇺🇸|美国
+    filter: (?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)
     hidden: true
 - smart:
     name: HK
     policies:
     - AllServers
     flatten: true
-    filter: 🇭🇰|香港
+    filter: (?i)🇭🇰|香港|(\b(HK|Hong)\b)
     hidden: true
 - smart:
     name: AllServers
@@ -242,89 +242,115 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/meta/cn.list
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cn.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cdn.yaml
     policy: Mainland
     disabled: false
 - rule_set:
     name: Direct Fix
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Direct.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/httpdns.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/adrules.yaml
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Reject.yaml
-    policy: REJECT
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Neverless.list
+    policy: US
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/IBKR.list
+    policy: US
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/iFast.list
+    policy: UK
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/N26.list
+    policy: DE
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Maya.list
+    policy: PH
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
     policy: Telegram
     disabled: false
 - and:
     name: Fuck Telegram
     match:
+    - not:
+        match:
+          rule_set:
+            match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
     - dest_port:
         match: '6153'
-    - rule_set:
-        match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Telegram.yaml
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/TikTok.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    policy: Media
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    policy: Media
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+    policy: Meta
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    policy: Meta
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
     policy: TikTok
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Porn.yaml
-    policy: Media
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Twitter.yaml
-    policy: Media
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Instagram.yaml
-    policy: Meta
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Facebook.yaml
-    policy: Meta
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/microsoft-cn.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft-cn.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/microsoft.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft.yaml
     policy: Microsoft
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/google.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/gits.yaml
+    policy: Microsoft
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
     policy: Google
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/youtube.yaml
-    policy: Media
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
+    policy: Google
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/meta/crypto.list
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/crypto.yaml
     policy: Crypto
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/apns.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/APNs.yaml
     policy: Apple
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/apple.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Apple.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/ai.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
     policy: AIGC
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/QuixoticHeart/rule-set@ruleset/egern/speedtest.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/speedtest.yaml
     policy: SpeedTest
     disabled: false
 - domain_suffix:
@@ -349,23 +375,24 @@ rules:
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/Repcz/Tool@X/Egern/Rules/Lan.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/missuo/ASN-China@main/ASN.China.list
+    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: Mainland
     disabled: false
 - geoip:
     match: CN
     policy: Mainland
     no_resolve: false
-    disabled: true
+    disabled: false
 - default:
     name: Final
     policy: Automatic
 mitm:
-  
+  ca_p12: 
+  ca_passphrase: 
 modules:
 - url: https://cdn.jsdelivr.net/gh/Yuheng0101/X@main/Scripts/GitRawAutoCDN/surge.sgmodule
   enabled: true
