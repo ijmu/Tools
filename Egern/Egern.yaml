@@ -154,35 +154,35 @@ policy_groups:
     policies:
     - AllServers
     flatten: true
-    filter: 🇳🇬|尼日利亚
+    filter: (?i)🇳🇬|尼日利亚|拉各斯|阿布贾|(\b(NG|Nigeria|Lagos|Abuja)\b)
     hidden: true
 - smart:
     name: TR
     policies:
     - AllServers
     flatten: true
-    filter: 🇹🇷|土耳其
+    filter: (?i)🇹🇷|土耳其|伊斯坦布尔|安卡拉|(\b(TR|Turkey|Türkiye|Turkiye|Istanbul|Ankara)\b)
     hidden: true
 - smart:
     name: PH
     policies:
     - AllServers
     flatten: true
-    filter: 🇵🇭|菲律宾
+    filter: (?i)🇵🇭|菲律宾|马尼拉|宿务|(\b(PH|Philippines|Philippine|Manila|Cebu)\b)
     hidden: true
 - smart:
     name: DE
     policies:
     - AllServers
     flatten: true
-    filter: 🇩🇪|德国
+    filter: (?i)🇩🇪|德国|法兰克福|柏林|慕尼黑|(\b(DE|Germany|German|Frankfurt|Berlin|Munich)\b)
     hidden: true
 - smart:
     name: UK
     policies:
     - AllServers
     flatten: true
-    filter: 🇬🇧|英国
+    filter: (?i)🇬🇧|英国|伦敦|英格兰|(\b(UK|GB|United Kingdom|Britain|British|England|London)\b)
     hidden: true
 - smart:
     name: SG
