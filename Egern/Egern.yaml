@@ -126,6 +126,15 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatgpt(balck).png
     hidden: false
 - select:
+    name: NoAuto
+    policies:
+    - AllServers
+    - Automatic
+    - Mainland
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(5).png
+    hidden: false
+- select:
     name: Automatic
     policies:
     - AllServers
@@ -246,10 +255,6 @@ rules:
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cdn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
     name: Direct Fix
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: Mainland
@@ -326,11 +331,11 @@ rules:
     policy: Microsoft
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
     policy: Google
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/youtube.yaml
     policy: Google
     disabled: false
 - rule_set:
@@ -338,15 +343,15 @@ rules:
     policy: Crypto
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/APNs.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/apns.yaml
     policy: Apple
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Apple.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/apple.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/ai.yaml
     policy: AIGC
     disabled: false
 - rule_set:
@@ -381,7 +386,7 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: Mainland
-    disabled: false
+    disabled: true
 - geoip:
     match: CN
     policy: Mainland
@@ -389,7 +394,7 @@ rules:
     disabled: false
 - default:
     name: Final
-    policy: Automatic
+    policy: NoAuto
 mitm:
   ca_p12: 
   ca_passphrase: 
