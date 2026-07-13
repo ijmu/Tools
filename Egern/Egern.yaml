@@ -1,18 +1,52 @@
-ipv6: false
+http_port: 6152
+socks_port: 6153
 vif_only: false
 hijack_dns:
 - '*:53'
-geoip_db_url: https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country-without-asn.mmdb
-proxy_latency_test_url: http://cp.cloudflare.com/generate_204
+geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
+asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+proxy_latency_test_url: http://1.1.1.1/generate_204
 direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 dns:
   bootstrap:
+  - system
+  upstreams:
+    Domestic-DNS:
+    - 223.5.5.5
+    - 119.29.29.29
+    Domestic-Encrypted-DNS:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    Foreign-Encrypted-DNS:
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.google/dns-query
+  forward:
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
+      value: REJECT
+      disabled: false
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+      value: Domestic-DNS
+      disabled: false
+  - domain_wildcard:
+      match: '*'
+      value: Domestic-Encrypted-DNS
+      disabled: false
+  hosts:
+    dns.google:
+    - 8.8.8.8, 8.8.4.4, 2001:4860:4860::8888, 2001:4860:4860::8844
+    cloudflare-dns.com:
+    - 104.16.249.249, 104.16.248.249, 2606:4700::6810:f8f9, 2606:4700::6810:f9f9
+    dns.alidns.com:
+    - 223.5.5.5, 223.6.6.6, 2400:3200:baba::1, 2400:3200::1
+    doh.pub:
+    - 1.12.12.12, 120.53.53.53
+    dot.pub:
+    - 1.12.12.12, 120.53.53.53
+  proxy_nameservers:
   - 119.29.29.29
   - 223.5.5.5
-  proxy_nameservers:
-  - https://dns.alidns.com/dns-query
-  - https://doh.pub/dns-query
-  public_ip_lookup_url: https://ipconfig.me/ip
 real_ip_domains:
 - '*.local'
 - '*.lan'
@@ -251,37 +285,17 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
     name: Direct Fix
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: Mainland
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/adrules.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Neverless.list
-    policy: US
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/IBKR.list
-    policy: US
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/iFast.list
-    policy: UK
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/N26.list
-    policy: DE
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Maya.list
-    policy: PH
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
+    policy: TikTok
     disabled: false
 - rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
@@ -307,28 +321,20 @@ rules:
     policy: Media
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
-    policy: Meta
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
+    policy: Microsoft
     disabled: false
 - rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
     policy: Meta
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
-    policy: TikTok
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft-cn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft.yaml
-    policy: Microsoft
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/gits.yaml
-    policy: Microsoft
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+    policy: Meta
     disabled: false
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
@@ -343,28 +349,36 @@ rules:
     policy: Crypto
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/apns.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
     policy: Apple
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/apple.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/ai.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
     policy: AIGC
     disabled: false
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/speedtest.yaml
     policy: SpeedTest
     disabled: false
-- domain_suffix:
-    match: liangxin.xyz
-    policy: Mainland
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Neverless.list
+    policy: US
     disabled: false
-- domain_suffix:
-    match: egernlicense.com
-    policy: Mainland
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/IBKR.list
+    policy: US
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/iFast.list
+    policy: UK
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/N26.list
+    policy: DE
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Maya.list
+    policy: PH
     disabled: false
 - domain:
     name: 农行拦截检测
@@ -386,7 +400,7 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: Mainland
-    disabled: true
+    disabled: false
 - geoip:
     match: CN
     policy: Mainland
@@ -399,7 +413,7 @@ mitm:
   ca_p12: 
   ca_passphrase: 
 modules:
-- url: https://cdn.jsdelivr.net/gh/Yuheng0101/X@main/Scripts/GitRawAutoCDN/surge.sgmodule
+- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
   enabled: true
 - url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   enabled: true
