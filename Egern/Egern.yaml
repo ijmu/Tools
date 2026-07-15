@@ -1,6 +1,6 @@
 http_port: 6152
 socks_port: 6153
-vif_only: false
+vif_only: true
 hijack_dns:
 - '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
@@ -48,8 +48,21 @@ dns:
   - 119.29.29.29
   - 223.5.5.5
 real_ip_domains:
-- '*.local'
-- '*.lan'
+- lancache.steamcontent.com
+- '*.msftconnecttest.com'
+- '*.msftncsi.com'
+- '*.srv.nintendo.net'
+- '*.stun.playstation.net'
+- xbox.*.microsoft.com
+- '*.xboxlive.com'
+- '*.logon.battlenet.com.cn'
+- '*.logon.battle.net'
+- stun.l.google.com
+- easy-login.10099.com.cn
+- '*-update.xoyocdn.com'
+- '*.prod.cloud.netflix.com'
+- appboot.netflix.com
+- '*-appboot.netflix.com'
 policy_groups:
 - select:
     name: SpeedTest
@@ -285,16 +298,23 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    name: Direct Fix
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/adrules.yaml
     policy: REJECT
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/httpdns.yaml
+    policy: REJECT
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cn.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/cncidr.yaml
+    policy: Mainland
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
     policy: TikTok
     disabled: false
 - rule_set:
@@ -349,11 +369,11 @@ rules:
     policy: Crypto
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/apple.yaml
     policy: Apple
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/ai.yaml
     policy: AIGC
     disabled: false
 - rule_set:
@@ -400,12 +420,12 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: Mainland
-    disabled: false
+    disabled: true
 - geoip:
     match: CN
     policy: Mainland
     no_resolve: false
-    disabled: false
+    disabled: true
 - default:
     name: Final
     policy: NoAuto
@@ -418,6 +438,8 @@ modules:
 - url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   enabled: true
 - url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+  enabled: true
+- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
   enabled: true
 - url: https://raw.githubusercontent.com/Keywos/rule/main/script/wy/wy.sgmodule
   enabled: false
