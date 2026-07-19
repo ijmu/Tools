@@ -1,0 +1,68 @@
+# Crypto
+# URL:https://github.com/ijmu/Tools/raw/main/Egern/List/Crypto.list
+
+domain_suffix_set:
+  # TradingView
+  - tradingview.com
+  - tradingview-widget.com
+
+  # TokenPocket
+  - tokenpocket.pro
+  - tp.xyz
+  - mytokenpocket.vip
+  - tpwallet.io
+
+  # SafePal
+  - safepal.com
+
+  # Binance
+  - binance.com
+  - bnbstatic.com
+  - binance.info
+  - binance.me
+
+  # OKX
+  - okx.com
+  - okx.cab
+  - okxusercontent.com
+  - okx-dns.com
+  - okg.com
+  - oklink.com
+
+  # WEEX
+  - weex.com
+  - weex.io
+
+  # Bitget
+  - bitget.com
+  - bitgetapi.com
+
+  # Plasma One
+  - plasma.org
+  - plasma.to
+
+domain_keyword_set:
+  # TradingView
+  - tradingview
+
+  # TokenPocket
+  - tokenpocket
+
+  # SafePal
+  - safepal
+
+  # Binance
+  - binance
+
+  # OKX
+  - okx
+  - okex
+
+  # WEEX
+  - weex
+
+  # Bitget
+  - bitget
+
+  # Plasma One
+  - plasma
