@@ -11,9 +11,18 @@ domain_suffix_set:
   - tp.xyz
   - mytokenpocket.vip
   - tpwallet.io
+  - tptool.pro
+  - tpstatic.net
+  - tpglobalwallet.net
+  - transit.finance
 
   # SafePal
   - safepal.com
+
+  # Plasma One
+  - plasma.org
+  - plasma.to
+  - plasmascan.to
 
   # Binance
   - binance.com
@@ -36,33 +45,26 @@ domain_suffix_set:
   # Bitget
   - bitget.com
   - bitgetapi.com
+  - bitgetapp.com
+  - bitget.site
 
-  # Plasma One
-  - plasma.org
-  - plasma.to
+  # Bybit
+  - bybit.com
+  - bytick.com
+  - bycsi.com
+  - bybit-global.com
+  - bybitglobal.com
+  - byoresvc.com
+  - bybit-aws.com
 
 domain_keyword_set:
-  # TradingView
   - tradingview
-
-  # TokenPocket
   - tokenpocket
-
-  # SafePal
   - safepal
-
-  # Binance
+  - Plasma
   - binance
-
-  # OKX
   - okx
   - okex
-
-  # WEEX
   - weex
-
-  # Bitget
   - bitget
-
-  # Plasma One
-  - plasma
+  - bybit
