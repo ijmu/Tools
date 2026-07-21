@@ -2,6 +2,9 @@
 # URL:https://github.com/ijmu/Tools/raw/main/Egern/Rules/Crypto.yaml
 
 domain_suffix_set:
+  # Debox
+  - debox.pro
+
   # TradingView
   - tradingview.com
   - tradingview-widget.com
@@ -58,6 +61,7 @@ domain_suffix_set:
   - bybit-aws.com
 
 domain_keyword_set:
+  - debox
   - tradingview
   - tokenpocket
   - safepal
