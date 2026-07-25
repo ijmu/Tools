@@ -5,6 +5,7 @@ allow_external_connections: true
 vif_only: true
 block_quic: true
 hide_vpn_icon: false
+
 hijack_dns:
 - '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
@@ -16,6 +17,7 @@ include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
+
 dns:
   bootstrap:
   - system
@@ -93,6 +95,7 @@ dns:
   - 223.5.5.5
   - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
+  
 bypass_tunnel_proxy:
 - '*.ts.net'
 - tailscale.com
@@ -106,6 +109,7 @@ bypass_tunnel_proxy:
 - 192.168.0.0/16
 - 10.0.0.0/8
 - 172.16.0.0/12
+
 real_ip_domains:
 - '*.lan'
 - '*.local'
@@ -131,6 +135,7 @@ real_ip_domains:
 - '*.tailscale.com'
 - tailscale.net
 - '*.tailscale.net'
+
 policy_groups:
 - select:
     name: SpeedTest
@@ -383,6 +388,7 @@ policy_groups:
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
     hidden: false
+    
 rules:
 - ssid:
     match: MLGS_5G
@@ -509,6 +515,7 @@ rules:
 - default:
     name: Final
     policy: NoAuto
+    
 mitm:
   ca_p12: 
   ca_passphrase: 
@@ -516,6 +523,7 @@ mitm:
     includes:
     - https://gs-loc.apple.com/
     - https://gs-loc-cn.apple.com/
+    
 modules:
 - url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
   enabled: true
