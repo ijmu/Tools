@@ -5,18 +5,33 @@ allow_external_connections: true
 vif_only: true
 block_quic: true
 hide_vpn_icon: false
-
-hijack_dns:
-- '*:53'
-geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: http://1.1.1.1/generate_204
-direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: false
 include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
+
+bypass_tunnel_proxy:
+- '*.ts.net'
+- tailscale.com
+- '*.tailscale.com'
+- tailscale.net
+- '*.tailscale.net'
+- 100.64.0.0/10
+- fd7a:115c:a1e0::/48
+- '*.local'
+- '*.lan'
+- 192.168.0.0/16
+- 10.0.0.0/8
+- 172.16.0.0/12
+
+hijack_dns:
+- '*:53'
+
+geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
+asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 
 dns:
   bootstrap:
@@ -96,20 +111,6 @@ dns:
   - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
   
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
-
 real_ip_domains:
 - '*.lan'
 - '*.local'
