@@ -1,542 +1,433 @@
+# Egern balanced and streamlined profile
+# Generated: 2026-07-25
+# Replace the subscription URL placeholders before importing.
+
 ipv6: false
 http_port: 3080
 socks_port: 3090
-allow_external_connections: true
+allow_external_connections: false
 vif_only: true
 block_quic: true
 hide_vpn_icon: false
-compat_route: false
-include_all_networks: false
-include_apns: false
-include_cellular_services: false
-include_local_networks: false
-
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
-
+close_connections_on_policy_change: true
 hijack_dns:
-- '*:53'
+  - "*:53"
 
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
 proxy_latency_test_url: http://1.1.1.1/generate_204
 direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 
+compat_route: false
+include_all_networks: false
+include_apns: false
+include_cellular_services: false
+include_local_networks: false
+
 dns:
   bootstrap:
-  - system
-  - 223.5.5.5
-  - 119.29.29.29
+    - system
+    - 223.5.5.5
+    - 119.29.29.29
   upstreams:
-    谷歌:
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
-    国外:
-    - https://1.1.1.1/dns-query
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.adguard.com/dns-query
-    国内:
-    - https://223.6.6.6/dns-query
-    - https://223.5.5.5/dns-query
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-    腾讯:
-    - https://doh.pub/dns-query
-    阿里:
-    - https://dns.alidns.com/dns-query
-    字节:
-    - 180.184.2.2
-    - 180.184.1.1
-    广告:
-    - https://dns.adguard-dns.com/dns-query
+    Domestic:
+      - https://dns.alidns.com/dns-query
+      - https://doh.pub/dns-query
+    Global:
+      - https://cloudflare-dns.com/dns-query
+      - https://dns.google/dns-query
+    ByteDance:
+      - 180.184.1.1
+      - 180.184.2.2
   forward:
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-      value: 广告
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
-      value: 字节
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
-      value: 国外
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
-      value: 国外
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
-      value: 国外
-  - domain_wildcard:
-      match: '*'
-      value: 国内
-  hosts:
-    iosapps.itunes.apple.com:
-    - iosapps.itunes.apple.com.download.ks-cdn.com
-    dns.google:
-    - 8.8.8.8, 8.8.4.4
-    cloudflare-dns.com:
-    - 104.16.249.249, 104.16.248.249
-    dns.alidns.com:
-    - 223.5.5.5, 223.6.6.6
-    doh.pub:
-    - 1.12.12.12, 120.53.53.53
+    - proxy_rule_set:
+        match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
+        value: REJECT
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
+        value: ByteDance
+    - domain_suffix:
+        match: cn
+        value: Domestic
+    - proxy_rule_set:
+        match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+        value: Domestic
+    - domain_wildcard:
+        match: "*"
+        value: Global
   proxy_nameservers:
-  - 223.5.5.5
-  - 119.29.29.29
+    - 223.5.5.5
+    - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
-  
+
+bypass_tunnel_proxy:
+  - "*.ts.net"
+  - tailscale.com
+  - "*.tailscale.com"
+  - tailscale.net
+  - "*.tailscale.net"
+  - 100.64.0.0/10
+  - fd7a:115c:a1e0::/48
+  - "*.local"
+  - "*.lan"
+  - 192.168.0.0/16
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+
 real_ip_domains:
-- '*.lan'
-- '*.local'
-- '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
+  - "*.lan"
+  - "*.local"
+  - "*.push.apple.com"
+  - lancache.steamcontent.com
+  - "*.msftconnecttest.com"
+  - "*.msftncsi.com"
+  - msftncsi.com
+  - msftconnecttest.com
+  - "*.srv.nintendo.net"
+  - "*.stun.playstation.net"
+  - xbox.*.microsoft.com
+  - "*.xboxlive.com"
+  - stun.l.google.com
+  - "*.prod.cloud.netflix.com"
+  - appboot.netflix.com
+  - "*.battle.net"
+  - "*.blzstatic.cn"
+  - "*.battlenet.com"
+  - "*.battlenet.com.cn"
+  - "*.ts.net"
+  - tailscale.com
+  - "*.tailscale.com"
+  - tailscale.net
+  - "*.tailscale.net"
 
 policy_groups:
-- select:
-    name: SpeedTest
-    policies:
-    - AllServers
-    - Mainland
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/speedtest.png
-    hidden: false
-- select:
-    name: Telegram
-    policies:
-    - AllServers
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram.png
-    hidden: false
-- select:
-    name: TikTok
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
-    hidden: false
-- select:
-    name: Movie
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/fileball.png
-    hidden: false
-- select:
-    name: Meta
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/meta.png
-    hidden: false
-- select:
-    name: Microsoft
-    policies:
-    - Mainland
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft(1).png
-    hidden: false
-- select:
-    name: Media
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-    hidden: false
-- select:
-    name: Google
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-    hidden: false
-- select:
-    name: Crypto
-    policies:
-    - AllServers
-    - SG
-    - JP
-    - TW
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
-    hidden: false
-- select:
-    name: Apple
-    policies:
-    - Mainland
-    - AllServers
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
-    hidden: false
-- select:
-    name: AIGC
-    policies:
-    - AllServers
-    - RO
-    - SG
-    - JP
-    - US
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/chatgpt(balck).png
-    hidden: false
-- select:
-    name: NoAuto
-    policies:
-    - AllServers
-    - Automatic
-    - Mainland
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(5).png
-    hidden: false
-- select:
-    name: Automatic
-    policies:
-    - AllServers
-    - NG
-    - TR
-    - PH
-    - DE
-    - UK
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
-    hidden: false
-- select:
-    name: Mainland
-    policies:
-    - DIRECT
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/quanqiu(2).png
-    hidden: false
-- smart:
-    name: RO
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇷🇴|罗马尼亚|罗|(\b(RO|Romania)\b)
-    hidden: true
-- smart:
-    name: NG
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇳🇬|尼日利亚|拉各斯|阿布贾|(\b(NG|Nigeria|Lagos|Abuja)\b)
-    hidden: true
-- smart:
-    name: TR
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇹🇷|土耳其|伊斯坦布尔|安卡拉|(\b(TR|Turkey|Türkiye|Turkiye|Istanbul|Ankara)\b)
-    hidden: true
-- smart:
-    name: PH
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇵🇭|菲律宾|马尼拉|宿务|(\b(PH|Philippines|Philippine|Manila|Cebu)\b)
-    hidden: true
-- smart:
-    name: DE
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇩🇪|德国|法兰克福|柏林|慕尼黑|(\b(DE|Germany|German|Frankfurt|Berlin|Munich)\b)
-    hidden: true
-- smart:
-    name: UK
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇬🇧|英国|伦敦|英格兰|(\b(UK|GB|United Kingdom|Britain|British|England|London)\b)
-    hidden: true
-- smart:
-    name: SG
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)
-    hidden: true
-- smart:
-    name: JP
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)
-    hidden: true
-- smart:
-    name: TW
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)
-    hidden: true
-- smart:
-    name: US
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)
-    hidden: true
-- smart:
-    name: HK
-    policies:
-    - AllServers
-    flatten: true
-    filter: (?i)🇭🇰|香港|(\b(HK|Hong)\b)
-    hidden: true
-- smart:
-    name: AllServers
-    policies:
-    - Sub
-    flatten: true
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(4).png
-    hidden: false
-- external:
-    name: Sub
-    type: select
-    urls:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    - 订阅地址1
-    - 订阅地址2
-    urls_disabled:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    filter: ^((?!(套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道)).)*$
-    update_interval: 10800
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
-    hidden: false
-    
+  # Replace these placeholders with your own subscription URLs.
+  - external:
+      name: Subscription
+      type: select
+      urls:
+        - 订阅地址1
+        - 订阅地址2
+      filter: '^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道)).+$'
+      update_interval: 86400
+      icon: link
+      hidden: false
+
+  - select:
+      name: Manual
+      policies:
+        - Subscription
+      flatten: true
+      icon: hand.tap
+      hidden: false
+
+  - smart:
+      name: Automatic
+      policies:
+        - Subscription
+      flatten: true
+      icon: bolt
+      hidden: false
+
+  - smart:
+      name: HK
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b'
+      icon: flag
+      hidden: false
+
+  - smart:
+      name: TW
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇹🇼|台湾|台灣|\b(?:TW|Taiwan)\b'
+      icon: flag
+      hidden: false
+
+  - smart:
+      name: JP
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇯🇵|日本|东京|東京|\b(?:JP|Japan|Tokyo)\b'
+      icon: flag
+      hidden: false
+
+  - smart:
+      name: SG
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b'
+      icon: flag
+      hidden: false
+
+  - smart:
+      name: US
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b'
+      icon: flag
+      hidden: false
+
+  - select:
+      name: Proxy
+      policies:
+        - Automatic
+        - Manual
+        - HK
+        - SG
+        - JP
+        - TW
+        - US
+        - DIRECT
+      icon: globe
+      hidden: false
+
+  - select:
+      name: AI
+      policies:
+        - US
+        - SG
+        - JP
+        - Manual
+      icon: brain
+      hidden: false
+
+  - select:
+      name: Telegram
+      policies:
+        - Proxy
+        - SG
+        - US
+        - HK
+        - Manual
+      icon: paperplane
+      hidden: false
+
+  - select:
+      name: TikTok
+      policies:
+        - SG
+        - JP
+        - TW
+        - US
+        - Manual
+      icon: music.note
+      hidden: false
+
+  - select:
+      name: Social
+      policies:
+        - Proxy
+        - SG
+        - US
+        - HK
+        - JP
+        - Manual
+      icon: person.2
+      hidden: false
+
+  - select:
+      name: Streaming
+      policies:
+        - Proxy
+        - SG
+        - JP
+        - TW
+        - US
+        - HK
+        - Manual
+      icon: play.tv
+      hidden: false
+
+  - select:
+      name: Google
+      policies:
+        - Proxy
+        - SG
+        - JP
+        - US
+        - HK
+        - Manual
+      icon: magnifyingglass
+      hidden: false
+
+  - select:
+      name: Microsoft
+      policies:
+        - DIRECT
+        - Proxy
+        - HK
+        - US
+        - Manual
+      icon: laptopcomputer
+      hidden: false
+
+  - select:
+      name: Apple
+      policies:
+        - DIRECT
+        - Proxy
+        - HK
+        - US
+        - Manual
+      icon: apple.logo
+      hidden: false
+
+  - select:
+      name: Crypto
+      policies:
+        - Proxy
+        - SG
+        - JP
+        - TW
+        - HK
+        - US
+        - Manual
+      icon: bitcoinsign.circle
+      hidden: false
+
 rules:
-- ssid:
-    match: MLGS_5G
-    policy: DIRECT
-    disabled: false
-- domain_keyword:
-    match: '96110'
-    policy: REJECT
-    disabled: false
-- domain_suffix:
-    match: gjfzpt.cn
-    policy: REJECT
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-    policy: Mainland
-    disabled: true
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-    policy: Mainland
-    disabled: true
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
-    policy: Mainland
-    disabled: true
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-    policy: REJECT
-    disabled: true
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
-    policy: TikTok
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
-    policy: Telegram
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
-    policy: Movie
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
-    policy: Media
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft-cn.yaml
-    policy: Mainland
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft.yaml
-    policy: Microsoft
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
-    policy: Meta
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
-    policy: Meta
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
-    policy: Google
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/youtube.yaml
-    policy: Google
-    disabled: false
-- rule_set:
-    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Crypto.yaml
-    policy: Crypto
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-    policy: Apple
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI-Merged.yaml
-    policy: AIGC
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/speedtest.yaml
-    policy: SpeedTest
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Neverless.list
-    policy: US
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/N26.list
-    policy: DE
-    disabled: false
-- rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Maya.list
-    policy: PH
-    disabled: false
-- domain:
-    name: 农行拦截检测
-    match: msmp.abchina.com.cn
-    policy: REJECT
-    disabled: true
-- domain_keyword:
-    match: egern
-    policy: Mainland
-    disabled: false
-- geoip:
-    match: CN
-    policy: Mainland
-    no_resolve: false
-    disabled: false
-- default:
-    name: Final
-    policy: NoAuto
-    
+  # Personal override: bypass Egern completely on this Wi-Fi.
+  - ssid:
+      match: MLGS_5G
+      policy: DIRECT
+      disabled: false
+
+  # Personal blocking rules retained from the original profile.
+  - domain_keyword:
+      match: "96110"
+      policy: REJECT
+      disabled: false
+  - domain_suffix:
+      match: gjfzpt.cn
+      policy: REJECT
+      disabled: false
+
+  # Infrastructure and anti-breakage rules must precede ad blocking.
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+      policy: DIRECT
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+      policy: DIRECT
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+      policy: DIRECT
+      disabled: false
+  - rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
+      policy: REJECT
+      disabled: false
+
+  # Explicit application routing precedes broad China/direct matching.
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
+      policy: DIRECT
+      disabled: false
+  # These shared ByteDance domains belong to TikTok rather than the AI tools
+  # that also appear in the merged AI rule set.
+  - domain_suffix:
+      match: byteintlapi.com
+      policy: TikTok
+      disabled: false
+  - domain_suffix:
+      match: byteoversea.com
+      policy: TikTok
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI-Merged.yaml
+      policy: AI
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+      policy: Telegram
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+      policy: TikTok
+      disabled: false
+  - rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+      policy: Social
+      disabled: false
+  - rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+      policy: Social
+      disabled: false
+  - rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+      policy: Social
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+      policy: Streaming
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Netflix.yaml
+      policy: Streaming
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Disney.yaml
+      policy: Streaming
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
+      policy: Streaming
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+      policy: Google
+      disabled: false
+  - rule_set:
+      match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft-cn.yaml
+      policy: DIRECT
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+      policy: Microsoft
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+      policy: Apple
+      disabled: false
+  - rule_set:
+      match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Crypto.yaml
+      policy: Crypto
+      disabled: false
+
+  # Broad direct and domestic matching comes only after service-specific routing.
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
+      policy: DIRECT
+      disabled: false
+  - domain_keyword:
+      match: egern
+      policy: DIRECT
+      disabled: false
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+      policy: DIRECT
+      disabled: false
+  - geoip:
+      match: CN
+      policy: DIRECT
+      no_resolve: false
+      disabled: false
+  - default:
+      name: Final
+      policy: Proxy
+
 mitm:
-  ca_p12: 
-  ca_passphrase: 
-  hostnames:
-    includes:
-    - https://gs-loc.apple.com/
-    - https://gs-loc-cn.apple.com/
-    
+  enabled: true
+
 modules:
-- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
-  enabled: true
-- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
-  enabled: true
-- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
-  enabled: true
-- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
-  enabled: false
+  - url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+    enabled: true
