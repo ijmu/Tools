@@ -255,18 +255,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
     hidden: false
 - select:
-    name: Streaming
-    policies:
-    - Proxy
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/youtube(4).png
-    hidden: false
-- select:
     name: Google
     policies:
     - Proxy
@@ -346,18 +334,12 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Lan.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    name: Direct Fix
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Reject.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
     policy: REJECT
     update_interval: 86400
     disabled: false
@@ -366,12 +348,12 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/AI.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI-Merged.yaml
     policy: AI
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Telegram.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
     policy: Telegram
     update_interval: 86400
     disabled: false
@@ -381,82 +363,51 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Twitter.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
     policy: Social
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Facebook.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
     policy: Social
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Instagram.yaml
-    policy: Social
-    update_interval: 86400
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+    policy: Google
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/YouTube.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Netflix.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Disney.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/PrimeVideo.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/HBO.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Spotify.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Google.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Github.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Microsoft.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/AppleServers.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Crypto.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/crypto.yaml
     policy: Crypto
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Porn.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Movie
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/ChinaDomain.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
