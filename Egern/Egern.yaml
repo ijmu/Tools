@@ -140,8 +140,8 @@ policy_groups:
     type: select
     urls:
     - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    - https://liangxin.xyz/api/v1/liangxin?OwO=67266d13e4143354ea889664abbcac80
-    - https://oics.net/api/v3/download.getFile/f66f62e0-8e08-4bef-af1b-eb994722d607?protocols=smart&provider=surge.txt
+    - 订阅地址1
+    - 订阅地址2
     urls_disabled:
     - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道)).+$
