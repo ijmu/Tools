@@ -7,7 +7,9 @@ block_quic: false
 close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
-- '*'
+- '*:53'
+- 8.8.8.8
+- 114.114.114.114
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
 proxy_latency_test_url: https://www.gstatic.com/generate_204
@@ -23,41 +25,74 @@ dns:
   - 223.5.5.5
   - 119.29.29.29
   upstreams:
-    global:
+    谷歌:
     - https://1.1.1.1/dns-query
     - https://8.8.8.8/dns-query
-    domestic:
+    国外:
+    - https://1.1.1.1/dns-query
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.adguard.com/dns-query
+    国内:
+    - https://223.6.6.6/dns-query
+    - https://223.5.5.5/dns-query
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
+    腾讯:
+    - https://doh.pub/dns-query
+    阿里:
+    - https://dns.alidns.com/dns-query
+    字节:
+    - 180.184.2.2
+    - 180.184.1.1
+    广告:
+    - https://dns.adguard-dns.com/dns-query
   forward:
-  - domain_suffix:
-      match: local
-      value: bootstrap
-  - domain_suffix:
-      match: lan
-      value: bootstrap
-  - domain_suffix:
-      match: home.arpa
-      value: bootstrap
-  - domain_suffix:
-      match: ts.net
-      value: bootstrap
   - proxy_rule_set:
-      match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Reject.yaml
-      value: reject
-      update_interval: 86400
-  - domain_suffix:
-      match: cn
-      value: domestic
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
+      value: 广告
   - proxy_rule_set:
-      match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/ChinaDomain.yaml
-      value: domestic
-      update_interval: 86400
-  - wildcard:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+      value: 谷歌
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+      value: 谷歌
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
+      value: 字节
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
+      value: 国外
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+      value: 国内
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+      value: 国内
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+      value: 国内
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
+      value: 国外
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
+      value: 国外
+  - domain_wildcard:
       match: '*'
-      value: global
+      value: 国内
+  hosts:
+    iosapps.itunes.apple.com:
+    - iosapps.itunes.apple.com.download.ks-cdn.com
+    dns.google:
+    - 8.8.8.8, 8.8.4.4
+    cloudflare-dns.com:
+    - 104.16.249.249, 104.16.248.249
+    dns.alidns.com:
+    - 223.5.5.5, 223.6.6.6
+    doh.pub:
+    - 1.12.12.12, 120.53.53.53
   proxy_nameservers:
-  - system
   - 223.5.5.5
   - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
@@ -76,40 +111,6 @@ bypass_tunnel_proxy:
 - 172.16.0.0/12
 - 127.0.0.0/8
 - 169.254.0.0/16
-- amemv.com
-- '*.amemv.com'
-- bytecdn.cn
-- '*.bytecdn.cn'
-- bytecdn.com
-- '*.bytecdn.com'
-- bytecdn.net
-- '*.bytecdn.net'
-- bytecdntp.com
-- '*.bytecdntp.com'
-- douyin.com
-- '*.douyin.com'
-- douyincdn.com
-- '*.douyincdn.com'
-- douyinliving.com
-- '*.douyinliving.com'
-- douyinpic.com
-- '*.douyinpic.com'
-- douyinstatic.com
-- '*.douyinstatic.com'
-- douyinvod.com
-- '*.douyinvod.com'
-- idouyinvod.com
-- '*.idouyinvod.com'
-- iesdouyin.com
-- '*.iesdouyin.com'
-- huoshanstatic.com
-- '*.huoshanstatic.com'
-- huoshanzhibo.com
-- '*.huoshanzhibo.com'
-- volccdn.com
-- '*.volccdn.com'
-- volcvideo.com
-- '*.volcvideo.com'
 real_ip_domains:
 - '*.lan'
 - '*.local'
@@ -135,23 +136,6 @@ real_ip_domains:
 - '*.tailscale.com'
 - tailscale.net
 - '*.tailscale.net'
-- '*.amemv.com'
-- '*.bytecdn.cn'
-- '*.bytecdn.com'
-- '*.bytecdn.net'
-- '*.bytecdntp.com'
-- '*.douyin.com'
-- '*.douyincdn.com'
-- '*.douyinliving.com'
-- '*.douyinpic.com'
-- '*.douyinstatic.com'
-- '*.douyinvod.com'
-- '*.idouyinvod.com'
-- '*.iesdouyin.com'
-- '*.huoshanstatic.com'
-- '*.huoshanzhibo.com'
-- '*.volccdn.com'
-- '*.volcvideo.com'
 policy_groups:
 - external:
     name: Subscription
@@ -370,16 +354,6 @@ rules:
     match: MLGS_5G
     policy: DIRECT
     disabled: false
-- domain_keyword:
-    name: Douyin ByteCDN fallback
-    match: bytecdn
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
-    name: TikTok shared domain
-    match: bytedance.net
-    policy: TikTok
-    disabled: false
 - rule_set:
     name: LAN
     match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Lan.yaml
@@ -417,7 +391,7 @@ rules:
     update_interval: 86400
 - rule_set:
     name: TikTok
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/TikTok.yaml
+    match: https://raw.githubusercontent.com/QuixoticHeart/rule-set/refs/heads/ruleset/egern/tiktok.yaml
     policy: TikTok
     update_interval: 86400
 - rule_set:
