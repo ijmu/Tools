@@ -3,14 +3,14 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: false
 vif_only: true
-close_connections_on_policy_change: false
+close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
-- '*'
+- '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: https://www.gstatic.com/generate_204
-direct_latency_test_url: https://wifi.vivo.com.cn/generate_204
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: false
 include_all_networks: false
 include_apns: false
@@ -106,8 +106,6 @@ bypass_tunnel_proxy:
 - 192.168.0.0/16
 - 10.0.0.0/8
 - 172.16.0.0/12
-- 127.0.0.0/8
-- 169.254.0.0/16
 real_ip_domains:
 - '*.lan'
 - '*.local'
@@ -138,13 +136,11 @@ policy_groups:
     name: Subscription
     type: select
     urls:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
     - 订阅地址1
     - 订阅地址2
-    urls_disabled:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道)).+$
-    update_interval: 86400
+    - 订阅地址3
+    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
+    update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
     hidden: false
 - select:
@@ -168,6 +164,14 @@ policy_groups:
     flatten: true
     filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
+    hidden: false
+- smart:
+    name: US
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
     hidden: false
 - smart:
     name: TW
@@ -194,24 +198,70 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
     hidden: false
 - smart:
-    name: US
+    name: KR
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
+    filter: 🇰🇷|韩国|Korea
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Korea(1).png
+    hidden: false
+- smart:
+    name: UK
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇬🇧|英国
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
+    hidden: false
+- smart:
+    name: DE
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇩🇪|德国
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
+    hidden: false
+- smart:
+    name: PH
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇵🇭|菲律宾
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/RepublicofthePhilippines(1).png
+    hidden: false
+- smart:
+    name: TR
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇹🇷|土耳其
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Turkey.png
+    hidden: false
+- smart:
+    name: NG
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇳🇬|尼日利亚
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/FederalRepublicofNigeria.png
     hidden: false
 - select:
     name: Proxy
     policies:
     - Automatic
     - Manual
+    - Mainland
     - HK
-    - SG
-    - JP
-    - TW
     - US
-    - DIRECT
+    - TW
+    - JP
+    - SG
+    - UK
+    - DE
+    - PH
+    - TR
+    - NG
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
     hidden: false
 - select:
@@ -224,89 +274,156 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
     hidden: false
 - select:
-    name: Telegram
-    policies:
-    - Proxy
-    - SG
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram(1).png
-    hidden: false
-- select:
-    name: TikTok
-    policies:
-    - SG
-    - JP
-    - TW
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok((2).png
-    hidden: false
-- select:
-    name: Social
-    policies:
-    - Proxy
-    - SG
-    - US
-    - HK
-    - JP
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-    hidden: false
-- select:
-    name: Google
-    policies:
-    - Proxy
-    - SG
-    - JP
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-    hidden: false
-- select:
-    name: Microsoft
-    policies:
-    - DIRECT
-    - Proxy
-    - HK
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
-    hidden: false
-- select:
     name: Apple
     policies:
-    - DIRECT
+    - Mainland
     - Proxy
     - HK
     - US
     - Manual
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
     hidden: false
 - select:
     name: Crypto
     policies:
     - Proxy
-    - SG
-    - JP
+    - HK
+    - US
     - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+    hidden: false
+- select:
+    name: Google
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+    hidden: false
+- select:
+    name: Microsoft
+    policies:
+    - Mainland
+    - Proxy
     - HK
     - US
     - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
+    hidden: false
+- select:
+    name: Meta
+    policies:
+    - Proxy
+    - US
+    - HK
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/meta.png
     hidden: false
 - select:
     name: Movie
     policies:
     - Proxy
-    - SG
     - TW
     - JP
+    - SG
     - Manual
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/fileball.png
+    hidden: false
+- select:
+    name: PayPal
+    policies:
+    - Proxy
+    - HK
+    - US
+    - UK
+    - DE
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
+    hidden: false
+- select:
+    name: Stripe
+    policies:
+    - Proxy
+    - HK
+    - UK
+    - DE
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/stripe.png
+    hidden: false
+- select:
+    name: Twitter
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+    hidden: false
+- select:
+    name: Telegram
+    policies:
+    - Proxy
+    - HK
+    - US
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram(1).png
+    hidden: false
+- select:
+    name: TikTok
+    policies:
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok((2).png
+    hidden: false
+- select:
+    name: Wise
+    policies:
+    - Proxy
+    - UK
+    - HK
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/wise.png
+    hidden: false
+- select:
+    name: Speedtest
+    policies:
+    - Mainland
+    - Proxy
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/speedtest.png
+    hidden: false
+- select:
+    name: Mainland
+    policies:
+    - DIRECT
+    flatten: false
+    latency_test_url: '86400'
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/quanqiu(4).png
     hidden: false
 rules:
 - domain_keyword:
@@ -319,24 +436,19 @@ rules:
     disabled: false
 - domain_suffix:
     match: oics.net
-    policy: DIRECT
+    policy: Mainland
     disabled: false
 - domain_suffix:
     match: liangxin.xyz
-    policy: DIRECT
+    policy: Mainland
     disabled: false
 - domain_keyword:
     match: egern
-    policy: DIRECT
+    policy: Mainland
     disabled: false
 - ssid:
     match: MLGS_5G
     policy: DIRECT
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
-    policy: DIRECT
-    update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
@@ -344,12 +456,53 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+    policy: Mainland
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+    policy: Mainland
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: Mainland
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
+    policy: Mainland
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
-    policy: DIRECT
+    policy: Mainland
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+    policy: Apple
+    update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI-Merged.yaml
     policy: AI
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Binancenew.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Crypto.yaml
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
+    policy: Twitter
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -363,22 +516,18 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
-    policy: Social
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
-    policy: Social
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
     policy: Google
+    update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-    policy: Google
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+    policy: Mainland
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -387,18 +536,8 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-    policy: Apple
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/crypto.yaml
-    policy: Crypto
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+    policy: Meta
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -407,14 +546,39 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
+    policy: PayPal
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Stripe/Stripe.list
+    policy: Stripe
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Wise.list
+    policy: Wise
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/N26.list
+    policy: DE
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Maya.list
+    policy: PH
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-    policy: DIRECT
+    policy: Mainland
     update_interval: 86400
     disabled: false
 - geoip:
     match: CN
-    policy: DIRECT
-    no_resolve: true
+    policy: Mainland
+    no_resolve: false
     disabled: false
 - default:
     name: Final
@@ -422,7 +586,21 @@ rules:
 mitm:
   
 modules:
-- name: YouTube Enhance
-  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
   update_interval: 86400
   enabled: true
+- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
+  update_interval: 86400
+  enabled: false
