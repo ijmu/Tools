@@ -1,0 +1,6 @@
+domain_suffix_set:
+  # N26 官方主域名
+  - n26.com
+
+  # N26 核心 API / 后端基础设施
+  - tech26.de
