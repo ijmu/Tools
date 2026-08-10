@@ -3,78 +3,57 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: false
 vif_only: true
-block_quic: true
-close_connections_on_policy_change: true
+close_connections_on_policy_change: false
 hide_vpn_icon: false
-
+hijack_dns:
+- '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
 proxy_latency_test_url: http://1.1.1.1/generate_204
 direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: true
 include_all_networks: false
-include_apns: false
-include_cellular_services: false
-include_local_networks: false
-
-hijack_dns:
-  - '*:53'
 dns:
-  # Bootstrap 始终直连，只负责启动、DoH 初始化和最终回退
   bootstrap:
-    - system
-    - 223.5.5.5
-    - 119.29.29.29
-
-  # 每组只保留两个解析器
-  # Egern 对同组服务器并行请求，最快响应生效
+  - system
   upstreams:
-    Domestic:
-      - https://223.5.5.5/dns-query
-      - https://1.12.12.12/dns-query
-    Foreign:
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
-
-  # 按顺序首条命中
-  forward:
-    # 国内抖音优先
-    - proxy_rule_set:
-        match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
-        value: Domestic
-
-    # TikTok 独有域名使用国外 DNS
-    - proxy_rule_set:
-        match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
-        value: Foreign
-
-    # 保留你原配置的 TestFlight 国外解析行为
-    - proxy_rule_set:
-        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
-        value: Foreign
-
-    # 其他 Apple 服务使用国内 DNS，获得国内 CDN
-    - proxy_rule_set:
-        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-        value: Domestic
-
-    # 国内域名统一使用国内 DNS
-    - proxy_rule_set:
-        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-        value: Domestic
-
-    # 未匹配域名使用国外 DoH
-    - domain_wildcard:
-        match: '*'
-        value: Foreign
-
-  # 只用于解析机场/代理服务器的域名
-  # 始终直连并绕过 forward，避免 DNS→代理→DNS 循环
-  proxy_nameservers:
+    Domestic-DNS:
     - 223.5.5.5
     - 119.29.29.29
+    Domestic-Encrypted-DNS:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    Foreign-Encrypted-DNS:
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.google/dns-query
+  forward:
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
+      value: REJECT
+      disabled: false
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+      value: Domestic-DNS
+      disabled: false
+  - domain_wildcard:
+      match: '*'
+      value: Domestic-Encrypted-DNS
+      disabled: false
+  hosts:
+    dns.google:
+    - 8.8.8.8, 8.8.4.4, 2001:4860:4860::8888, 2001:4860:4860::8844
+    cloudflare-dns.com:
+    - 104.16.249.249, 104.16.248.249, 2606:4700::6810:f8f9, 2606:4700::6810:f9f9
+    dns.alidns.com:
+    - 223.5.5.5, 223.6.6.6, 2400:3200:baba::1, 2400:3200::1
+    doh.pub:
+    - 1.12.12.12, 120.53.53.53
+    dot.pub:
+    - 1.12.12.12, 120.53.53.53
+  proxy_nameservers:
+  - 119.29.29.29
+  - 223.5.5.5
   public_ip_lookup_url: https://ifconfig.me/ip
-  
 bypass_tunnel_proxy:
 - '*.ts.net'
 - tailscale.com
@@ -120,7 +99,6 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
-    - 订阅地址3
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
@@ -313,14 +291,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/youtube(4).png
     hidden: false
 - select:
-    name: Speedtest
-    policies:
-    - DIRECT
-    - Proxy
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/speedtest.png
-    hidden: false
-- select:
     name: TikTok
     policies:
     - US
@@ -357,11 +327,6 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-    policy: REJECT
-    update_interval: 86400
-    disabled: true
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
     policy: DIRECT
     update_interval: 86400
@@ -392,7 +357,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI-Merged.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -422,22 +387,37 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
     policy: Social Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
-    policy: TikTok
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
+    policy: Social Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    policy: Social Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+    policy: Social Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reddit.yaml
+    policy: Social Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Streaming
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Disney.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
     policy: Streaming
     update_interval: 86400
     disabled: false
@@ -452,17 +432,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Emby.yaml
-    policy: Streaming
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
+    policy: TikTok
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
-    policy: Streaming
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/PayPal.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/PayPal.yaml
     policy: Pay
     update_interval: 86400
     disabled: false
@@ -478,11 +453,6 @@ rules:
 - rule_set:
     match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/N26.yaml
     policy: DE
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Speedtest/Speedtest.list
-    policy: Speedtest
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -539,6 +509,21 @@ widgets:
 - name: 节日倒计时
   script_name: 节日倒计时小组件
 modules:
+- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-weather.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-maps.sgmodule
+  update_interval: 86400
+  enabled: true
 - url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
   update_interval: 86400
   enabled: false
@@ -549,9 +534,6 @@ modules:
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
