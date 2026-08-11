@@ -99,6 +99,7 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
+    - 订阅地址3
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
@@ -311,11 +312,15 @@ rules:
     policy: REJECT
     disabled: false
 - domain_suffix:
-    match: oics.net
+    match: liangxin.xyz
     policy: DIRECT
     disabled: false
 - domain_suffix:
-    match: liangxin.xyz
+    match: kaze1.aisaka-taiga.com
+    policy: DIRECT
+    disabled: false
+- domain_suffix:
+    match: oics.net
     policy: DIRECT
     disabled: false
 - domain_keyword:
@@ -327,22 +332,8 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
+    name: Direct Fix
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -456,7 +447,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
