@@ -182,6 +182,14 @@ policy_groups:
     filter: 🇩🇪|德国|Germany
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
     hidden: false
+- smart:
+    name: PH
+    policies:
+    - Subscription
+    flatten: true
+    filter: 🇵🇭|菲律宾|Philippine
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/RepublicofthePhilippines(1).png
+    hidden: false
 - select:
     name: Proxy
     policies:
@@ -192,19 +200,12 @@ policy_groups:
     - TW
     - JP
     - SG
+    - KR
     - UK
+    - DE
+    - PH
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
-    hidden: false
-- select:
-    name: AIGC
-    policies:
-    - US
-    - SG
-    - JP
-    - Manual
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
     hidden: false
 - select:
     name: Apple
@@ -216,6 +217,16 @@ policy_groups:
     - Manual
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
+    hidden: false
+- select:
+    name: AIGC
+    policies:
+    - US
+    - SG
+    - JP
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
     hidden: false
 - select:
     name: Crypto
@@ -292,6 +303,17 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/youtube(4).png
     hidden: false
 - select:
+    name: Spotify
+    policies:
+    - DIRECT
+    - US
+    - TW
+    - PH
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
+    hidden: false
+- select:
     name: TikTok
     policies:
     - US
@@ -332,8 +354,22 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    name: Direct Fix
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -398,11 +434,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reddit.yaml
-    policy: Social Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Streaming
     update_interval: 86400
@@ -418,8 +449,18 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Disney.yaml
     policy: Streaming
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Emby.yaml
+    policy: Streaming
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
+    policy: Spotify
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -447,7 +488,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
