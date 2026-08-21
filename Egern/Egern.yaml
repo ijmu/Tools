@@ -6,53 +6,90 @@ vif_only: true
 close_connections_on_policy_change: false
 hide_vpn_icon: false
 hijack_dns:
-- '*:53'
-geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: http://1.1.1.1/generate_204
-direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
+  - "*:53"
+geoip_db_url: https://github.com/xream/geoip/releases/latest/download/ipinfo.country.mmdb
+asn_db_url: https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb
+proxy_latency_test_url: https://connectivitycheck.gstatic.com/generate_204
+direct_latency_test_url: https://www.qq.com
+udp_latency_test_url: google.com@8.8.8.8
 compat_route: true
 include_all_networks: false
 dns:
   bootstrap:
-  - system
-  upstreams:
-    Domestic-DNS:
+    - system
     - 223.5.5.5
     - 119.29.29.29
-    Domestic-Encrypted-DNS:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    Foreign-Encrypted-DNS:
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.google/dns-query
+  upstreams:
+    谷歌:
+      - https://1.1.1.1/dns-query
+      - https://8.8.8.8/dns-query
+    国外:
+      - https://1.1.1.1/dns-query
+      - https://dns.google/dns-query
+      - https://cloudflare-dns.com/dns-query
+      - https://dns.adguard.com/dns-query
+    国内:
+      - https://223.6.6.6/dns-query
+      - https://223.5.5.5/dns-query
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    腾讯:
+      - https://doh.pub/dns-query
+    阿里:
+      - https://dns.alidns.com/dns-query
+    字节:
+      - 180.184.2.2
+      - 180.184.1.1
+    广告:
+      - https://dns.adguard-dns.com/dns-query
   forward:
-  - proxy_rule_set:
-      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Reject.yaml
-      value: REJECT
-      disabled: false
-  - proxy_rule_set:
-      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
-      value: Domestic-DNS
-      disabled: false
-  - domain_wildcard:
-      match: '*'
-      value: Domestic-Encrypted-DNS
-      disabled: false
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
+        value: 广告
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+        value: 谷歌
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+        value: 谷歌
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
+        value: 字节
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
+        value: 国外
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+        value: 国内
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+        value: 国内
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+        value: 国内
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
+        value: 国外
+    - proxy_rule_set:
+        match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
+        value: 国外
+    - domain_wildcard:
+        match: "*"
+        value: 国内
   hosts:
+    iosapps.itunes.apple.com:
+      - iosapps.itunes.apple.com.download.ks-cdn.com
     dns.google:
-    - 8.8.8.8, 8.8.4.4, 2001:4860:4860::8888, 2001:4860:4860::8844
+      - 8.8.8.8, 8.8.4.4
     cloudflare-dns.com:
-    - 104.16.249.249, 104.16.248.249, 2606:4700::6810:f8f9, 2606:4700::6810:f9f9
+      - 104.16.249.249, 104.16.248.249
     dns.alidns.com:
-    - 223.5.5.5, 223.6.6.6, 2400:3200:baba::1, 2400:3200::1
+      - 223.5.5.5, 223.6.6.6
     doh.pub:
-    - 1.12.12.12, 120.53.53.53
-    dot.pub:
-    - 1.12.12.12, 120.53.53.53
+      - 1.12.12.12, 120.53.53.53
   proxy_nameservers:
-  - 119.29.29.29
-  - 223.5.5.5
+    - 223.5.5.5
+    - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
 bypass_tunnel_proxy:
 - '*.ts.net'
@@ -99,7 +136,6 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
-    - 订阅地址3
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
@@ -342,7 +378,7 @@ rules:
     policy: DIRECT
     disabled: false
 - domain_suffix:
-    match: oics.net
+    match: cdn.jsdelivr.net
     policy: DIRECT
     disabled: false
 - domain_keyword:
@@ -354,22 +390,8 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
+    name: Direct Fix
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -389,7 +411,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://cdn.jsdelivr.net/gh/LeiyuG/Surge@main/rules/Binancenew.list
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
     policy: Crypto
     update_interval: 86400
     disabled: false
@@ -399,7 +426,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
@@ -411,25 +438,9 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
     policy: Microsoft
-    update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
-    policy: Social Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
-    policy: Social Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
-    policy: Social Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Instagram.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
     policy: Social Media
     update_interval: 86400
     disabled: false
@@ -454,27 +465,21 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Emby.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Streaming
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/spotify.yaml
     policy: Spotify
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
     policy: TikTok
-    update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/PayPal.yaml
-    policy: Pay
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Wise.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
     policy: Pay
     update_interval: 86400
     disabled: false
@@ -483,12 +488,17 @@ rules:
     policy: Pay
     disabled: false
 - rule_set:
+    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Wise.yaml
+    policy: UK
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/N26.yaml
     policy: DE
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -502,8 +512,8 @@ rules:
     policy: Proxy
 scriptings:
 - generic:
-    name: 网络测速
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/NetSpeed_Widget.JS
+    name: iOS限免
+    script_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Widgets/IBL3ND/App_Store_Widget.JS
     update_interval: 86400
 - generic:
     name: IP信息流媒体解锁
@@ -516,30 +526,33 @@ scriptings:
 - generic:
     name: 节日倒计时
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Holiday_Countdown.js
+    update_interval: 86400
 - generic:
     name: 全国油价查询
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
+    env:
+      region: fujian/putian
+      SHOW_TREND: 'true'
+    update_interval: 86400
 - generic:
     name: 彩票开奖
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Lottery-Widget.JS
+    env:
+      彩票类型: 大乐透
+    update_interval: 86400
 mitm:
   
 widgets:
-- name: IP解锁
+- name: IP信息
   script_name: IP信息流媒体解锁
+- name: 大乐透
+  script_name: 彩票开奖
 - name: 招商金价
-  script_name: 招商金价
-- name: 油价查询
-  script_name: 油价查询小组件
-  env:
-    region: fujian/putian
-    SHOW_TREND: 'true'
-- name: 彩票开奖
-  script_name: 彩票开奖小组件
-  env:
-    彩票类型: 大乐透
-- name: 节日倒计时
-  script_name: 节日倒计时小组件
+  script_name: 招商实时金价
+- name: 油价
+  script_name: 全国油价查询
+- name: 节日
+  script_name: 节日倒计时
 modules:
 - url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
   update_interval: 86400
@@ -562,10 +575,10 @@ modules:
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
