@@ -17,22 +17,9 @@ DOMAIN-KEYWORD,tokenpocket
 DOMAIN-SUFFIX,safepal.com
 DOMAIN-KEYWORD,safepal
 
-# Binance
-DOMAIN-SUFFIX,binance.com
-DOMAIN-SUFFIX,bnbstatic.com
-DOMAIN-SUFFIX,binance.info
-DOMAIN-SUFFIX,binance.me
-DOMAIN-KEYWORD,binance
-
-# OKX
-DOMAIN-SUFFIX,okx.com
-DOMAIN-SUFFIX,okx.cab
-DOMAIN-SUFFIX,okxusercontent.com
-DOMAIN-SUFFIX,okx-dns.com
-DOMAIN-SUFFIX,okg.com
-DOMAIN-SUFFIX,oklink.com
-DOMAIN-KEYWORD,okx
-DOMAIN-KEYWORD,okex
+# GMGN
+DOMAIN-SUFFIX,gmgn.gracematrix.net
+DOMAIN-KEYWORD,gmgn
 
 # WEEX
 DOMAIN-SUFFIX,weex.com
