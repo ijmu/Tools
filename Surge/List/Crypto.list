@@ -17,6 +17,12 @@ DOMAIN-KEYWORD,tokenpocket
 DOMAIN-SUFFIX,safepal.com
 DOMAIN-KEYWORD,safepal
 
+# VergeX
+DOMAIN-SUFFIX,api.hyperliquid.xyz
+DOMAIN-SUFFIX,vergex.trade
+DOMAIN-KEYWORD,vergex
+DOMAIN-KEYWORD,hyperliquid
+
 # GMGN
 DOMAIN-SUFFIX,gmgn.gracematrix.net
 DOMAIN-KEYWORD,gmgn
@@ -25,8 +31,3 @@ DOMAIN-KEYWORD,gmgn
 DOMAIN-SUFFIX,weex.com
 DOMAIN-SUFFIX,weex.io
 DOMAIN-KEYWORD,weex
-
-# Bitget
-DOMAIN-SUFFIX,bitget.com
-DOMAIN-SUFFIX,bitgetapi.com
-DOMAIN-KEYWORD,bitget
