@@ -96,43 +96,44 @@ dns:
   - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
 bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
+# Tailscale + 局域网（邮储/税务豁免已移除，避免废去开屏 MITM）
+  - "*.ts.net"
+  - "tailscale.com"
+  - "*.tailscale.com"
+  - "tailscale.net"
+  - "*.tailscale.net"
+  - "100.64.0.0/10"
+  - "fd7a:115c:a1e0::/48"
+  - "*.local"
+  - "*.lan"
+  - "192.168.0.0/16"
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
 real_ip_domains:
-- '*.lan'
-- '*.local'
-- '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
+  - "*.lan"
+  - "*.local"
+  - "*.push.apple.com"
+  - lancache.steamcontent.com
+  - "*.msftconnecttest.com"
+  - "*.msftncsi.com"
+  - msftncsi.com
+  - msftconnecttest.com
+  - "*.srv.nintendo.net"
+  - "*.stun.playstation.net"
+  - xbox.*.microsoft.com
+  - "*.xboxlive.com"
+  - stun.l.google.com
+  - "*.prod.cloud.netflix.com"
+  - appboot.netflix.com
+  - "*.battle.net"
+  - "*.blzstatic.cn"
+  - "*.battlenet.com"
+  - "*.battlenet.com.cn"
+  - "*.ts.net"
+  - "tailscale.com"
+  - "*.tailscale.com"
+  - "tailscale.net"
+  - "*.tailscale.net"
 policy_groups:
 - external:
     name: Subscription
@@ -140,7 +141,6 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
-    - 订阅地址3
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
@@ -387,8 +387,22 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    name: Direct Fix
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -397,15 +411,11 @@ rules:
     policy: DIRECT
     disabled: false
 - domain_suffix:
-    match: oics.net
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
     match: liangxin.xyz
     policy: DIRECT
     disabled: false
 - domain_suffix:
-    match: kaze1.aisaka-taiga.com
+    match: m1.tohno-0.top
     policy: DIRECT
     disabled: false
 - domain_suffix:
@@ -510,14 +520,9 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
-- geoip:
-    match: CN
-    policy: DIRECT
-    no_resolve: false
     disabled: false
 - default:
     name: Final
