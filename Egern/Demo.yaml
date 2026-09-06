@@ -40,8 +40,11 @@ dns:
       match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
       value: system
   - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/ai.conf
-      value: Global
+      match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
+      value: system
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+      value: system
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/domainset/cdn.conf
       value: Global
@@ -54,9 +57,6 @@ dns:
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/global.conf
       value: Global
-  - proxy_rule_set:
-      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
-      value: system
   - domain_wildcard:
       match: '*'
       value: Domestic
@@ -133,14 +133,6 @@ policy_groups:
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
 - smart:
-    name: US
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
-    hidden: true
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
-- smart:
     name: HK
     policies:
     - Subscription
@@ -148,6 +140,14 @@ policy_groups:
     filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
     hidden: true
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
+- smart:
+    name: US
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
+    hidden: true
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
 - smart:
     name: TW
     policies:
@@ -177,8 +177,8 @@ policy_groups:
     policies:
     - Automatic
     - Manual
-    - US
     - HK
+    - US
     - TW
     - JP
     - SG
@@ -192,42 +192,76 @@ policy_groups:
     - SG
     - TW
     - JP
+    - Proxy
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
 - select:
     name: Crypto
-    policies:
+    policies: &id001
     - Proxy
-    - US
     - HK
-    - SG
+    - US
     - TW
     - JP
+    - SG
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
 - select:
-    name: Pay
+    name: Google
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+- select:
+    name: Microsoft
     policies:
+    - DIRECT
     - Proxy
-    - US
     - HK
+    - US
     - TW
+    - JP
     - SG
     - Manual
     hidden: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
+- select:
+    name: Meta
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Facebook.png
+- select:
+    name: Twitter
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+- select:
+    name: Telegram
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png
 - select:
     name: TikTok
     policies:
     - US
-    - SG
     - TW
     - JP
+    - SG
+    - Proxy
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok((2).png
+- select:
+    name: Porn
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Pornhub.png
+- select:
+    name: Pay
+    policies: *id001
+    hidden: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
 rules:
 - domain_keyword:
     match: '96110'
@@ -277,31 +311,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/apple_services.conf
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/microsoft.conf
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
     policy: Crypto
     update_interval: 86400
@@ -322,6 +331,81 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/Repcz/EgernRules/X/Rules/Google/Google.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/Repcz/EgernRules/X/Rules/YouTube/YouTube.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/non_ip/microsoft.conf
+    policy: Microsoft
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
+    policy: Meta
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Instagram/Instagram.list
+    policy: Meta
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Threads/Threads.list
+    policy: Meta
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Whatsapp/Whatsapp.list
+    policy: Meta
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    policy: Twitter
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/non_ip/telegram.conf
+    policy: Telegram
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/ip/telegram.conf
+    policy: Telegram
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/ip/telegram_asn.conf
+    policy: Telegram
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
+    policy: TikTok
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    policy: Porn
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
     policy: Pay
     update_interval: 86400
@@ -332,8 +416,13 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
-    policy: TikTok
+    match: https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
+    policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
