@@ -1,490 +1,409 @@
+# 设计目标：国内直连，国外代理，AI 默认美国，Crypto/支付/TikTok 独立策略
+# 使用前只需要修改 Subscription 下的订阅地址
+# 2026-09-06
+
 ipv6: false
 http_port: 3080
 socks_port: 3090
 allow_external_connections: false
 vif_only: true
-block_quic: false
-close_connections_on_policy_change: true
+close_connections_on_policy_change: false
 hide_vpn_icon: false
+
 hijack_dns:
-- '*:53'
-- 8.8.8.8
-- 114.114.114.114
-geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: https://www.gstatic.com/generate_204
-direct_latency_test_url: https://wifi.vivo.com.cn/generate_204
+  - '*:53'
+
+geoip_db_url: https://raw.githubusercontent.com/Masaiki/GeoIP2-CN/release/Country.mmdb
+proxy_latency_test_url: https://www.apple.com/library/test/success.html
+direct_latency_test_url: http://connectivitycheck.gstatic.com/generate_204
+
 compat_route: false
 include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
+
 dns:
   bootstrap:
-  - system
-  - 223.5.5.5
-  - 119.29.29.29
-  upstreams:
-    谷歌:
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
-    国外:
-    - https://1.1.1.1/dns-query
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.adguard.com/dns-query
-    国内:
-    - https://223.6.6.6/dns-query
-    - https://223.5.5.5/dns-query
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-    腾讯:
-    - https://doh.pub/dns-query
-    阿里:
-    - https://dns.alidns.com/dns-query
-    字节:
-    - 180.184.2.2
-    - 180.184.1.1
-    广告:
-    - https://dns.adguard-dns.com/dns-query
-  forward:
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-      value: 广告
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
-      value: 字节
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
-      value: 国外
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
-      value: 国外
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
-      value: 国外
-  - domain_wildcard:
-      match: '*'
-      value: 国内
-  hosts:
-    iosapps.itunes.apple.com:
-    - iosapps.itunes.apple.com.download.ks-cdn.com
-    dns.google:
-    - 8.8.8.8, 8.8.4.4
-    cloudflare-dns.com:
-    - 104.16.249.249, 104.16.248.249
-    dns.alidns.com:
-    - 223.5.5.5, 223.6.6.6
-    doh.pub:
-    - 1.12.12.12, 120.53.53.53
-  proxy_nameservers:
-  - 223.5.5.5
-  - 119.29.29.29
-  public_ip_lookup_url: https://ifconfig.me/ip
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
-- 127.0.0.0/8
-- 169.254.0.0/16
-real_ip_domains:
-- '*.lan'
-- '*.local'
-- '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-policy_groups:
-- external:
-    name: Subscription
-    type: select
-    urls:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    - 订阅地址1
-    - 订阅地址2
-    urls_disabled:
-    - https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
-    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道)).+$
-    update_interval: 86400
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
-    hidden: false
-- select:
-    name: Manual
-    policies:
-    - Subscription
-    flatten: true
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(5).png
-    hidden: false
-- smart:
-    name: Automatic
-    policies:
-    - Subscription
-    flatten: true
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
-    hidden: false
-- smart:
-    name: HK
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
-    hidden: false
-- smart:
-    name: TW
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇹🇼|台湾|台灣|\b(?:TW|Taiwan)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
-    hidden: false
-- smart:
-    name: JP
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇯🇵|日本|东京|東京|\b(?:JP|Japan|Tokyo)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
-    hidden: false
-- smart:
-    name: SG
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
-    hidden: false
-- smart:
-    name: US
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
-    hidden: false
-- select:
-    name: Proxy
-    policies:
-    - Automatic
-    - Manual
-    - HK
-    - SG
-    - JP
-    - TW
-    - US
-    - DIRECT
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
-    hidden: false
-- select:
-    name: AI
-    policies:
-    - US
-    - SG
-    - JP
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
-    hidden: false
-- select:
-    name: Telegram
-    policies:
-    - Proxy
-    - SG
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram(1).png
-    hidden: false
-- select:
-    name: TikTok
-    policies:
-    - SG
-    - JP
-    - TW
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok((2).png
-    hidden: false
-- select:
-    name: Social
-    policies:
-    - Proxy
-    - SG
-    - US
-    - HK
-    - JP
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-    hidden: false
-- select:
-    name: Streaming
-    policies:
-    - Proxy
-    - SG
-    - JP
-    - TW
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/youtube(4).png
-    hidden: false
-- select:
-    name: Google
-    policies:
-    - Proxy
-    - SG
-    - JP
-    - US
-    - HK
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-    hidden: false
-- select:
-    name: Microsoft
-    policies:
-    - DIRECT
-    - Proxy
-    - HK
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
-    hidden: false
-- select:
-    name: Apple
-    policies:
-    - DIRECT
-    - Proxy
-    - HK
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
-    hidden: false
-- select:
-    name: Crypto
-    policies:
-    - Proxy
-    - SG
-    - JP
-    - TW
-    - HK
-    - US
-    - Manual
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
-    hidden: false
-- select:
-    name: Movie
-    policies:
-    - Proxy
-    - SG
-    - TW
-    - JP
-    - Manual
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/fileball.png
-    hidden: false
-rules:
-- domain_keyword:
-    name: Anti-fraud endpoint
-    match: '96110'
-    policy: REJECT
-    disabled: false
-- domain_suffix:
-    name: Anti-fraud endpoint
-    match: gjfzpt.cn
-    policy: REJECT
-    disabled: false
-- domain_suffix:
-    name: Required direct
-    match: oics.net
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
-    name: Required direct
-    match: liangxin.xyz
-    policy: DIRECT
-    disabled: false
-- domain_keyword:
-    name: Egern direct
-    match: egern
-    policy: DIRECT
-    disabled: false
-- ssid:
-    name: Trusted Wi-Fi
-    match: MLGS_5G
-    policy: DIRECT
-    disabled: false
-- rule_set:
-    name: LAN
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Lan.yaml
-    policy: DIRECT
-    update_interval: 86400
-- rule_set:
-    name: Direct exceptions
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-- rule_set:
-    name: Advertising and tracking
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Reject.yaml
-    policy: REJECT
-    update_interval: 86400
-- rule_set:
-    name: Douyin
-    match: https://raw.githubusercontent.com/QuixoticHeart/rule-set/refs/heads/ruleset/egern/douyin.yaml
-    policy: DIRECT
-    update_interval: 86400
-- rule_set:
-    name: China domains
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/ChinaDomain.yaml
-    policy: DIRECT
-    update_interval: 86400
-- rule_set:
-    name: AI services
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/AI.yaml
-    policy: AI
-    update_interval: 86400
-- rule_set:
-    name: Telegram
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Telegram.yaml
-    policy: Telegram
-    update_interval: 86400
-- rule_set:
-    name: TikTok
-    match: https://raw.githubusercontent.com/QuixoticHeart/rule-set/refs/heads/ruleset/egern/tiktok.yaml
-    policy: TikTok
-    update_interval: 86400
-- rule_set:
-    name: X Twitter
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Twitter.yaml
-    policy: Social
-    update_interval: 86400
-- rule_set:
-    name: Facebook
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Facebook.yaml
-    policy: Social
-    update_interval: 86400
-- rule_set:
-    name: Instagram
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Instagram.yaml
-    policy: Social
-    update_interval: 86400
-- rule_set:
-    name: YouTube
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/YouTube.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: Netflix
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Netflix.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: Disney Plus
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Disney.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: Prime Video
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/PrimeVideo.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: HBO Max
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/HBO.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: Spotify
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Spotify.yaml
-    policy: Streaming
-    update_interval: 86400
-- rule_set:
-    name: Google
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Google.yaml
-    policy: Google
-    update_interval: 86400
-- rule_set:
-    name: GitHub
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Github.yaml
-    policy: Microsoft
-    update_interval: 86400
-- rule_set:
-    name: Microsoft
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Microsoft.yaml
-    policy: Microsoft
-    update_interval: 86400
-- rule_set:
-    name: Apple China
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/AppleCN.yaml
-    policy: DIRECT
-    update_interval: 86400
-- rule_set:
-    name: Apple services
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/AppleServers.yaml
-    policy: Apple
-    update_interval: 86400
-- rule_set:
-    name: Crypto
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Crypto.yaml
-    policy: Crypto
-    update_interval: 86400
-- rule_set:
-    name: Adult content
-    match: https://raw.githubusercontent.com/Repcz/Tool/refs/heads/X/Egern/Rules/Porn.yaml
-    policy: Movie
-    update_interval: 86400
-- geoip:
-    name: Mainland China IP
-    match: CN
-    policy: DIRECT
-    no_resolve: true
-- default:
-    name: Final
-    policy: Proxy
+    - system
+    - 223.5.5.5
+    - 119.29.29.29
 
-modules:
-- name: YouTube Enhance
-  url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
-  update_interval: 86400
-  enabled: true
+  upstreams:
+    China:
+      - https://dns.alidns.com/dns-query
+      - https://doh.pub/dns-query
+
+    Global:
+      - https://1.1.1.1/dns-query
+      - https://dns.google/dns-query
+
+  forward:
+    - proxy_rule_set:
+        match: https://ruleset.skk.moe/List/non_ip/direct.conf
+        value: China
+
+    - proxy_rule_set:
+        match: https://ruleset.skk.moe/List/non_ip/domestic.conf
+        value: China
+
+    - domain_wildcard:
+        match: '*'
+        value: Global
+
+  hosts:
+    dns.google:
+      - 8.8.8.8
+      - 8.8.4.4
+    dns.alidns.com:
+      - 223.5.5.5
+      - 223.6.6.6
+    doh.pub:
+      - 1.12.12.12
+      - 120.53.53.53
+
+  proxy_nameservers:
+    - 223.5.5.5
+    - 119.29.29.29
+
+  public_ip_lookup_url: https://ifconfig.me/ip
+
+# Tailscale 与局域网直接绕过隧道
+bypass_tunnel_proxy:
+  - "*.ts.net"
+  - "tailscale.com"
+  - "*.tailscale.com"
+  - "tailscale.net"
+  - "*.tailscale.net"
+  - "100.64.0.0/10"
+  - "fd7a:115c:a1e0::/48"
+  - "*.local"
+  - "*.lan"
+  - "192.168.0.0/16"
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+
+real_ip_domains:
+  - "*.lan"
+  - "*.local"
+  - "*.push.apple.com"
+  - "*.msftconnecttest.com"
+  - "*.msftncsi.com"
+  - msftncsi.com
+  - msftconnecttest.com
+  - "*.srv.nintendo.net"
+  - "*.stun.playstation.net"
+  - xbox.*.microsoft.com
+  - "*.xboxlive.com"
+  - stun.l.google.com
+  - "*.prod.cloud.netflix.com"
+  - appboot.netflix.com
+  - "*.ts.net"
+  - "tailscale.com"
+  - "*.tailscale.com"
+  - "tailscale.net"
+  - "*.tailscale.net"
+
+policy_groups:
+  - external:
+      name: Subscription
+      type: select
+      urls:
+        - 订阅地址1
+        - 订阅地址2
+      filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
+      update_interval: 10800
+      hidden: false
+
+  - select:
+      name: Manual
+      policies:
+        - Subscription
+      flatten: true
+      hidden: false
+
+  - smart:
+      name: Automatic
+      policies:
+        - Subscription
+      flatten: true
+      hidden: false
+
+  - smart:
+      name: US
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b'
+      hidden: true
+
+  - smart:
+      name: HK
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b'
+      hidden: true
+
+  - smart:
+      name: JP
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇯🇵|日本|东京|東京|\b(?:JP|Japan|Tokyo)\b'
+      hidden: true
+
+  - smart:
+      name: SG
+      policies:
+        - Subscription
+      flatten: true
+      filter: '(?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b'
+      hidden: true
+
+  - select:
+      name: Proxy
+      policies:
+        - Automatic
+        - Manual
+        - US
+        - HK
+        - JP
+        - SG
+        - DIRECT
+      hidden: false
+
+  - select:
+      name: AI
+      policies:
+        - US
+        - SG
+        - JP
+        - Manual
+      hidden: false
+
+  - select:
+      name: Crypto
+      policies:
+        - Proxy
+        - US
+        - HK
+        - SG
+        - JP
+        - Manual
+      hidden: false
+
+  - select:
+      name: Pay
+      policies:
+        - Proxy
+        - US
+        - HK
+        - SG
+        - Manual
+      hidden: false
+
+  - select:
+      name: TikTok
+      policies:
+        - US
+        - SG
+        - JP
+        - Manual
+      hidden: false
+
+rules:
+  # 自定义规则
+  - domain_keyword:
+      match: '96110'
+      policy: REJECT
+      disabled: false
+
+  - domain_suffix:
+      match: gjfzpt.cn
+      policy: REJECT
+      disabled: false
+
+  - ssid:
+      match: MLGS_5G
+      policy: DIRECT
+      disabled: false
+
+  # 局域网与系统基础流量
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/lan.conf
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  # 广告与追踪
+  - rule_set:
+      match: https://ruleset.skk.moe/List/domainset/reject.conf
+      policy: REJECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/reject.conf
+      policy: REJECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/reject-drop.conf
+      policy: REJECT
+      update_interval: 86400
+      disabled: false
+
+  # AI 独立走美国优先策略
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/ai.conf
+      policy: AI
+      update_interval: 86400
+      disabled: false
+
+  # Apple 与 Microsoft 默认直连
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  # Crypto
+  - rule_set:
+      match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
+      policy: Crypto
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://github.com/LeiyuG/Surge/raw/main/rules/Bybit.list
+      policy: Crypto
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
+      policy: Crypto
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Crypto.yaml
+      policy: Crypto
+      update_interval: 86400
+      disabled: false
+
+  # TikTok
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+      policy: TikTok
+      update_interval: 86400
+      disabled: false
+
+  # 支付
+  - rule_set:
+      match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
+      policy: Pay
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Stripe.yaml
+      policy: Pay
+      update_interval: 86400
+      disabled: false
+
+  # 常用国外服务统一交给 Proxy
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Netflix.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Disney.yaml
+      policy: Proxy
+      update_interval: 86400
+      disabled: false
+
+  # Cloudflare 自有服务走代理
+  - domain_suffix:
+      match: cloudflare.com
+      policy: Proxy
+      disabled: false
+
+  - domain_suffix:
+      match: cloudflare-dns.com
+      policy: Proxy
+      disabled: false
+
+  # 国内域名与 IP
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/direct.conf
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/domestic.conf
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  - rule_set:
+      match: https://ruleset.skk.moe/List/ip/domestic.conf
+      policy: DIRECT
+      update_interval: 86400
+      disabled: false
+
+  - domain_suffix:
+      match: cn
+      policy: DIRECT
+      disabled: false
+
+  - geoip:
+      match: CN
+      policy: DIRECT
+      no_resolve: true
+
+  # 最终兜底
+  - default:
+      name: Final
+      policy: Proxy
