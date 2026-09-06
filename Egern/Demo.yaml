@@ -3,139 +3,62 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: false
 vif_only: true
-# 【修改 false → true】切换策略（手动切换/自动测速切换/订阅更新回退）时
-# 立即断开仍挂在旧节点上的连接：切换 AI、TikTok 地区后新会话马上生效，
-# 避免出现"切了区还是旧 IP"的情况。代价是切换瞬间现有连接会重连。
 close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
-# 走代理测速用 Apple（国内外都可达，测的是完整 TLS 握手）
-proxy_latency_test_url: https://www.apple.com/library/test/success.html
-# 【修复】原 connectivitycheck.gstatic.com 在大陆直连不可达，
-# DIRECT 延迟测试会一直失败/超时；改用国内三大运营商均可达的 204 检测
-direct_latency_test_url: http://connect.rom.miui.com/generate_204
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: false
 include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
-# QUIC 说明（官方文档）：不设置时协议默认生效——TCP 系代理协议
-# （Trojan/SS/VLESS+WS 等）默认已屏蔽 QUIC，UDP 系（Hysteria2/TUIC）默认放行。
-# 因此无需全局开启 block_quic；若你的节点是 UDP 系协议且想强制 TCP，
-# 在对应策略组或节点上加 block_quic: true 即可。
-
 dns:
   bootstrap:
-  - system
   - 223.5.5.5
   - 119.29.29.29
   upstreams:
     Domestic:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
-    # 官方文档确认：加密 DNS 上游的连接本身会按分流规则走隧道，
-    # 1.1.1.1 / dns.google 实际经代理转发，国内可用，无需改动
+    - https://223.5.5.5/dns-query
+    - https://120.53.53.53/dns-query
     Global:
     - https://1.1.1.1/dns-query
-    - https://dns.google/dns-query
+    - https://8.8.8.8/dns-query
   forward:
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/lan.conf
       value: system
   - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
-      value: system
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
-      value: system
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
-      value: system
-  - proxy_rule_set:
-      match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
-      value: system
-  - proxy_rule_set:
       match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
-      value: system
-  # 【新增】Telegram 域名改用 Global 解析（经隧道出口视角），
-  # 配合 rules 里的 telegram IP 段 / ASN 规则，命中更准
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/telegram.conf
-      value: Global
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/domainset/cdn.conf
-      value: Global
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/cdn.conf
-      value: Global
-  - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/stream.conf
-      value: Global
+      value: Domestic
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/global.conf
       value: Global
   - domain_wildcard:
       match: '*'
       value: Domestic
-  hosts:
-    dns.google:
-    - 8.8.8.8
-    - 8.8.4.4
-    dns.alidns.com:
-    - 223.5.5.5
-    - 223.6.6.6
-    doh.pub:
-    - 1.12.12.12
-    - 120.53.53.53
-  # 【新增】过滤 DNS 应答里的黑洞地址（0.0.0.0/127.0.0.1/::1），
-  # 防运营商 DNS 广告劫持与部分投毒；若应答被全部过滤则按解析失败处理
   block_ips:
   - 0.0.0.0
   - 127.0.0.1
   - '::1'
-  # 代理侧解析固定走国内明文 DNS 并强制直连（官方确认会绕过 forward），
-  # 用于避免 DNS→代理→DNS 循环依赖，保持不动
   proxy_nameservers:
   - 223.5.5.5
   - 119.29.29.29
   public_ip_lookup_url: https://ifconfig.me/ip
-
 bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
 - '*.local'
 - '*.lan'
 - 192.168.0.0/16
 - 10.0.0.0/8
 - 172.16.0.0/12
-
 real_ip_domains:
-- '*.lan'
-- '*.local'
 - '*.push.apple.com'
 - '*.msftconnecttest.com'
-- '*.msftncsi.com'
 - msftncsi.com
 - msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-
+- '*.lan'
+- '*.local'
 policy_groups:
 - external:
     name: Subscription
@@ -143,7 +66,6 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
-    # 【增强】在原有基础上追加：网址/时间/应急/过期/有效/失联/公告/群
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 10800
     hidden: false
@@ -162,7 +84,6 @@ policy_groups:
     flatten: true
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
-# 以下地区组用 smart 类型（官方：EWMA 健康度 + 迟滞切换，比 auto_test 抗抖动），保持不变
 - smart:
     name: HK
     policies:
@@ -176,7 +97,6 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    # 【增强】补充常见美国城市命名：纽约/芝加哥/西雅图/达拉斯/凤凰城/硅谷/费利蒙/圣克拉拉
     filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|纽约|紐約|芝加哥|西雅图|西雅圖|达拉斯|達拉斯|凤凰城|鳳凰城|硅谷|矽谷|费利蒙|費利蒙|圣克拉拉|聖克拉拉|\b(?:US|USA|United\s*States)\b
     hidden: true
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
@@ -193,7 +113,6 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    # 【增强】补充大阪/名古屋
     filter: (?i)🇯🇵|日本|东京|東京|大阪|名古屋|\b(?:JP|Japan|Tokyo|Osaka)\b
     hidden: true
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
@@ -218,7 +137,6 @@ policy_groups:
     - DIRECT
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
-# AI 组不含 HK：OpenAI / Anthropic / Gemini 均不对香港开放，原本就正确，保持
 - select:
     name: AI
     policies:
@@ -230,9 +148,6 @@ policy_groups:
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
-# 【调整】Crypto 组移除 US：Binance / Bybit 对美国 IP 直接拒绝，
-# Bybit 2024 年起停止服务香港 IP，Binance 对香港限制衍生品；
-# 默认走 Proxy，备选顺序调整为 日→新→台→港
 - select:
     name: Crypto
     policies:
@@ -305,7 +220,6 @@ policy_groups:
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png
-# TikTok 组不含 HK：TikTok 不向香港提供服务，原本就正确，保持
 - select:
     name: TikTok
     policies:
@@ -341,9 +255,7 @@ policy_groups:
     - Manual
     hidden: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
-
 rules:
-# —— 本地/反诈 ——
 - domain_keyword:
     match: '96110'
     policy: REJECT
@@ -356,7 +268,6 @@ rules:
     match: MLGS_5G
     policy: DIRECT
     disabled: false
-# —— 启动/局域网 ——
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
     policy: DIRECT
@@ -367,7 +278,6 @@ rules:
     policy: DIRECT
     update_interval: 86400
     disabled: false
-# —— 广告拦截 ——
 - rule_set:
     match: https://ruleset.skk.moe/List/domainset/reject.conf
     policy: REJECT
@@ -388,13 +298,11 @@ rules:
     policy: REJECT-DROP
     update_interval: 86400
     disabled: false
-# —— AI ——
 - rule_set:
     match: https://ruleset.skk.moe/List/non_ip/ai.conf
     policy: AI
     update_interval: 86400
     disabled: false
-# —— Crypto ——
 - rule_set:
     match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
     policy: Crypto
@@ -415,21 +323,14 @@ rules:
     policy: Crypto
     update_interval: 86400
     disabled: false
-# —— Google ——
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/EgernRules/X/Rules/Google/Google.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/EgernRules/X/Rules/YouTube/YouTube.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
     policy: Google
-    update_interval: 86400
-    disabled: false
-# —— Microsoft（先 CDN 直连，再全量）——
-- rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
-    policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -437,7 +338,11 @@ rules:
     policy: Microsoft
     update_interval: 86400
     disabled: false
-# —— Meta ——
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Facebook/Facebook.list
     policy: Meta
@@ -458,13 +363,11 @@ rules:
     policy: Meta
     update_interval: 86400
     disabled: false
-# —— Twitter ——
 - rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
     policy: Twitter
     update_interval: 86400
     disabled: false
-# —— Telegram（域名 → IP 段 → ASN）——
 - rule_set:
     match: https://ruleset.skk.moe/List/non_ip/telegram.conf
     policy: Telegram
@@ -480,25 +383,21 @@ rules:
     policy: Telegram
     update_interval: 86400
     disabled: false
-# —— 抖音直连（置于 TikTok 之前，防止 TikTok 列表误伤字节域名）——
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
-# —— TikTok ——
 - rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
     policy: TikTok
     update_interval: 86400
     disabled: false
-# —— Porn ——
 - rule_set:
     match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Porn
     update_interval: 86400
     disabled: false
-# —— Pay ——
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
     policy: Pay
@@ -509,18 +408,16 @@ rules:
     policy: Pay
     update_interval: 86400
     disabled: false
-# —— Apple ——
 - rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
+    match: https://ruleset.skk.moe/List/domainset/apple_cdn.conf
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
-# —— 海外 CDN / 流媒体 / 全量海外 ——
 - rule_set:
     match: https://ruleset.skk.moe/List/domainset/cdn.conf
     policy: Proxy
@@ -541,7 +438,6 @@ rules:
     policy: Proxy
     update_interval: 86400
     disabled: false
-# —— 国内兜底 ——
 - rule_set:
     match: https://ruleset.skk.moe/List/non_ip/direct.conf
     policy: DIRECT
@@ -552,7 +448,6 @@ rules:
     policy: DIRECT
     update_interval: 86400
     disabled: false
-# —— IP 兜底 ——
 - rule_set:
     match: https://ruleset.skk.moe/List/ip/reject.conf
     policy: REJECT-DROP
