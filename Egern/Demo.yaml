@@ -1,3 +1,14 @@
+# Egern First-Principles Final v5
+# 2026-09-06
+# Design:
+# - Known foreign domains -> Global encrypted DNS / Proxy
+# - Known domestic domains -> system DNS / DIRECT
+# - Unknown domains -> Domestic encrypted DNS, then IP-based China routing
+# - Domain rules before IP rules
+# - No giant mixed China-Direct mega-list in routing
+# - DNS is for resolution; ad blocking is handled by routing rules
+# - File intentionally ends at rules; modules/widgets/scripts are user-managed
+#
 ipv6: false
 http_port: 3080
 socks_port: 3090
@@ -7,7 +18,6 @@ close_connections_on_policy_change: false
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
-geoip_db_url: https://raw.githubusercontent.com/Masaiki/GeoIP2-CN/release/Country.mmdb
 proxy_latency_test_url: https://www.apple.com/library/test/success.html
 direct_latency_test_url: http://connectivitycheck.gstatic.com/generate_204
 compat_route: false
@@ -21,7 +31,7 @@ dns:
   - 223.5.5.5
   - 119.29.29.29
   upstreams:
-    China:
+    Domestic:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
     Global:
@@ -30,25 +40,37 @@ dns:
   forward:
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/lan.conf
-      value: China
+      value: system
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/apple_cdn.conf
-      value: China
+      value: system
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/microsoft_cdn.conf
-      value: China
+      value: system
   - proxy_rule_set:
       match: https://ruleset.skk.moe/List/non_ip/apple_cn.conf
-      value: China
+      value: system
   - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/direct.conf
-      value: China
+      match: https://ruleset.skk.moe/List/non_ip/ai.conf
+      value: Global
   - proxy_rule_set:
-      match: https://ruleset.skk.moe/List/non_ip/domestic.conf
-      value: China
+      match: https://ruleset.skk.moe/List/domainset/cdn.conf
+      value: Global
+  - proxy_rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/cdn.conf
+      value: Global
+  - proxy_rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/stream.conf
+      value: Global
+  - proxy_rule_set:
+      match: https://ruleset.skk.moe/List/non_ip/global.conf
+      value: Global
+  - proxy_rule_set:
+      match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+      value: system
   - domain_wildcard:
       match: '*'
-      value: Global
+      value: Domestic
   hosts:
     dns.google:
     - 8.8.8.8
@@ -332,14 +354,6 @@ rules:
     policy: Proxy
     update_interval: 86400
     disabled: false
-- domain_suffix:
-    match: cloudflare.com
-    policy: Proxy
-    disabled: false
-- domain_suffix:
-    match: cloudflare-dns.com
-    policy: Proxy
-    disabled: false
 - rule_set:
     match: https://ruleset.skk.moe/List/non_ip/direct.conf
     policy: DIRECT
@@ -370,86 +384,7 @@ rules:
     policy: DIRECT
     update_interval: 86400
     disabled: false
-- geoip:
-    match: CN
-    policy: DIRECT
-    no_resolve: true
 - default:
     name: Final
     policy: Proxy
-scriptings:
-- generic:
-    name: iOS限免
-    script_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Widgets/IBL3ND/App_Store_Widget.JS
-    update_interval: 86400
-- generic:
-    name: IP信息流媒体解锁
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/IP_STR_Widget.JS
-    update_interval: 86400
-- generic:
-    name: 招商实时金价
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
-    update_interval: 86400
-- generic:
-    name: 节日倒计时
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Holiday_Countdown.js
-    update_interval: 86400
-- generic:
-    name: 全国油价查询
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
-    env:
-      region: fujian/putian
-      SHOW_TREND: 'true'
-    update_interval: 86400
-- generic:
-    name: 彩票开奖
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Lottery-Widget.JS
-    env:
-      彩票类型: 大乐透
-    update_interval: 86400
-mitm: null
-widgets:
-- name: IP信息
-  script_name: IP信息流媒体解锁
-- name: 大乐透
-  script_name: 彩票开奖
-- name: 招商金价
-  script_name: 招商实时金价
-- name: 油价
-  script_name: 全国油价查询
-- name: 节日
-  script_name: 节日倒计时
-modules:
-- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
-  update_interval: 86400
-  enabled: true
-- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-weather.sgmodule
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-maps.sgmodule
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
-  update_interval: 86400
-  enabled: false
+    
