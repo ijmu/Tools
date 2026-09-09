@@ -7,8 +7,6 @@ close_connections_on_policy_change: false
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
-- 8.8.8.8
-- 114.114.114.114
 geoip_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/GeoLite2-ASN.mmdb
 proxy_latency_test_url: https://www.apple.com/library/test/success.html
@@ -141,7 +139,7 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
-    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网)).+$
+    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
     hidden: false
@@ -298,7 +296,7 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|\b(?:US|USA|United\s*States)\b
+    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|纽约|紐約|芝加哥|西雅图|西雅圖|达拉斯|達拉斯|凤凰城|鳳凰城|硅谷|矽谷|费利蒙|費利蒙|圣克拉拉|聖克拉拉|\b(?:US|USA|United\s*States)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
     hidden: true
 - smart:
@@ -314,7 +312,7 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇯🇵|日本|东京|東京|\b(?:JP|Japan|Tokyo)\b
+    filter: (?i)🇯🇵|日本|东京|東京|大阪|名古屋|\b(?:JP|Japan|Tokyo|Osaka)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
     hidden: true
 - smart:
@@ -423,7 +421,7 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -472,7 +470,7 @@ rules:
     policy: Microsoft
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
     policy: Social Media
     update_interval: 86400
     disabled: false
@@ -501,7 +499,7 @@ rules:
     policy: TikTok
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
+    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/PayPal.yaml
     policy: Pay
     update_interval: 86400
     disabled: false
