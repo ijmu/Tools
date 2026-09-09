@@ -1,0 +1,571 @@
+# ============================================================================
+# Egern v2（B 方案）—— 只改 mitm: 以上的部分
+# 生成: 2026-09-09  状态: 草稿，未推送 GitHub，未在设备上验证
+#
+# 本版改动仅限两类：
+#   【解析类】geoip 不再本地解析、DNS forward 换成 Egern 原生规则集、
+#             关闭换节点即断连、替换 4 个已 404 的失效规则集
+#   【分组对齐】国家组 5→11、新增 Streaming 与 Pay 组及配套规则集
+#
+# 未改动（按你的要求）：mitm / widgets / modules（含去广告合集模块、boxjs、
+# iRingo、YT Music 增强）三段与原版逐字节一致；crypto 三条交易所名单保持启用；
+# scriptings 三个小组件保持原样；GeoDB 地址、测速 URL、全局开关其余项不动。
+# 上一版我自行加的增强已全部撤回：Ads_EasyListChina、block_quic、Loyalsoldier
+# GeoDB 换源与 asn_db_url/ChinaASN、ChinaIP、Proxy/ProxyGFW 兜底点名、
+# 银行政务点名直连、Telegram 集、测速 URL 改 gstatic、udp_latency_test_url。
+#
+# 硬性三条原样保留：反诈 2 条 REJECT、SSID MLGS_5G → DIRECT、egernlicense.com → DIRECT
+# Surge 侧配置仅作参照，未修改。
+# ============================================================================
+
+ipv6: false
+http_port: 3080
+socks_port: 3090
+allow_external_connections: false
+vif_only: true
+close_connections_on_policy_change: false      # 【改 1】原 true：每次换节点掐断全部连接
+hide_vpn_icon: false
+hijack_dns:
+- '*:53'
+geoip_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/Country-without-asn.mmdb
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
+compat_route: false
+include_all_networks: false
+include_apns: false
+include_cellular_services: false
+include_local_networks: false
+
+# ---- DNS -------------------------------------------------------------------
+# 唯一实质变化是 forward 的两条匹配源：原来指向 skk 的 Surge 语法 .conf，
+# 这里换成同用途的 Egern 原生 yaml（Repcz Lan / ProxyGFW）。bootstrap、
+# upstreams 取值、proxy_nameservers、block_ips 全部与原版一致。
+dns:
+  bootstrap:
+  - 223.5.5.5
+  - 119.29.29.29
+  upstreams:
+    Domestic:
+    - https://223.5.5.5/dns-query
+    - https://120.53.53.53/dns-query
+    Global:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  forward:
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Lan.yaml
+      value: system
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/ProxyGFW.yaml
+      value: Global
+  - domain_wildcard:
+      match: '*'
+      value: Domestic
+  proxy_nameservers:
+  - 223.5.5.5
+  - 119.29.29.29
+  block_ips:
+  - 0.0.0.0
+  - 127.0.0.1
+  - ::1
+  public_ip_lookup_url: https://ifconfig.me/ip
+bypass_tunnel_proxy:
+- '*.local'
+- '*.lan'
+- 192.168.0.0/16
+- 10.0.0.0/8
+- 172.16.0.0/12
+real_ip_domains:
+- '*.push.apple.com'
+- '*.msftconnecttest.com'
+- msftncsi.com
+- msftconnecttest.com
+- '*.lan'
+- '*.local'
+- '*.captive.apple.com'
+- connectivitycheck.gstatic.com
+- clients3.google.com
+- detectportal.firefox.com
+
+# ---- 策略组：原 17 个 + 6 个国家组 + Streaming + Pay = 25 -------------------
+policy_groups:
+- external:
+    name: Subscription
+    type: select
+    urls:
+    - 订阅地址1
+    - 订阅地址2
+    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
+    update_interval: 10800
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/jichang.png
+    hidden: false
+- select:
+    name: Manual
+    policies:
+    - Subscription
+    flatten: true
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(5).png
+    hidden: false
+- smart:
+    name: Automatic
+    policies:
+    - Subscription
+    flatten: true
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
+    hidden: false
+- smart:
+    name: HK
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
+    hidden: true
+- smart:
+    name: US
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|纽约|紐約|芝加哥|西雅图|西雅圖|达拉斯|達拉斯|凤凰城|鳳凰城|硅谷|矽谷|费利蒙|費利蒙|圣克拉拉|聖克拉拉|\b(?:US|USA|United\s*States)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
+    hidden: true
+- smart:
+    name: TW
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇹🇼|台湾|台灣|\b(?:TW|Taiwan)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
+    hidden: true
+- smart:
+    name: JP
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇯🇵|日本|东京|東京|大阪|名古屋|\b(?:JP|Japan|Tokyo|Osaka)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
+    hidden: true
+- smart:
+    name: SG
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
+    hidden: true
+# ↓ 【分组对齐】新增 6 个国家组，filter 关键词取自 Surge 对应组
+- smart:
+    name: KR
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇰🇷|韩国|南韓|首尔|首爾|\b(?:KR|Korea|Seoul)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Korea(2).png
+    hidden: true
+- smart:
+    name: UK
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇬🇧|英国|英國|伦敦|倫敦|\b(?:UK|GB|United\s*Kingdom|London)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
+    hidden: true
+- smart:
+    name: DE
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇩🇪|德国|德國|法兰克福|\b(?:DE|Germany|Frankfurt)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
+    hidden: true
+- smart:
+    name: PH
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇵🇭|菲律宾|菲律賓|\b(?:PH|Philippine)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/RepublicofthePhilippines(1).png
+    hidden: true
+- smart:
+    name: TR
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇹🇷|土耳其|\b(?:TR|Turkey|Türkiye)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Turkey.png
+    hidden: true
+- smart:
+    name: NG
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇳🇬|尼日利亚|\b(?:NG|Nigeria)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/FederalRepublicofNigeria.png
+    hidden: true
+- select:
+    name: Proxy
+    policies:
+    - Automatic
+    - Manual
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - KR
+    - UK
+    - DE
+    - PH
+    - TR
+    - NG
+    - DIRECT
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
+    hidden: false
+- select:
+    name: Apple
+    policies:
+    - DIRECT
+    - Proxy
+    - HK
+    - US
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
+    hidden: false
+- select:
+    name: AIGC
+    policies:
+    - Proxy
+    - US
+    - SG
+    - TW
+    - JP
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
+    hidden: false
+- select:
+    name: Crypto
+    policies:
+    - Proxy
+    - JP
+    - SG
+    - TW
+    - HK
+    - Manual
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+    hidden: false
+- select:
+    name: Google
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+    hidden: false
+- select:
+    name: Microsoft
+    policies:
+    - DIRECT
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
+    hidden: false
+- select:
+    name: Media
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+    hidden: false
+# ↓ 【分组对齐】新增：Surge 侧已有 Streaming 与 Pay
+- select:
+    name: Streaming
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/youtube(4).png
+    hidden: false
+- select:
+    name: Pay
+    policies:
+    - DIRECT
+    - HK
+    - US
+    - UK
+    - DE
+    - Proxy
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
+    hidden: false
+- select:
+    name: TikTok
+    policies:
+    - US
+    - TW
+    - JP
+    - SG
+    - Proxy
+    - Manual
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
+    hidden: false
+- select:
+    name: Porn
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Manual
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Pornhub.png
+    hidden: false
+
+rules:
+- domain_keyword:
+    match: '96110'
+    policy: REJECT
+    disabled: false
+- domain_suffix:
+    match: gjfzpt.cn
+    policy: REJECT
+    disabled: false
+- ssid:
+    match: MLGS_5G
+    policy: DIRECT
+    disabled: false
+- domain_suffix:
+    name: Egern
+    match: egernlicense.com
+    policy: DIRECT
+    disabled: false
+- rule_set:
+    name: Direct Fix
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
+    policy: Apple
+    update_interval: 86400
+    disabled: false
+
+# 【改 2】原 ai.yaml / gits.yaml / socialmedia.yaml / douyin.yaml 四条来自
+#   QuixoticHeart/rule-set，该仓库已重构，四条现均 404 —— 一直是哑规则，
+#   这几类域名此前都掉进 geoip 兜底被本地解析，正是 CF 跳盾的高发路径。
+#   现换成 Repcz 的 Egern 原生 yaml（逐个实测 HTTP 200）。
+- rule_set:
+    name: AIGC
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/AI.yaml
+    policy: AIGC
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Bybit.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: GitHub
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Github.yaml
+    policy: Microsoft
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Twitter
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Twitter.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Instagram
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Instagram.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Facebook
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Facebook.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Reddit
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Reddit.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+# 原 douyin.yaml（404）不替换：Repcz ChinaDomain.yaml 实测已含 douyin.com、
+# iesdouyin.com、pstatp/snssdk 系列，由下面的国内直连兜住，行为与原先一致。
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
+    policy: TikTok
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    policy: Porn
+    update_interval: 86400
+    disabled: false
+
+# 【分组对齐】新增 Streaming 与 Pay 的配套点名，位置必须在国内直连之前
+# （锁区流媒体域名有相当一部分不在 ChinaDomain 内，排后面会被 geoip 抢先兜底）
+- rule_set:
+    name: ProxyMedia
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/ProxyMedia.yaml
+    policy: Streaming
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Netflix
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Netflix.yaml
+    policy: Streaming
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: Disney
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Disney.yaml
+    policy: Streaming
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: PayPal
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/PayPal.yaml
+    policy: Pay
+    update_interval: 86400
+    disabled: false
+
+- rule_set:
+    name: LAN
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    name: ChinaDomain
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/ChinaDomain.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+
+# 【改 3 / 本版最关键】geoip 兜底不再本地解析
+#   原 no_resolve: false 会把所有未命中规则的长尾海外域名交给国内 DNS 解析，
+#   拿到 Cloudflare 的中国/亚太边缘 IP 后再由境外节点拨号 —— CF 判定地理异常，
+#   直接出验证。Surge 对应那行本来就是 no-resolve。
+#   待实测：Egern 是否真正尊重该取值，只有设备日志能定。
+- geoip:
+    match: CN
+    policy: DIRECT
+    no_resolve: true
+    disabled: false
+- default:
+    name: Final
+    policy: Proxy
+scriptings:
+- generic:
+    name: 招商实时金价
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
+    update_interval: 86400
+- generic:
+    name: 节日倒计时
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Holiday_Countdown.js
+    update_interval: 86400
+- generic:
+    name: 全国油价查询
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
+    env:
+      region: fujian/putian
+      SHOW_TREND: 'true'
+    update_interval: 86400
+mitm:
+  
+widgets:
+- name: 招商金价
+  script_name: 招商实时金价
+- name: 油价
+  script_name: 全国油价查询
+- name: 节日
+  script_name: 节日倒计时
+modules:
+- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-weather.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-maps.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
+  update_interval: 86400
+  enabled: false
