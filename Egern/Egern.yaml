@@ -70,6 +70,9 @@ dns:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
       value: 国内
   - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+      value: 国外
+  - proxy_rule_set:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
       value: 国外
   - proxy_rule_set:
@@ -258,6 +261,18 @@ policy_groups:
     - Manual
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
+    hidden: false
+- select:
+    name: Telegram
+    policies:
+    - Proxy
+    - HK
+    - US
+    - JP
+    - SG
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram.png
     hidden: false
 - select:
     name: Streaming
@@ -475,6 +490,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    name: Telegram
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    policy: Telegram
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
     policy: Streaming
     update_interval: 86400
@@ -593,7 +614,7 @@ modules:
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/adblock-nocf.module
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
