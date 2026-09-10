@@ -7,10 +7,10 @@ close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
-geoip_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/GeoLite2-ASN.mmdb
-proxy_latency_test_url: https://www.apple.com/library/test/success.html
-direct_latency_test_url: http://connectivitycheck.gstatic.com/generate_204
+geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
+asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: false
 include_all_networks: false
 include_apns: false
@@ -292,18 +292,6 @@ policy_groups:
     - Manual
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
     hidden: false
-- select:
-    name: Porn
-    policies:
-    - Proxy
-    - HK
-    - US
-    - TW
-    - JP
-    - SG
-    - Manual
-    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Pornhub.png
-    hidden: false
 rules:
 - domain_keyword:
     match: '96110'
@@ -318,41 +306,18 @@ rules:
     match: MLGS_5G
     policy: DIRECT
     disabled: false
-- domain_suffix:
-    name: Egern
-    match: egernlicense.com
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
-    match: cdn.jsdelivr.net
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
-    match: liangxin.xyz
-    policy: DIRECT
-    disabled: false
-- domain_suffix:
-    match: m1.tohno-0.top
-    policy: DIRECT
-    disabled: false
 - rule_set:
-    name: LAN
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
+    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Direct_Own.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -367,32 +332,37 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
-    policy: Crypto
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
     policy: Media
     update_interval: 86400
     disabled: false
@@ -402,19 +372,19 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
     policy: TikTok
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
-    policy: Porn
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
+    policy: DIRECT
     update_interval: 86400
     disabled: false
 - geoip:
     match: CN
     policy: DIRECT
-    no_resolve: false
+    no_resolve: true
     disabled: false
 - default:
     name: Final
@@ -437,9 +407,6 @@ scriptings:
     update_interval: 86400
 mitm:
   
-  hostnames:
-    includes:
-    - sub.store
 widgets:
 - name: 招商金价
   script_name: 招商实时金价
@@ -469,15 +436,6 @@ modules:
 - url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
-  update_interval: 86400
-  enabled: false
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.sgmodule
-  update_interval: 86400
-  enabled: false
