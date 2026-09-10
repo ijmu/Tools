@@ -1,1 +1,9 @@
-Demo
+# Direct
+# URL:https://github.com/ijmu/Tools/raw/main/Egern/Rules/Direct_Own.yaml
+
+domain_suffix_set:
+  - rilipro.com
+  - egernlicense.com
+  - cdn.jsdelivr.net
+  - liangxin.xyz
+  - m1.tohno-0.top
