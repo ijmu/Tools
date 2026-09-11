@@ -332,12 +332,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -352,22 +352,22 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
@@ -392,7 +392,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
     policy: TikTok
     update_interval: 86400
     disabled: false
