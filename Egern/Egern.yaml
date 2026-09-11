@@ -3,7 +3,7 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: false
 vif_only: true
-close_connections_on_policy_change: true
+close_connections_on_policy_change: false
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
@@ -400,6 +400,11 @@ rules:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
+    disabled: false
+- geoip:
+    match: CN
+    policy: DIRECT
+    no_resolve: false
     disabled: false
 - default:
     name: Final
