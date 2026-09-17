@@ -1,7 +1,6 @@
 ipv6: false
 allow_external_connections: false
 vif_only: true
-block_quic: false
 close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
@@ -18,18 +17,14 @@ dns:
   - 119.29.29.29
   upstreams:
     China:
-    - https://223.5.5.5/dns-query
-    - https://doh.pub/dns-query
+    - 223.5.5.5
+    - 119.29.29.29
     Global:
     - https://1.1.1.1/dns-query
     - https://8.8.8.8/dns-query
   forward:
   - proxy_rule_set:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
-      value: Global
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
       value: Global
       update_interval: 86400
   - domain_wildcard:
@@ -81,57 +76,41 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
+    filter: (?i)🇭🇰|香港|Hong Kong|\bHK\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
-    hidden: false
+    hidden: true
 - smart:
     name: US
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|纽约|紐約|芝加哥|西雅图|西雅圖|达拉斯|達拉斯|凤凰城|鳳凰城|硅谷|矽谷|费利蒙|費利蒙|圣克拉拉|聖克拉拉|\b(?:US|USA|United\s*States)\b
+    filter: (?i)🇺🇸|美国|美國|United States|\b(?:US|USA)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
-    hidden: false
+    hidden: true
 - smart:
     name: TW
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇹🇼|台湾|台灣|\b(?:TW|Taiwan)\b
+    filter: (?i)🇹🇼|台湾|台灣|Taiwan|\bTW\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
-    hidden: false
+    hidden: true
 - smart:
     name: JP
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇯🇵|日本|东京|東京|大阪|名古屋|\b(?:JP|Japan|Tokyo|Osaka)\b
+    filter: (?i)🇯🇵|日本|Japan|\bJP\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
-    hidden: false
+    hidden: true
 - smart:
     name: SG
     policies:
     - Subscription
     flatten: true
-    filter: (?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b
+    filter: (?i)🇸🇬|新加坡|Singapore|\bSG\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
-    hidden: false
-- smart:
-    name: UK
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇬🇧|英国|英國|\b(?:UK|GB|United\s*Kingdom)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
-    hidden: false
-- smart:
-    name: DE
-    policies:
-    - Subscription
-    flatten: true
-    filter: (?i)🇩🇪|德国|德國|\b(?:DE|GER|Germany|Deutschland)\b
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
-    hidden: false
+    hidden: true
 - select:
     name: Proxy
     policies:
@@ -142,8 +121,6 @@ policy_groups:
     - TW
     - JP
     - SG
-    - UK
-    - DE
     - DIRECT
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
@@ -164,9 +141,9 @@ policy_groups:
     policies:
     - Proxy
     - US
-    - SG
     - TW
     - JP
+    - SG
     - Manual
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
@@ -175,11 +152,12 @@ policy_groups:
     name: Crypto
     policies:
     - Proxy
+    - HK
+    - TW
     - JP
     - SG
-    - TW
-    - HK
     - Manual
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
     hidden: false
 - select:
@@ -188,23 +166,18 @@ policy_groups:
     - Proxy
     - HK
     - US
-    - TW
-    - JP
-    - SG
     - Manual
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
     hidden: false
 - select:
     name: Microsoft
     policies:
-    - DIRECT
     - Proxy
     - HK
     - US
-    - TW
-    - JP
-    - SG
     - Manual
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
     hidden: false
 - select:
@@ -213,25 +186,9 @@ policy_groups:
     - Proxy
     - HK
     - US
-    - TW
-    - JP
-    - SG
     - Manual
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-    hidden: false
-- select:
-    name: PayPal
-    policies:
-    - DIRECT
-    - Proxy
-    - HK
-    - US
-    - UK
-    - DE
-    - Manual
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
     hidden: false
 - select:
     name: TikTok
@@ -252,6 +209,11 @@ rules:
     disabled: false
 - domain_suffix:
     match: gjfzpt.cn
+    policy: REJECT
+    disabled: false
+- rule_set:
+    name: Fuck AD
+    match: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-RULE-SET.list
     policy: REJECT
     disabled: false
 - ssid:
@@ -310,38 +272,23 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft-cn.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/microsoft.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
     policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
-    policy: PayPal
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/Wise.list
-    policy: UK
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/N26.list
-    policy: DE
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -362,7 +309,7 @@ rules:
 - geoip:
     match: CN
     policy: DIRECT
-    no_resolve: false
+    no_resolve: true
     disabled: false
 - default:
     name: Final
@@ -413,4 +360,4 @@ modules:
   enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
   update_interval: 86400
-  enabled: true
+  enabled: false
