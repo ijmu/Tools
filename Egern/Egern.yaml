@@ -1,136 +1,56 @@
 ipv6: false
-http_port: 3080
-socks_port: 3090
 allow_external_connections: false
 vif_only: true
-close_connections_on_policy_change: false
+block_quic: false
+close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: http://1.1.1.1/generate_204
+proxy_latency_test_url: https://www.apple.com/library/test/success.html
 direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: false
-include_all_networks: false
-include_apns: false
-include_cellular_services: false
-include_local_networks: false
 dns:
   bootstrap:
   - system
   - 223.5.5.5
   - 119.29.29.29
   upstreams:
-    谷歌:
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
-    国外:
-    - https://1.1.1.1/dns-query
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.adguard.com/dns-query
-    国内:
-    - https://223.6.6.6/dns-query
+    China:
     - https://223.5.5.5/dns-query
     - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-    腾讯:
-    - https://doh.pub/dns-query
-    阿里:
-    - https://dns.alidns.com/dns-query
-    字节:
-    - 180.184.2.2
-    - 180.184.1.1
-    广告:
-    - https://dns.adguard-dns.com/dns-query
+    Global:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
   forward:
   - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-      value: 广告
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-      value: 谷歌
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/Douyin.yaml
-      value: 字节
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TestFlight.yaml
-      value: 国外
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
-      value: 国内
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-      value: 国内
-  - proxy_rule_set:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/ProxyGFW.yaml
-      value: 国外
+      value: Global
+      update_interval: 86400
   - proxy_rule_set:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Proxy.yaml
-      value: 国外
+      value: Global
+      update_interval: 86400
   - domain_wildcard:
       match: '*'
-      value: 国内
-  hosts:
-    iosapps.itunes.apple.com:
-    - iosapps.itunes.apple.com.download.ks-cdn.com
-    dns.google:
-    - 8.8.8.8, 8.8.4.4
-    cloudflare-dns.com:
-    - 104.16.249.249, 104.16.248.249
-    dns.alidns.com:
-    - 223.5.5.5, 223.6.6.6
-    doh.pub:
-    - 1.12.12.12, 120.53.53.53
+      value: China
   proxy_nameservers:
   - 223.5.5.5
   - 119.29.29.29
-  public_ip_lookup_url: https://ifconfig.me/ip
 bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
 - '*.local'
 - '*.lan'
-- 192.168.0.0/16
+- localhost
+- 127.0.0.0/8
 - 10.0.0.0/8
 - 172.16.0.0/12
+- 192.168.0.0/16
 real_ip_domains:
-- '*.lan'
 - '*.local'
+- '*.lan'
+- localhost
 - '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
 policy_groups:
 - external:
     name: Subscription
@@ -163,7 +83,7 @@ policy_groups:
     flatten: true
     filter: (?i)🇭🇰|香港|\b(?:HK|Hong(?:\s*Kong)?)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
-    hidden: true
+    hidden: false
 - smart:
     name: US
     policies:
@@ -171,7 +91,7 @@ policy_groups:
     flatten: true
     filter: (?i)🇺🇸|美国|美國|洛杉矶|洛杉磯|圣何塞|聖何塞|纽约|紐約|芝加哥|西雅图|西雅圖|达拉斯|達拉斯|凤凰城|鳳凰城|硅谷|矽谷|费利蒙|費利蒙|圣克拉拉|聖克拉拉|\b(?:US|USA|United\s*States)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
-    hidden: true
+    hidden: false
 - smart:
     name: TW
     policies:
@@ -179,7 +99,7 @@ policy_groups:
     flatten: true
     filter: (?i)🇹🇼|台湾|台灣|\b(?:TW|Taiwan)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
-    hidden: true
+    hidden: false
 - smart:
     name: JP
     policies:
@@ -187,7 +107,7 @@ policy_groups:
     flatten: true
     filter: (?i)🇯🇵|日本|东京|東京|大阪|名古屋|\b(?:JP|Japan|Tokyo|Osaka)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
-    hidden: true
+    hidden: false
 - smart:
     name: SG
     policies:
@@ -195,7 +115,23 @@ policy_groups:
     flatten: true
     filter: (?i)🇸🇬|新加坡|狮城|獅城|\b(?:SG|Singapore)\b
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
-    hidden: true
+    hidden: false
+- smart:
+    name: UK
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇬🇧|英国|英國|\b(?:UK|GB|United\s*Kingdom)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
+    hidden: false
+- smart:
+    name: DE
+    policies:
+    - Subscription
+    flatten: true
+    filter: (?i)🇩🇪|德国|德國|\b(?:DE|GER|Germany|Deutschland)\b
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
+    hidden: false
 - select:
     name: Proxy
     policies:
@@ -206,7 +142,10 @@ policy_groups:
     - TW
     - JP
     - SG
+    - UK
+    - DE
     - DIRECT
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
     hidden: false
 - select:
@@ -282,14 +221,28 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
     hidden: false
 - select:
+    name: PayPal
+    policies:
+    - DIRECT
+    - Proxy
+    - HK
+    - US
+    - UK
+    - DE
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
+    hidden: false
+- select:
     name: TikTok
     policies:
+    - Proxy
     - US
     - TW
     - JP
     - SG
-    - Proxy
     - Manual
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
     hidden: false
 rules:
@@ -332,12 +285,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -352,38 +305,43 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
+    policy: Crypto
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/YouTube.yaml
-    policy: Google
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
     policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
     policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
-    policy: Media
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
+    policy: PayPal
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/Wise.list
+    policy: UK
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/LeiyuG/Surge/raw/main/rules/N26.list
+    policy: DE
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -392,7 +350,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
     policy: TikTok
     update_interval: 86400
     disabled: false
@@ -400,11 +358,6 @@ rules:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
-- geoip:
-    match: CN
-    policy: DIRECT
-    no_resolve: false
     disabled: false
 - default:
     name: Final
@@ -450,12 +403,9 @@ modules:
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/QingRex/LoonKissSurge/refs/heads/main/Surge/Official/Youtube%20(Music)%20Enhance.official.sgmodule
+- url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/GitRawAutoCDN/surge.sgmodule
-  update_interval: 86400
-  enabled: false
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
   update_interval: 86400
   enabled: true
