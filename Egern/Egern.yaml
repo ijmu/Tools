@@ -359,6 +359,11 @@ rules:
     policy: DIRECT
     update_interval: 86400
     disabled: false
+- geoip:
+    match: CN
+    policy: DIRECT
+    no_resolve: false
+    disabled: false
 - default:
     name: Final
     policy: Proxy
