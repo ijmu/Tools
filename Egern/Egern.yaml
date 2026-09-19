@@ -245,6 +245,18 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
     hidden: false
 - select:
+    name: Game
+    policies:
+    - Proxy
+    - HK
+    - US
+    - TW
+    - JP
+    - Manual
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/steam(1).png
+    hidden: false
+- select:
     name: Google
     policies:
     - Proxy
@@ -350,12 +362,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -375,18 +387,33 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Game.yaml
+    policy: Game
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
     policy: GitHub
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
     policy: Microsoft
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -395,12 +422,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
     policy: Telegram
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/TikTok.yaml
     policy: TikTok
     update_interval: 86400
     disabled: false
