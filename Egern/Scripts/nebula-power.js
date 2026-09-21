@@ -26,7 +26,9 @@
  * env（小组件编辑页 Env 区，全部可选）：
  *   NEBULA_COOKIE = "server_session_xxx=..."  → 追加显示你的余额 / 电力包剩余（私有）
  *                                                不填 = 只显示公开补贴（零凭证）
- *   NEBULA_TOP    = "6"                       → 大尺寸列出的补贴档数（默认 medium 3 / large 6）
+ *   NEBULA_TOP    = "6"                       → 大尺寸列出的补贴档数（默认 medium 4 / large 6）
+ *   NEBULA_SORT   = "power" | "price"          → power=能力优先（默认，新/强在前，首行标「首推」）
+ *                                                price=省钱优先（有效电价升序，v1 行为）
  *
  * 部署：
  *   1) 工具 → 脚本 → + ：名称 nebula-power，类型 generic，文件位置「本地」，文件名 nebula-power.js
@@ -43,6 +45,40 @@
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
 const USAGE_API = 'https://ai.ipix.ink/user/usage';
 const CNY_PER_POWER = 0.01; // 兜底单价；实际以接口 rmb_rate 为准
+
+/* 能力档位（0-100）：越新越强越高。依据站点模型描述的参数量/定位词手工标定，
+ * 排序模式 power（默认）按它从高到低；表外模型走后缀+描述启发式。 */
+const CAPABILITY = {
+  'Qwen3.8-Max': 96, 'Kimi-K3': 95, 'GLM-5.2': 94, 'MiMo-V2.5-Pro': 93,
+  'GLM-5.3': 92, 'DeepSeek-V4-Pro-0813': 90, 'MiniMax-M3': 88, 'DeepSeek-V4-Pro': 88,
+  'Kimi-K2.7-Code': 86, 'GLM-5.1': 85, 'Hy4-Preview': 85, 'GLM-5.3-Flash': 84,
+  'Kimi-K2.6': 82, 'Qwen3.8-Flash': 82, 'GLM-5.3-FlashX': 80, 'DeepSeek-V4.1-Flash': 80,
+  'MiMo-V2.5': 78, 'Qwen3.7-Plus': 76, 'DeepSeek-V4-Flash-0731': 74,
+  'DeepSeek-V4-Flash-Vision-Exp': 72, 'DeepSeek-V4-Flash': 70, 'Hy3': 70,
+  'Qwen3.7-Flash': 68, 'MiniMax-M2.7': 66,
+};
+function capabilityScore(m) {
+  if (CAPABILITY[m && m.display_name] != null) return CAPABILITY[m.display_name];
+  const name = String((m && m.display_name) || '');
+  const desc = String((m && m.description) || '');
+  let s = 50;
+  if (/(^|[^a-z])Max|Pro|Plus/.test(name)) s += 18;
+  if (/Flash/i.test(name)) s -= 6;
+  if (/Exp|Preview/i.test(name)) s -= 4;
+  if (/万亿|2\.4T|2\.8万亿|7430 亿|千亿/.test(desc)) s += 16;
+  if (/旗舰|最强|第一|Opus/.test(desc)) s += 10;
+  if (/轻量|高速|极速|更快/.test(desc)) s -= 6;
+  if ((m && m.context_limit || 0) >= 1000000) s += 4;
+  return Math.max(0, Math.min(100, s));
+}
+
+/** 展示排序：power=能力优先（生效档在前→档位高在前→同档价低在前）；price=省钱优先（v1：电价升序） */
+function displayRows(rows, mode) {
+  const arr = (rows || []).slice();
+  if (mode === 'price') return arr;
+  return arr.sort((a, b) => ((b.active - a.active) || (b.cap - a.cap) || (a.eff - b.eff)
+    || String(a.m.display_name).localeCompare(String(b.m.display_name))));
+}
 
 /* ============================ 时间（纯算术时区，不依赖 Intl） ============================ */
 
@@ -247,6 +283,7 @@ async function loadSubsidy(ctx, now) {
       hasSubsidy: m.discount_price != null,
       depth: depth(m),
       eff: price,
+      cap: capabilityScore(m),
     });
   }
   // 排序：有效电价升序 → 补贴力度降序 → 名称
@@ -333,12 +370,12 @@ function foot(parts) {
   };
 }
 
-/** 补贴/价格一行（中尺寸：名 + 价 + 力度；大尺寸再加时段与额度） */
-function rowLine(r, wide) {
+/** 补贴/价格一行；first=true 时加「首推」标 */
+function rowLine(r, wide, first) {
   const m = r.m;
   const priceColor = r.active ? C.gold : C.tertiary;
   const kids = [
-    T(m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.7 }),
+    T((first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
     { type: 'spacer' },
   ];
   if (wide) {
@@ -348,15 +385,16 @@ function rowLine(r, wide) {
   kids.push(T(`-${pct(r.depth)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
   if (wide) {
     const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '已耗尽' : '剩' + fmtPower(r.q.left));
-    kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted ? C.warn : C.tertiary, lineLimit: 1 }));
+    const ratio = r.q.total ? r.q.left / r.q.total : 1;
+    kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted || ratio < 0.15 ? C.warn : C.tertiary, lineLimit: 1 }));
   }
   return { type: 'stack', direction: 'row', alignItems: 'center', gap: 5, children: kids };
 }
 
-function subsidyRowList(data, limit, wide) {
-  const list = data.activeRows.length ? data.activeRows : data.subsidised.filter((r) => !r.q.depleted);
-  const picked = (list.length ? list : data.subsidised).slice(0, limit);
-  return picked.map((r) => rowLine(r, wide));
+function subsidyRowList(data, disp, limit, wide) {
+  const act = disp.filter((r) => r.active);
+  const list = act.length ? act : disp.filter((r) => r.hasSubsidy && !r.q.depleted);
+  return list.slice(0, limit).map((r, i) => rowLine(r, wide, i === 0));
 }
 
 /* ============================ 入口 ============================ */
@@ -386,7 +424,9 @@ export default async function (ctx) {
     };
   }
 
-  const best = data.best;
+  const order = String(env.NEBULA_SORT || 'power').toLowerCase() === 'price' ? 'price' : 'power';
+  const disp = displayRows(data.rows, order);
+  const best = disp[0] || data.best;
   const activeN = data.activeRows.length;
   const subN = data.subsidised.length;
   const deep = data.deepest;
@@ -438,7 +478,7 @@ export default async function (ctx) {
   const isSmall = fam === 'systemSmall';
   const isLarge = fam === 'systemLarge';
   const wide = isLarge;
-  const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 3);
+  const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 4);
 
   const children = [header(activeN ? `补贴中 ${activeN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴'))];
 
@@ -465,7 +505,7 @@ export default async function (ctx) {
     );
   } else {
     children.push({ type: 'spacer', length: 2 });
-    children.push(...subsidyRowList(data, topN, wide));
+    children.push(...subsidyRowList(data, disp, topN, wide));
     children.push({ type: 'spacer' });
     const footParts = [];
     if (usage) footParts.push(`⚡${fmtPower(usage.remaining)}`, `${usage.packCount} 包`);
@@ -495,4 +535,5 @@ function nextRefresh() {
 export const __internals = {
   bjNow, normEnd, endExpired, inDailyWindow, subsidyActive, quotaState,
   effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpJson,
+  capabilityScore, displayRows,
 };
