@@ -29,9 +29,15 @@
  *   NEBULA_TOP    = "6"                       → 大尺寸列出的补贴档数（默认 medium 3 / large 6）
  *
  * 部署：
- *   1) 工具 → 脚本 → + ：名称 nebula-power，类型 generic，本地文件 nebula-power.js
- *   2) 分析 → 小组件画廊 → + ：名称「星云电力」，脚本选 nebula-power
- *   3) 主屏/锁屏长按 → + → Egern → 选尺寸 → 编辑小组件 → 选「星云电力」
+ *   1) 工具 → 脚本 → + ：名称 nebula-power，类型 generic，文件位置「本地」，文件名 nebula-power.js
+ *   2) 编辑文件，粘贴本文件内容，保存
+ *   3) 分析 → 左上角 → 小组件画廊 → +，名称任意，脚本选 nebula-power
+ *   4) 主屏幕长按 → + → Egern → 选尺寸 → 长按小组件 → 编辑小组件 → 选该名称
+ *
+ * v2（2026-09-21）：HTTP 垫片对齐 Egern 实机 API —— ctx.http.get/post(url, {timeout})
+ *   返回 Response，需 await res.text()（社区实机组件 xcgtb/Egern-Widgets 核实）；
+ *   依次尝试 ctx.http(url,init) → ctx.http({url,...}) → $httpClient 回调 → fetch，
+ *   全挂时把各通道死因显示在卡片上。
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
@@ -128,58 +134,22 @@ function nextWindow(rows, now) {
 }
 const hmToMin = (hm) => Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5));
 
-/* ============================ HTTP 垫片（多运行时兼容） ============================ */
+/* ============================ HTTP 垫片 v2 ============================
+ * Egern 真实 API（对社区实机组件核实）：ctx.http.get(url, {timeout}) → Response，
+ * 必须再 await res.text() / res.json()。post 同构。
+ * 这里按优先级依次尝试：ctx.http(url,init) → ctx.http({url,...}) → $httpClient 回调 → fetch，
+ * 全部失败时抛出带各通道死因的聚合错误（会显示在小组件上，便于远程排障）。
+ * ========================================================================== */
 
-function pickGetter(ctx, method) {
-  const c = [
-    ctx && ctx.http,
-    typeof globalThis.$httpClient !== 'undefined' ? globalThis.$httpClient : null,
-    typeof globalThis.$http !== 'undefined' ? globalThis.$http : null,
-  ];
-  for (const o of c) {
-    if (o && typeof o[method] === 'function') return o[method].bind(o);
-  }
-  return null;
-}
-
-/** 回调式 / Promise 式 / fetch 式三种运行时统一成一个 async 请求 */
-function httpRequest(ctx, opts) {
-  const headers = Object.assign({ 'User-Agent': 'Egern/nebula-power' }, opts.headers || {});
-  const req = { url: opts.url, method: opts.method || 'GET', headers };
-  if (opts.body != null) req.body = opts.body;
-
-  const getter = pickGetter(ctx, (opts.method || 'GET').toLowerCase());
-  if (getter) {
-    return new Promise((resolve, reject) => {
-      let settled = false;
-      const finish = (r) => { if (!settled) { settled = true; resolve(r); } };
-      const fail = (e) => { if (!settled) { settled = true; reject(e instanceof Error ? e : new Error(String(e))); } };
-      const cb = (err, resp, body) => {
-        if (err) return fail(err);
-        finish({ status: (resp && (resp.status || resp.statusCode)) || 0, text: bodyText(body) });
-      };
-      let timer = null;
-      if (typeof setTimeout === 'function') timer = setTimeout(() => fail(new Error('请求超时')), 9000);
-      try {
-        const ret = getter(req, cb);
-        if (ret && typeof ret.then === 'function') {
-          ret.then((r) => finish({ status: (r && (r.status || r.statusCode)) || 0, text: bodyText(r && (r.body != null ? r.body : r)) }), fail);
-        } else if (ret && (typeof ret.text === 'function' || typeof ret === 'string')) {
-          Promise.resolve(ret).then(async (r) => {
-            const t = typeof r === 'string' ? r : (typeof r.text === 'function' ? await r.text() : JSON.stringify(r));
-            finish({ status: (r && r.status) || 0, text: t });
-          }, fail);
-        }
-      } catch (e) { fail(e); return; }
-      const clear = () => { if (timer) clearTimeout(timer); };
-      Promise.resolve().then(clear);
-    });
-  }
-  if (typeof fetch === 'function') {
-    return fetch(opts.url, { method: req.method, headers, body: opts.body })
-      .then(async (r) => ({ status: r.status, text: await r.text() }));
-  }
-  return Promise.reject(new Error('当前运行时不提供 HTTP 接口'));
+async function readBody(res) {
+  if (res == null) return '';
+  if (typeof res === 'string') return res;
+  if (typeof res.text === 'function') return String(await res.text());
+  if (typeof res.json === 'function') { try { return JSON.stringify(await res.json()); } catch (_) { return ''; } }
+  if (typeof res.body === 'string') return res.body;
+  if (typeof res.data === 'string') return res.data;
+  if (res.data && typeof res.data === 'object') return JSON.stringify(res.data);
+  try { return JSON.stringify(res); } catch (_) { return ''; }
 }
 
 function bodyText(b) {
@@ -190,16 +160,79 @@ function bodyText(b) {
   try { return JSON.stringify(b); } catch (_) { return ''; }
 }
 
+/** 统一请求：opts = {url, method, headers, body, expect(json)->bool}，成功返回 {status, text, json} */
+async function httpJson(ctx, opts) {
+  const method = (opts.method || 'GET').toUpperCase();
+  const lower = method.toLowerCase();
+  const headers = Object.assign({ 'User-Agent': 'Egern/nebula-power' }, opts.headers || {});
+  const init = { method, headers, timeout: 9000 };
+  if (opts.body != null) init.body = opts.body;
+  const url = opts.url;
+
+  const errs = [];
+  const attempts = [];
+  const h = ctx && ctx.http;
+  if (h && typeof h[lower] === 'function') {
+    attempts.push(['ctx.http(url,init)', async () => {
+      const res = await h[lower](url, init);
+      return { status: (res && (res.status || res.statusCode)) || 0, text: await readBody(res) };
+    }]);
+    attempts.push(['ctx.http({url,...})', async () => {
+      const res = await h[lower](Object.assign({ url }, init));
+      return { status: (res && (res.status || res.statusCode)) || 0, text: await readBody(res) };
+    }]);
+  }
+  const client = typeof globalThis.$httpClient !== 'undefined' ? globalThis.$httpClient : null;
+  if (client && typeof client[lower] === 'function') {
+    attempts.push(['$httpClient', () => new Promise((resolve, reject) => {
+      let settled = false;
+      const fin = (r) => { if (!settled) { settled = true; resolve(r); } };
+      const rej = (e) => { if (!settled) { settled = true; reject(e instanceof Error ? e : new Error(String(e))); } };
+      const timer = typeof setTimeout === 'function' ? setTimeout(() => rej(new Error('超时')), 9000) : null;
+      try {
+        client[lower]({ url, headers, body: opts.body }, (err, resp, body) => {
+          if (timer) clearTimeout(timer);
+          if (err) return rej(err);
+          fin({ status: (resp && (resp.status || resp.statusCode)) || 0, text: bodyText(body) });
+        });
+      } catch (e) { if (timer) clearTimeout(timer); rej(e); }
+    })]);
+  }
+  if (typeof fetch === 'function') {
+    attempts.push(['fetch', async () => {
+      const res = await fetch(url, { method, headers, body: opts.body });
+      return { status: res.status, text: await res.text() };
+    }]);
+  }
+
+  for (const [name, run] of attempts) {
+    let r;
+    try { r = await run(); } catch (e) { errs.push(name + ': ' + (e && e.message ? e.message : String(e))); continue; }
+    let j = null;
+    try { j = JSON.parse(r.text); } catch (_) { /* 非 JSON */ }
+    if (j != null && opts.expect && !opts.expect(j)) {
+      const d = j && j.detail ? ' detail=' + String(j.detail).slice(0, 60) : '';
+      errs.push(name + ': HTTP ' + r.status + d);
+      continue;
+    }
+    if (j == null && r.status >= 400) { errs.push(name + ': HTTP ' + r.status); continue; }
+    return { status: r.status, text: r.text, json: j };
+  }
+  const msg = errs.length ? errs.join(' | ') : '无可用通道（ctx.http/$httpClient/fetch 均缺失）';
+  throw new Error(String(msg).slice(0, 150));
+}
+
 /* ============================ 取数 ============================ */
 
 /** 公开补贴数据：返回 { rows, rate, best, activeCount, total } */
 async function loadSubsidy(ctx, now) {
-  const res = await httpRequest(ctx, {
+  const res = await httpJson(ctx, {
     url: MODELS_API, method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ key: 'public' }),
+    expect: (j) => !!(j && (j.data || j.groups)),
   });
-  const json = JSON.parse(res.text);
+  const json = res.json || JSON.parse(res.text);
   const list = json.data || json.models || [];
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
 
@@ -229,10 +262,12 @@ async function loadSubsidy(ctx, now) {
 async function loadUsage(ctx, cookie) {
   if (!cookie) return null;
   try {
-    const res = await httpRequest(ctx, { url: USAGE_API, headers: { Cookie: cookie, Accept: 'application/json' } });
-    if (!res || !res.text) return null;
-    const j = JSON.parse(res.text);
-    const u = j.usage || j;
+    const res = await httpJson(ctx, {
+      url: USAGE_API,
+      headers: { Cookie: cookie, Accept: 'application/json' },
+      expect: (j) => j && (j.usage || j.packs_remaining != null) && !j.detail,
+    });
+    const u = (res.json && (res.json.usage || res.json)) || {};
     return {
       remaining: Number(u.packs_remaining || 0),
       packCount: Number(u.active_packs_count || 0),
@@ -459,5 +494,5 @@ function nextRefresh() {
 /* 供离线测试脚本调用（Egern 忽略多余导出） */
 export const __internals = {
   bjNow, normEnd, endExpired, inDailyWindow, subsidyActive, quotaState,
-  effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpRequest,
+  effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpJson,
 };
