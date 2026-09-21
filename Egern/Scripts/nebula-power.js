@@ -47,12 +47,14 @@ const USAGE_API = 'https://ai.ipix.ink/user/usage';
 const CNY_PER_POWER = 0.01; // 兜底单价；实际以接口 rmb_rate 为准
 
 /* 能力档位（0-100）：越新越强越高。依据站点模型描述的参数量/定位词手工标定，
- * 排序模式 power（默认）按它从高到低；表外模型走后缀+描述启发式。 */
+ * 排序模式 power（默认）按它从高到低；表外模型走后缀+描述启发式。
+ * 标定原则：同代旗舰(Pro/Max) > 标准 > Flash/轻量；新一代可越上一代旗舰
+ * （定案：GLM-5.3-Flash 90 > GLM-5.2 88 —— 补后同价 ⚡1.0，新一代原生多模态优先）。 */
 const CAPABILITY = {
-  'Qwen3.8-Max': 96, 'Kimi-K3': 95, 'GLM-5.2': 94, 'MiMo-V2.5-Pro': 93,
-  'GLM-5.3': 92, 'DeepSeek-V4-Pro-0813': 90, 'MiniMax-M3': 88, 'DeepSeek-V4-Pro': 88,
-  'Kimi-K2.7-Code': 86, 'GLM-5.1': 85, 'Hy4-Preview': 85, 'GLM-5.3-Flash': 84,
-  'Kimi-K2.6': 82, 'Qwen3.8-Flash': 82, 'GLM-5.3-FlashX': 80, 'DeepSeek-V4.1-Flash': 80,
+  'Qwen3.8-Max': 96, 'Kimi-K3': 95, 'MiMo-V2.5-Pro': 93, 'GLM-5.3': 92,
+  'GLM-5.3-Flash': 90, 'GLM-5.2': 88, 'GLM-5.3-FlashX': 86, 'DeepSeek-V4-Pro-0813': 90,
+  'MiniMax-M3': 88, 'DeepSeek-V4-Pro': 88, 'Kimi-K2.7-Code': 86, 'Hy4-Preview': 85,
+  'Kimi-K2.6': 82, 'Qwen3.8-Flash': 82, 'DeepSeek-V4.1-Flash': 80, 'GLM-5.1': 78,
   'MiMo-V2.5': 78, 'Qwen3.7-Plus': 76, 'DeepSeek-V4-Flash-0731': 74,
   'DeepSeek-V4-Flash-Vision-Exp': 72, 'DeepSeek-V4-Flash': 70, 'Hy3': 70,
   'Qwen3.7-Flash': 68, 'MiniMax-M2.7': 66,
@@ -393,7 +395,15 @@ function rowLine(r, wide, first) {
 
 function subsidyRowList(data, disp, limit, wide) {
   const act = disp.filter((r) => r.active);
-  const list = act.length ? act : disp.filter((r) => r.hasSubsidy && !r.q.depleted);
+  let list = act.length ? act : disp.filter((r) => r.hasSubsidy && !r.q.depleted);
+  // 每个模型组只留一个最优推荐（GLM/Qwen/DeepSeek/… 各留榜首，不重复点同一家的菜）
+  const seen = {};
+  list = list.filter((r) => {
+    const g = r.m.group || r.m.display_name;
+    if (seen[g]) return false;
+    seen[g] = true;
+    return true;
+  });
   return list.slice(0, limit).map((r, i) => rowLine(r, wide, i === 0));
 }
 
