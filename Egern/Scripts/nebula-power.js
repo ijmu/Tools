@@ -82,16 +82,14 @@ function capabilityScore(m) {
 }
 
 /** 展示排序：smart=综合分（默认：能力50%+人气30%+补贴20%，分高在前）
- *  power=纯能力优先；price=省钱优先（有效电价升序）。生效档永远排在失效档前。 */
+ *  power=纯能力优先；price=省钱优先（有效电价升序）。
+ *  可用度分层永远最优先：生效档 > 时段内但额度耗尽 > 时段外。 */
 function displayRows(rows, mode) {
   const arr = (rows || []).slice();
-  if (mode === 'price') return arr;
-  if (mode === 'power') {
-    return arr.sort((a, b) => ((b.active - a.active) || (b.cap - a.cap) || (a.eff - b.eff)
-      || String(a.m.display_name).localeCompare(String(b.m.display_name))));
-  }
-  return arr.sort((a, b) => ((b.active - a.active) || (b.score - a.score) || (a.eff - b.eff)
-    || String(a.m.display_name).localeCompare(String(b.m.display_name))));
+  const tier = (a, b) => ((b.usable - a.usable)
+    || (mode === 'price' ? (a.eff - b.eff) || (b.depthEff - a.depthEff) : mode === 'power' ? (b.cap - a.cap) || (a.eff - b.eff) : (b.score - a.score) || (a.eff - b.eff))
+    || String(a.m.display_name).localeCompare(String(b.m.display_name)));
+  return arr.sort(tier);
 }
 
 /* ============================ 时间（纯算术时区，不依赖 Intl） ============================ */
@@ -345,13 +343,17 @@ function computeSubsidy(json, now, lb) {
     const pop = popMap[m.id] != null ? popMap[m.id]
       : (popMap[m.display_name] != null ? popMap[m.display_name] : 0);
     const cap = capabilityScore(m);
+    // 耗尽档：补贴事实上失效 → 深度按 0 计、原价显示，但保留在榜内（计数与官网口径一致）
+    const depthEff = q.depleted ? 0 : depth(m);
     rows.push({
       m, q, timeOk, active, price,
       hasSubsidy: m.discount_price != null,
       depth: depth(m),
+      depthEff,
       eff: price,
       cap, pop,
-      score: Math.round((0.5 * cap + 0.3 * pop + 0.2 * Math.round(depth(m) * 100)) * 10) / 10,
+      usable: active ? 2 : (timeOk ? 1 : 0),
+      score: Math.round((0.5 * cap + 0.3 * pop + 0.2 * Math.round(depthEff * 100)) * 10) / 10,
     });
   }
   // 排序：有效电价升序 → 补贴力度降序 → 名称（展示序由 displayRows 定）
@@ -360,7 +362,8 @@ function computeSubsidy(json, now, lb) {
   const activeRows = subsidised.filter((r) => r.active);
   const best = rows[0] || null;
   const deepest = subsidised.slice().sort((a, b) => b.depth - a.depth)[0] || null;
-  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, lbUsed: !!(Array.isArray(lb) && lb.length) };
+  const siteCount = rows.filter((r) => r.timeOk).length; // 官网「补贴生效中」口径：只看时段
+  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, siteCount, lbUsed: !!(Array.isArray(lb) && lb.length) };
 }
 
 /** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错。
@@ -483,7 +486,7 @@ function foot(parts) {
 /** 补贴/价格一行；first=true 时加「首推」标 */
 function rowLine(r, wide, first) {
   const m = r.m;
-  const priceColor = r.active ? C.gold : C.tertiary;
+  const priceColor = r.active ? C.gold : (r.q.depleted ? C.warn : C.tertiary);
   const kids = [
     T((first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
     { type: 'spacer' },
@@ -492,9 +495,13 @@ function rowLine(r, wide, first) {
     kids.push(T(windowLabel(m) || '全天', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }));
   }
   kids.push(T(`⚡${fmtPower(r.eff)}`, { font: { size: 'footnote', weight: 'heavy' }, textColor: priceColor, lineLimit: 1 }));
-  kids.push(T(`-${pct(r.depth)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
+  if (r.q.depleted) {
+    kids.push(T('已耗尽', { font: { size: 'caption2', weight: 'semibold' }, textColor: C.warn, lineLimit: 1 }));
+  } else {
+    kids.push(T(`-${pct(r.depthEff)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
+  }
   if (wide) {
-    const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '已耗尽' : '剩' + fmtPower(r.q.left));
+    const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '额度0' : '剩' + fmtPower(r.q.left));
     const ratio = r.q.total ? r.q.left / r.q.total : 1;
     kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted || ratio < 0.15 ? C.warn : C.tertiary, lineLimit: 1 }));
   }
@@ -502,9 +509,9 @@ function rowLine(r, wide, first) {
 }
 
 function subsidyRowList(data, disp, limit, wide) {
-  const act = disp.filter((r) => r.active);
-  let list = act.length ? act : disp.filter((r) => r.hasSubsidy && !r.q.depleted);
-  // 每个模型组只留一个最优推荐（GLM/Qwen/DeepSeek/… 各留榜首，不重复点同一家的菜）
+  // 计数口径与官网一致：时段内就算「补贴中」（含额度耗尽的档，黄字标出）
+  let list = disp.filter((r) => r.timeOk);
+  if (!list.length) list = disp.filter((r) => r.hasSubsidy && !r.q.depleted);
   const seen = {};
   list = list.filter((r) => {
     const g = r.m.group || r.m.display_name;
@@ -549,7 +556,7 @@ async function renderWidget(ctx) {
   const order = ['smart', 'power', 'price'].includes(orderRaw) ? orderRaw : 'smart';
   const disp = displayRows(data.rows, order);
   const best = disp[0] || data.best;
-  const activeN = data.activeRows.length;
+  const onN = data.siteCount != null ? data.siteCount : data.activeRows.length; // 官网口径：时段内即计数（含耗尽档）
   const subN = data.subsidised.length;
   const deep = data.deepest;
   const cheapest = best.m.display_name;
@@ -575,7 +582,7 @@ async function renderWidget(ctx) {
       type: 'widget', refreshAfter, padding: 2, gap: 0,
       children: [
         T(fmtPower(best.eff), { font: { size: 'headline', weight: 'heavy' }, textColor: C.gold, textAlign: 'center', lineLimit: 1, minScale: 0.5 }),
-        T(activeN ? `补贴 ${activeN}` : '无补贴', { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center', lineLimit: 1, minScale: 0.6 }),
+        T(onN ? `补贴 ${onN}` : '无补贴', { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center', lineLimit: 1, minScale: 0.6 }),
       ],
     };
   }
@@ -587,7 +594,7 @@ async function renderWidget(ctx) {
           type: 'stack', direction: 'row', alignItems: 'center', gap: 5, children: [
             T('星云电力', { font: { size: 'caption1', weight: 'bold' }, textColor: C.primary, lineLimit: 1 }),
             { type: 'spacer' },
-            T(activeN ? `补贴中 ${activeN} 档` : '当前无补贴', { font: { size: 'caption1' }, textColor: activeN ? C.accent : C.secondary, lineLimit: 1 }),
+            T(onN ? `补贴中 ${onN} 档` : '当前无补贴', { font: { size: 'caption1' }, textColor: onN ? C.accent : C.secondary, lineLimit: 1 }),
           ],
         },
         T(`${cheapest} ${priceTxt}${best.active ? ' -' + pct(best.depth) + '%' : ''}`,
@@ -603,7 +610,7 @@ async function renderWidget(ctx) {
   const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 4);
 
   const children = [header((data.fromCache ? `缓存 ${bjNow(data.staleAt).hm} · ` : '')
-    + (activeN ? `补贴中 ${activeN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴')))];
+    + (onN ? `补贴中 ${onN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴')))];
 
   if (isSmall) {
     children.push(
