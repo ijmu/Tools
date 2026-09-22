@@ -1,0 +1,173 @@
+# ══════════════════════════════════════════════════════════════
+# AI_Own · 自维护 AI 分流（Egern YAML）
+# ══════════════════════════════════════════════════════════════
+# 合并来源：Repcz AI.yaml(51) + MetaCubeX geosite category-ai-!cn + 手工补全
+#
+# 收录原则（按你的要求）：
+#   ✅ AI 服务商与产品的官方域名（对话/编程/绘图/推理平台）
+#   ❌ github.com 系 —— api.github.com / githubcopilot.com /
+#      copilot-proxy.githubusercontent.com 等全部不收，归还 GitHub 组
+#   ❌ 微软系 —— copilot.microsoft.com / copilot.cloud.microsoft /
+#      sydney.bing.com / msn 不收，归还 Microsoft 组
+#   ❌ 遥测杂毛 —— datadoghq / sentry / qualtrics / liveperson 不收
+#   ❌ 国内 AI —— 豆包/混元/通义/智谱/Kimi/MiniMax/百川/商汤 不收
+#   ❌ 过宽后缀 —— googleusercontent.com / clients6.google.com 不收
+#      （只收精确的 googleapis AI 端点，避免抢走 Google 组的流量）
+#
+# 用法：push 到 ijmu/Tools/Egern/Rules/AI_Own.yaml，规则里引用
+#   https://github.com/ijmu/Tools/raw/main/Egern/Rules/AI_Own.yaml
+# ══════════════════════════════════════════════════════════════
+
+no_resolve: true
+
+# ── 精确主机名：googleapis AI 端点 / 官方资产 CDN / 语音栈 ──
+domain_set:
+  # Google Gemini / AI Studio / Jules / Antigravity
+  - ai.google.dev
+  - aida.googleapis.com
+  - aisandbox-pa.googleapis.com
+  - alkalimakersuite-pa.clients6.google.com
+  - alkalicore-pa.clients6.google.com
+  - webchannel-alkalimakersuite-pa.clients6.google.com
+  - cloudaicompanion.googleapis.com
+  - cloudcode-pa.googleapis.com
+  - daily-cloudcode-pa.googleapis.com
+  - notebooklm-pa.googleapis.com
+  - antigravity-pa.googleapis.com
+  - antigravity.googleapis.com
+  - aicode.googleapis.com
+  - geller-pa.googleapis.com
+  - generativelanguage.googleapis.com
+  - proactivebackend-pa.googleapis.com
+  - robinfrontend-pa.googleapis.com
+  - gemini.gstatic.com
+  - jules.google.com
+  - stitch.withgoogle.com
+  # OpenAI 官方资产 CDN（azure 系，精确域名）
+  - openaiapi-site.azureedge.net
+  - openaiassets.blob.core.windows.net
+  - openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
+  - openaicom.imgix.net
+  - openaicomproductionae4b.blob.core.windows.net
+  - production-openaicom-storage.azureedge.net
+  # Anthropic / Perplexity / Cloudflare 网关
+  - servd-anthropic-website.b-cdn.net
+  - pplx-res.cloudinary.com
+  - ppl-ai-file-upload.s3.amazonaws.com
+  - gateway.ai.cloudflare.com
+  # ChatGPT 语音（LiveKit，只收 OpenAI 用的三个子域）
+  - chatgpt.livekit.cloud
+  - turn.livekit.cloud
+  - host.livekit.cloud
+
+# ── 主域（suffix 匹配，自动覆盖全部子域）──
+domain_suffix_set:
+  # OpenAI / ChatGPT / Sora
+  - openai.com
+  - chatgpt.com
+  - chatgpt.site
+  - chat.com
+  - ai.com
+  - sora.com
+  - oaistatic.com
+  - oaiusercontent.com
+  # Anthropic / Claude
+  - anthropic.com
+  - claude.ai
+  - claude.com
+  - clau.de
+  - claudeusercontent.com
+  - claudemcpcontent.com
+  - claudemcpclient.com
+  # Google Gemini 产品域（.google TLD 系）
+  - gemini.google
+  - gemini.google.com
+  - aistudio.google.com
+  - bard.google.com
+  - notebooklm.google
+  - notebooklm.google.com
+  - notebook.google
+  - flow.google
+  - labs.google
+  - opal.google
+  - generativeai.google
+  - deepmind.google
+  - deepmind.com
+  - antigravity.google
+  - antigravity-unleash.goog
+  - makersuite.google.com
+  - ai.studio
+  # xAI / Grok（不收 grok.x.com，那是 x.com 子域）
+  - x.ai
+  - grok.com
+  - grokipedia.com
+  # Perplexity
+  - perplexity.ai
+  - perplexity.com
+  - pplx.ai
+  # 编程 AI：Cursor / Windsurf / 新一代
+  - cursor.sh
+  - cursor.com
+  - cursorapi.com
+  - cursor-cdn.com
+  - windsurf.com
+  - windsurf.build
+  - codeium.com
+  - codeiumdata.com
+  - bolt.new
+  - lovable.dev
+  - v0.dev
+  - devin.ai
+  - deepwiki.com
+  - trae.ai
+  # 推理平台 / 模型 API
+  - openrouter.ai
+  - together.ai
+  - together.xyz
+  - replicate.com
+  - cohere.ai
+  - cohere.com
+  - mistral.ai
+  - fireworks.ai
+  - cerebras.ai
+  - groq.com
+  - elevenlabs.io
+  - elevenlabs.com
+  - runwayml.com
+  # 图像 / 视频 / 模型社区
+  - midjourney.com
+  - novelai.net
+  - leonardo.ai
+  - pika.art
+  - lumalabs.ai
+  - ideogram.ai
+  - stability.ai
+  - civitai.com
+  - huggingface.co
+  - hf.co
+  - hf.space
+  # 助手 / Agent / 写作
+  - meta.ai
+  - poe.com
+  - poecdn.net
+  - you.com
+  - pi.ai
+  - phind.com
+  - gamma.app
+  - dify.ai
+  - jasper.ai
+  - clipdrop.co
+  - openart.ai
+  - g.ai
+  - manus.im
+  - manuscdn.com
+  - duck.ai
+  - coze.com
+
+# ── 关键词兜底：自动覆盖 openai 未来新增子域 ──
+domain_keyword_set:
+  - openai
+
+# ── Gemini 登录跳转（保留 Repcz 原有条目）──
+url_regex_set:
+  - 'https://www\.google\.com/.*continue=https://gemini\.google\.com.+'
