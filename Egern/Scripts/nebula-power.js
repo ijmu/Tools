@@ -46,6 +46,8 @@
  * v6（2026-09-22）：综合排行——综合分 = 能力档位 50% + 平台人气 30% + 补贴力度 20%。
  *   人气项：配 NEBULA_COOKIE 时取 /user/leaderboard 的平台模型榜(真实 tokens，对数刻度)；
  *   未配置时用公开的补贴池今日消耗(discount_used)作代理。NEBULA_SORT=smart(默认)/power/price。
+ * v6.2（2026-09-22）：实扣价语义修正——时段内即补贴价；额度池(discount_used 到 quota 封顶)
+ *   只是平台记账，不改实扣价（实账单证实）。池状态仅在大尺寸做黄字信息位，不参与计价。
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
@@ -338,13 +340,13 @@ function computeSubsidy(json, now, lb) {
   for (const m of list) {
     const q = quotaState(m);
     const timeOk = subsidyActive(m, now);
-    const active = timeOk && !q.depleted;
-    const price = effPrice(m, active);
+    const price = effPrice(m, timeOk);
     const pop = popMap[m.id] != null ? popMap[m.id]
       : (popMap[m.display_name] != null ? popMap[m.display_name] : 0);
     const cap = capabilityScore(m);
-    // 耗尽档：补贴事实上失效 → 深度按 0 计、原价显示，但保留在榜内（计数与官网口径一致）
-    const depthEff = q.depleted ? 0 : depth(m);
+    // 实扣价只看时段：额度池耗尽不改实扣价（实账单证实，计数器到 quota 封顶只是记账）
+    const active = timeOk;
+    const depthEff = depth(m);
     rows.push({
       m, q, timeOk, active, price,
       hasSubsidy: m.discount_price != null,
@@ -352,7 +354,7 @@ function computeSubsidy(json, now, lb) {
       depthEff,
       eff: price,
       cap, pop,
-      usable: active ? 2 : (timeOk ? 1 : 0),
+      usable: timeOk ? 2 : 0,
       score: Math.round((0.5 * cap + 0.3 * pop + 0.2 * Math.round(depthEff * 100)) * 10) / 10,
     });
   }
@@ -486,7 +488,7 @@ function foot(parts) {
 /** 补贴/价格一行；first=true 时加「首推」标 */
 function rowLine(r, wide, first) {
   const m = r.m;
-  const priceColor = r.active ? C.gold : (r.q.depleted ? C.warn : C.tertiary);
+  const priceColor = r.active ? C.gold : C.tertiary;
   const kids = [
     T((first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
     { type: 'spacer' },
@@ -495,13 +497,10 @@ function rowLine(r, wide, first) {
     kids.push(T(windowLabel(m) || '全天', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }));
   }
   kids.push(T(`⚡${fmtPower(r.eff)}`, { font: { size: 'footnote', weight: 'heavy' }, textColor: priceColor, lineLimit: 1 }));
-  if (r.q.depleted) {
-    kids.push(T('已耗尽', { font: { size: 'caption2', weight: 'semibold' }, textColor: C.warn, lineLimit: 1 }));
-  } else {
-    kids.push(T(`-${pct(r.depthEff)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
-  }
+  kids.push(T(`-${pct(r.depthEff)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
   if (wide) {
-    const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '额度0' : '剩' + fmtPower(r.q.left));
+    // 额度池只是信息位：耗尽（计数封顶）不改实扣价，黄字提示「池满」即可
+    const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '池满' : '剩' + fmtPower(r.q.left));
     const ratio = r.q.total ? r.q.left / r.q.total : 1;
     kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted || ratio < 0.15 ? C.warn : C.tertiary, lineLimit: 1 }));
   }
