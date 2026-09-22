@@ -4,7 +4,7 @@ socks_port: 3090
 allow_external_connections: false
 vif_only: true
 block_quic: true
-close_connections_on_policy_change: false
+close_connections_on_policy_change: true
 hide_vpn_icon: false
 hijack_dns:
 - '*:53'
@@ -260,6 +260,7 @@ policy_groups:
 - select:
     name: GitHub
     policies:
+    - DIRECT
     - Proxy
     - HK
     - US
@@ -293,7 +294,7 @@ policy_groups:
     policies:
     - Subscription
     flatten: true
-    filter: (?=.*(🇸🇬|新加坡|Singapore|\bSG\b|\bSGP\b|狮城|🇭🇰|香港|Hong|🇯🇵|日本|Japan|\bJP\b|\bJPN\b|东京|大阪))(?!.*(流媒体|专线|IEPL|IPLC|家宽|游戏|解锁))
+    filter: (?=.*(🇸🇬|新加坡|Singapore|\bSG\b|\bSGP\b|狮城|🇭🇰|香港|Hong))(?!.*(流媒体|专线|IEPL|IPLC|家宽|游戏|解锁))
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram(1).png
     hidden: false
 - select:
@@ -309,6 +310,11 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/tiktok.png
     hidden: false
 rules:
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+    policy: GitHub
+    update_interval: 86400
+    disabled: false
 - domain_keyword:
     match: '96110'
     policy: REJECT
@@ -323,12 +329,7 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Tailscale-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/ijmu/Tools/raw/main/Egern/Rules/Direct_Own.yaml
+    match: http://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -353,32 +354,27 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
+    match: http://raw.githubusercontent.com/QuixoticHeart/rule-set/ruleset/egern/douyin.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
+    disabled: true
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AI.yaml
+    match: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/AI_Own.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/Binancenew.list
+    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Binancenew.list
     policy: Crypto
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/Bybit.list
-    policy: Crypto
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/LeiyuG/Surge/raw/main/rules/Pionex.list
+    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Bybit.list
     policy: Crypto
     update_interval: 86400
     disabled: false
@@ -388,22 +384,17 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
-    policy: GitHub
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Facebook.yaml
     policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Porn.yaml
     policy: Media
     update_interval: 86400
     disabled: false
@@ -444,6 +435,22 @@ url_rewrites:
   status_code: 302
 scriptings:
 - generic:
+    name: 星云AI
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/nebula-power.js
+    update_interval: 86400
+- generic:
+    name: 小六壬
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js
+    update_interval: 21600
+- generic:
+    name: 全国彩票开奖
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Lottery-Widget.JS
+    update_interval: 86400
+- generic:
+    name: 全国油价查询
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
+    update_interval: 86400
+- generic:
     name: 招商实时金价
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
     update_interval: 86400
@@ -451,24 +458,31 @@ scriptings:
     name: 节日倒计时
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Holiday_Countdown.js
     update_interval: 86400
-- generic:
-    name: 全国油价查询
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
-    env:
-      region: fujian/putian
-      SHOW_TREND: 'true'
-    update_interval: 86400
 mitm:
   
 widgets:
-- name: 招商金价
-  script_name: 招商实时金价
-- name: 油价
+- name: 星云AI
+  script_name: 星云AI
+- name: 小六壬
+  script_name: 小六壬
+  env:
+    ZI_ROLLOVER: '1'
+    SHOW_MEANING: '0'
+- name: 全国彩票开奖
+  script_name: 全国彩票开奖
+  env:
+    彩票类型: 大乐透
+- name: 全国油价查询
   script_name: 全国油价查询
-- name: 节日
+  env:
+    region: fujian/putian
+    SHOW_TREND: 'true'
+- name: 招商实时金价
+  script_name: 招商实时金价
+- name: 节日倒计时
   script_name: 节日倒计时
 modules:
-- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
+- url: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
@@ -485,7 +499,7 @@ modules:
   enabled: false
 - url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
   update_interval: 86400
   enabled: true
