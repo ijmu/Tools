@@ -40,6 +40,9 @@
  *   返回 Response，需 await res.text()（社区实机组件 xcgtb/Egern-Widgets 核实）；
  *   依次尝试 ctx.http(url,init) → ctx.http({url,...}) → $httpClient 回调 → fetch，
  *   全挂时把各通道死因显示在卡片上。
+ * v5（2026-09-22）：刷新韧性——成功数据写入 $persistentStore，断网/超时自动回放缓存
+ *   （头部标「缓存 HH:MM」）；记住可用通道走快路径（单通道 5s、总预算 9s）；
+ *   整体 11s 看门狗，超时也交付可用卡片，小部件进程掐不死渲染。
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
@@ -198,12 +201,13 @@ function bodyText(b) {
   try { return JSON.stringify(b); } catch (_) { return ''; }
 }
 
-/** 统一请求：opts = {url, method, headers, body, expect(json)->bool}，成功返回 {status, text, json} */
+/** 统一请求：opts = {url, method, headers, body, expect(json)->bool, prefer(上次成功通道), budget(总预算ms)}
+ *  成功返回 {status, text, json, via(通道名)} */
 async function httpJson(ctx, opts) {
   const method = (opts.method || 'GET').toUpperCase();
   const lower = method.toLowerCase();
   const headers = Object.assign({ 'User-Agent': 'Egern/nebula-power' }, opts.headers || {});
-  const init = { method, headers, timeout: 9000 };
+  const init = { method, headers, timeout: 5000 };
   if (opts.body != null) init.body = opts.body;
   const url = opts.url;
 
@@ -226,7 +230,7 @@ async function httpJson(ctx, opts) {
       let settled = false;
       const fin = (r) => { if (!settled) { settled = true; resolve(r); } };
       const rej = (e) => { if (!settled) { settled = true; reject(e instanceof Error ? e : new Error(String(e))); } };
-      const timer = typeof setTimeout === 'function' ? setTimeout(() => rej(new Error('超时')), 9000) : null;
+      const timer = typeof setTimeout === 'function' ? setTimeout(() => rej(new Error('超时')), 5000) : null;
       try {
         client[lower]({ url, headers, body: opts.body }, (err, resp, body) => {
           if (timer) clearTimeout(timer);
@@ -242,8 +246,14 @@ async function httpJson(ctx, opts) {
       return { status: res.status, text: await res.text() };
     }]);
   }
-
+  // 上次成功的通道提到最前（省去逐个试错，小部件进程的渲染窗口很宝贵）
+  if (opts.prefer) {
+    const i = attempts.findIndex(([n]) => n === opts.prefer);
+    if (i > 0) attempts.unshift(...attempts.splice(i, 1));
+  }
+  const deadline = Date.now() + (opts.budget || 9000);
   for (const [name, run] of attempts) {
+    if (Date.now() > deadline - 1200) { errs.push(name + ': 跳过(超预算)'); continue; }
     let r;
     try { r = await run(); } catch (e) { errs.push(name + ': ' + (e && e.message ? e.message : String(e))); continue; }
     let j = null;
@@ -254,23 +264,41 @@ async function httpJson(ctx, opts) {
       continue;
     }
     if (j == null && r.status >= 400) { errs.push(name + ': HTTP ' + r.status); continue; }
-    return { status: r.status, text: r.text, json: j };
+    return { status: r.status, text: r.text, json: j, via: name };
   }
   const msg = errs.length ? errs.join(' | ') : '无可用通道（ctx.http/$httpClient/fetch 均缺失）';
   throw new Error(String(msg).slice(0, 150));
 }
 
+/* ============================ 持久缓存（$persistentStore → 内存兜底） ============================ */
+
+const STORE_KEY = 'nebula_power_cache';
+let _memCache = null;
+
+function cacheRead() {
+  try {
+    const ps = typeof globalThis.$persistentStore !== 'undefined' ? globalThis.$persistentStore : null;
+    if (ps && typeof ps.read === 'function') {
+      const raw = ps.read(STORE_KEY);
+      const c = raw ? JSON.parse(raw) : null;
+      return c && c.json ? c : _memCache;
+    }
+  } catch (_) { /* 存储坏就当没有 */ }
+  return _memCache;
+}
+function cacheWrite(c) {
+  _memCache = c;
+  try {
+    const ps = typeof globalThis.$persistentStore !== 'undefined' ? globalThis.$persistentStore : null;
+    if (ps && typeof ps.write === 'function') return !!ps.write(JSON.stringify(c), STORE_KEY);
+  } catch (_) {}
+  return false;
+}
+
 /* ============================ 取数 ============================ */
 
-/** 公开补贴数据：返回 { rows, rate, best, activeCount, total } */
-async function loadSubsidy(ctx, now) {
-  const res = await httpJson(ctx, {
-    url: MODELS_API, method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key: 'public' }),
-    expect: (j) => !!(j && (j.data || j.groups)),
-  });
-  const json = res.json || JSON.parse(res.text);
+/** 纯计算：接口 JSON → 汇总结构（不碰网络） */
+function computeSubsidy(json, now) {
   const list = json.data || json.models || [];
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
 
@@ -295,6 +323,33 @@ async function loadSubsidy(ctx, now) {
   const best = rows[0] || null;
   const deepest = subsidised.slice().sort((a, b) => b.depth - a.depth)[0] || null;
   return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length };
+}
+
+/** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错 */
+async function loadSubsidy(ctx, now) {
+  const memo = cacheRead();
+  try {
+    const res = await httpJson(ctx, {
+      url: MODELS_API, method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'public' }),
+      expect: (j) => !!(j && (j.data || j.groups)),
+      prefer: memo && memo.tr,
+      budget: 9000,
+    });
+    const json = res.json || JSON.parse(res.text);
+    cacheWrite({ t: Date.now(), tr: res.via, json });
+    return computeSubsidy(json, now);
+  } catch (e) {
+    if (memo && memo.json) {
+      const out = computeSubsidy(memo.json, now);
+      out.fromCache = true;
+      out.staleAt = memo.t;
+      out.err = e && e.message;
+      return out;
+    }
+    throw e;
+  }
 }
 
 /** 私有数据（可选）：塞入会话 Cookie 后读你自己的余额 / 电力包 */
@@ -409,7 +464,7 @@ function subsidyRowList(data, disp, limit, wide) {
 
 /* ============================ 入口 ============================ */
 
-export default async function (ctx) {
+async function renderWidget(ctx) {
   ctx = ctx || {};
   const env = ctx.env || {};
   const fam = ctx.widgetFamily || 'systemSmall';
@@ -490,7 +545,8 @@ export default async function (ctx) {
   const wide = isLarge;
   const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 4);
 
-  const children = [header(activeN ? `补贴中 ${activeN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴'))];
+  const children = [header((data.fromCache ? `缓存 ${bjNow(data.staleAt).hm} · ` : '')
+    + (activeN ? `补贴中 ${activeN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴')))];
 
   if (isSmall) {
     children.push(
@@ -545,5 +601,25 @@ function nextRefresh() {
 export const __internals = {
   bjNow, normEnd, endExpired, inDailyWindow, subsidyActive, quotaState,
   effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpJson,
-  capabilityScore, displayRows,
+  capabilityScore, displayRows, computeSubsidy,
+  _testResetCache: () => { _memCache = null; },
 };
+
+/** 入口：整体看门狗——小部件进程对脚本时长很敏感，超时也给一张可用卡片 */
+export default async function (ctx) {
+  const run = renderWidget(ctx || {});
+  if (typeof Promise !== 'undefined' && typeof Promise.race === 'function' && typeof setTimeout === 'function') {
+    return Promise.race([
+      run,
+      new Promise((resolve) => setTimeout(() => resolve({
+        type: 'widget', padding: 14, gap: 4, backgroundColor: C.bg,
+        refreshAfter: nextRefresh(),
+        children: [
+          header('超时'),
+          T('本次刷新超时，下个周期自动重试', { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.7 }),
+        ],
+      }), 11000)),
+    ]);
+  }
+  return run;
+}
