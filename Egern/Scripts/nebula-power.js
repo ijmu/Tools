@@ -43,10 +43,14 @@
  * v5（2026-09-22）：刷新韧性——成功数据写入 $persistentStore，断网/超时自动回放缓存
  *   （头部标「缓存 HH:MM」）；记住可用通道走快路径（单通道 5s、总预算 9s）；
  *   整体 11s 看门狗，超时也交付可用卡片，小部件进程掐不死渲染。
+ * v6（2026-09-22）：综合排行——综合分 = 能力档位 50% + 平台人气 30% + 补贴力度 20%。
+ *   人气项：配 NEBULA_COOKIE 时取 /user/leaderboard 的平台模型榜(真实 tokens，对数刻度)；
+ *   未配置时用公开的补贴池今日消耗(discount_used)作代理。NEBULA_SORT=smart(默认)/power/price。
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
 const USAGE_API = 'https://ai.ipix.ink/user/usage';
+const LEADERBOARD_API = 'https://ai.ipix.ink/user/leaderboard';
 const CNY_PER_POWER = 0.01; // 兜底单价；实际以接口 rmb_rate 为准
 
 /* 能力档位（0-100）：越新越强越高。依据站点模型描述的参数量/定位词手工标定，
@@ -77,11 +81,16 @@ function capabilityScore(m) {
   return Math.max(0, Math.min(100, s));
 }
 
-/** 展示排序：power=能力优先（生效档在前→档位高在前→同档价低在前）；price=省钱优先（v1：电价升序） */
+/** 展示排序：smart=综合分（默认：能力50%+人气30%+补贴20%，分高在前）
+ *  power=纯能力优先；price=省钱优先（有效电价升序）。生效档永远排在失效档前。 */
 function displayRows(rows, mode) {
   const arr = (rows || []).slice();
   if (mode === 'price') return arr;
-  return arr.sort((a, b) => ((b.active - a.active) || (b.cap - a.cap) || (a.eff - b.eff)
+  if (mode === 'power') {
+    return arr.sort((a, b) => ((b.active - a.active) || (b.cap - a.cap) || (a.eff - b.eff)
+      || String(a.m.display_name).localeCompare(String(b.m.display_name))));
+  }
+  return arr.sort((a, b) => ((b.active - a.active) || (b.score - a.score) || (a.eff - b.eff)
     || String(a.m.display_name).localeCompare(String(b.m.display_name))));
 }
 
@@ -297,10 +306,35 @@ function cacheWrite(c) {
 
 /* ============================ 取数 ============================ */
 
-/** 纯计算：接口 JSON → 汇总结构（不碰网络） */
-function computeSubsidy(json, now) {
+/** 人气分 0-100（对数刻度）：lb 有平台排行榜(需 Cookie)用真实 tokens；否则用公开的
+ *  补贴池今日消耗(discount_used)作代理——它本身就是全站用户在补贴价下的真实用量。 */
+function popularityMap(lbModels, rows) {
+  const vals = {};
+  let max = 0;
+  const src = (Array.isArray(lbModels) && lbModels.length) ? lbModels : null;
+  if (src) {
+    for (const it of src) {
+      const v = Number(it.tokens || it.credit || 0);
+      if (v > 0) { vals[it.model] = v; if (v > max) max = v; }
+    }
+  } else {
+    for (const it of rows || []) { // 原始模型表：补贴池今日消耗 = 全站用户的真实用票
+      const v = Number((it && it.discount_used) || 0);
+      const key = (it && (it.id || it.display_name)) || '';
+      if (v > 0) { vals[key] = v; if (v > max) max = v; }
+    }
+  }
+  const out = {};
+  const L = Math.log(1 + Math.max(max, 1));
+  for (const k in vals) out[k] = Math.max(1, Math.min(100, Math.round(100 * Math.log(1 + vals[k]) / L)));
+  return out;
+}
+
+/** 纯计算：接口 JSON → 汇总结构（不碰网络）。lb = 平台模型排行榜（可选，Cookie 模式才有） */
+function computeSubsidy(json, now, lb) {
   const list = json.data || json.models || [];
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
+  const popMap = popularityMap(lb, list);
 
   const rows = [];
   for (const m of list) {
@@ -308,25 +342,30 @@ function computeSubsidy(json, now) {
     const timeOk = subsidyActive(m, now);
     const active = timeOk && !q.depleted;
     const price = effPrice(m, active);
+    const pop = popMap[m.id] != null ? popMap[m.id]
+      : (popMap[m.display_name] != null ? popMap[m.display_name] : 0);
+    const cap = capabilityScore(m);
     rows.push({
       m, q, timeOk, active, price,
       hasSubsidy: m.discount_price != null,
       depth: depth(m),
       eff: price,
-      cap: capabilityScore(m),
+      cap, pop,
+      score: Math.round((0.5 * cap + 0.3 * pop + 0.2 * Math.round(depth(m) * 100)) * 10) / 10,
     });
   }
-  // 排序：有效电价升序 → 补贴力度降序 → 名称
+  // 排序：有效电价升序 → 补贴力度降序 → 名称（展示序由 displayRows 定）
   rows.sort((a, b) => (a.eff - b.eff) || (b.depth - a.depth) || String(a.m.display_name).localeCompare(String(b.m.display_name)));
   const subsidised = rows.filter((r) => r.hasSubsidy);
   const activeRows = subsidised.filter((r) => r.active);
   const best = rows[0] || null;
   const deepest = subsidised.slice().sort((a, b) => b.depth - a.depth)[0] || null;
-  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length };
+  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, lbUsed: !!(Array.isArray(lb) && lb.length) };
 }
 
-/** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错 */
-async function loadSubsidy(ctx, now) {
+/** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错。
+ *  lb = 平台模型排行榜数组（可选，Cookie 模式才有；没有就用人气代理） */
+async function loadSubsidy(ctx, now, lb) {
   const memo = cacheRead();
   try {
     const res = await httpJson(ctx, {
@@ -339,10 +378,10 @@ async function loadSubsidy(ctx, now) {
     });
     const json = res.json || JSON.parse(res.text);
     cacheWrite({ t: Date.now(), tr: res.via, json });
-    return computeSubsidy(json, now);
+    return computeSubsidy(json, now, lb);
   } catch (e) {
     if (memo && memo.json) {
-      const out = computeSubsidy(memo.json, now);
+      const out = computeSubsidy(memo.json, now, lb);
       out.fromCache = true;
       out.staleAt = memo.t;
       out.err = e && e.message;
@@ -368,6 +407,20 @@ async function loadUsage(ctx, cookie) {
       balance: Number(u.balance || 0),
       balancePay: !!u.balance_pay_enabled,
     };
+  } catch (_) { return null; }
+}
+
+/** 平台模型排行榜（可选，需 Cookie）：[{model, tokens, requests, credit}]，给综合分当人气项 */
+async function loadLeaderboard(ctx, cookie) {
+  if (!cookie) return null;
+  try {
+    const res = await httpJson(ctx, {
+      url: LEADERBOARD_API,
+      headers: { Cookie: cookie, Accept: 'application/json' },
+      expect: (j) => j && Array.isArray(j.models) && !j.detail,
+      budget: 6000,
+    });
+    return (res.json && res.json.models) || null;
   } catch (_) { return null; }
 }
 
@@ -471,7 +524,10 @@ async function renderWidget(ctx) {
   const now = bjNow();
 
   let data = null, usage = null, err = null;
-  try { data = await loadSubsidy(ctx, now); } catch (e) { err = e && e.message ? e.message : String(e); }
+  try {
+    const lb = env.NEBULA_COOKIE ? await loadLeaderboard(ctx, env.NEBULA_COOKIE) : null;
+    data = await loadSubsidy(ctx, now, lb);
+  } catch (e) { err = e && e.message ? e.message : String(e); }
   if (data && env.NEBULA_COOKIE) usage = await loadUsage(ctx, env.NEBULA_COOKIE);
 
   const refreshAfter = nextRefresh();
@@ -489,7 +545,8 @@ async function renderWidget(ctx) {
     };
   }
 
-  const order = String(env.NEBULA_SORT || 'power').toLowerCase() === 'price' ? 'price' : 'power';
+  const orderRaw = String(env.NEBULA_SORT || 'smart').toLowerCase();
+  const order = ['smart', 'power', 'price'].includes(orderRaw) ? orderRaw : 'smart';
   const disp = displayRows(data.rows, order);
   const best = disp[0] || data.best;
   const activeN = data.activeRows.length;
