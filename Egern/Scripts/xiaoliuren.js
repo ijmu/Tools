@@ -159,6 +159,15 @@ export default async function (ctx) {
   const isSmall = fam === 'systemSmall';
   const isLarge = fam === 'systemLarge';
 
+  // 昼夜图标：白天太阳 / 夜晚月亮——refreshAfter 钉在时辰交界，图标随之自然切换
+  const dayIcon = (() => {
+    // 白昼：辰(07)…酉(19)；其余为夜
+    if (zhi >= 4 && zhi <= 9) {
+      return { name: 'sun.max.fill', color: { light: '#C75700', dark: '#FF9F0A' } };
+    }
+    return { name: 'moon.stars.fill', color: { light: '#C77700', dark: '#FFD60A' } };
+  })();
+
   // 锁屏内联
   if (fam === 'accessoryInline') {
     return {
@@ -228,7 +237,7 @@ export default async function (ctx) {
   const children = [
     // header
     { type: 'stack', direction: 'row', alignItems: 'center', gap: 4, children: [
-      { type: 'image', src: 'sf-symbol:moon.stars.fill', width: 13, height: 13, color: { light: '#C77700', dark: '#FFD60A' } },
+      { type: 'image', src: `sf-symbol:${dayIcon.name}`, width: 13, height: 13, color: dayIcon.color },
       { type: 'text', text: '小六壬', font: { size: 'subheadline', weight: 'bold' }, textColor: C.primary, lineLimit: 1 },
       { type: 'spacer' },
       { type: 'text', text: isSmall ? `${ZHI[zhi]}时` : `${lunarStr} · ${clock}`,
