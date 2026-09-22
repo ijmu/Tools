@@ -115,7 +115,7 @@ function nextShichenTime(now) {
 }
 
 export default async function (ctx) {
-  const ZI_ROLLOVER = ["1", "true"].includes((ctx.env.ZI_ROLLOVER || "").trim().toLowerCase());
+  const ZI_ROLLOVER = (ctx.env.ZI_ROLLOVER || "").trim() === "1";
   const SHOW_MEANING = (ctx.env.SHOW_MEANING || "true").trim() !== "0";
 
   const now = new Date();
@@ -139,19 +139,22 @@ export default async function (ctx) {
   const refreshTime = nextShichenTime(now).toISOString();
   const fam = ctx.widgetFamily || 'systemSmall';
 
-  // 颜色：light/dark 自适应（对齐油价组件：白底 + 灰卡 + 描边）
+  // 颜色：light/dark 自适应（参考油价组件写法）
   const C = {
     bg: { light: '#FFFFFF', dark: '#1C1C1E' },
-    card: { light: '#F5F5F7', dark: '#2C2C2E' },
-    cardBorder: { light: '#E0E0E0', dark: '#3A3A3C' },
+    card: { light: '#EBEBF0', dark: '#2C2C2E' },
     primary: { light: '#1A1A1A', dark: '#FFFFFF' },
     secondary: { light: '#666666', dark: '#AAAAAA' },
     tertiary: { light: '#999999', dark: '#6E6E73' },
+    accent: {
+      light: { 大安: '#1E9E43', 留连: '#0A6ED1', 速喜: '#C77700', 赤口: '#D70015', 小吉: '#248A3D', 空亡: '#8E8E93' }[hour.name],
+      dark: { 大安: '#34C759', 留连: '#0A84FF', 速喜: '#FF9F0A', 赤口: '#FF453A', 小吉: '#30D158', 空亡: '#98989D' }[hour.name],
+    },
   };
-  const P_LIGHT = { 大安: '#1E9E43', 留连: '#0A6ED1', 速喜: '#C77700', 赤口: '#D70015', 小吉: '#248A3D', 空亡: '#8E8E93' };
-  const P_DARK = { 大安: '#34C759', 留连: '#0A84FF', 速喜: '#FF9F0A', 赤口: '#FF453A', 小吉: '#30D158', 空亡: '#98989D' };
-  const pColor = (p) => ({ light: P_LIGHT[p.name], dark: P_DARK[p.name] });
-  const C_ACCENT = { light: P_LIGHT[hour.name], dark: P_DARK[hour.name] };
+  const pColor = (p) => ({
+    light: { 大安: '#1E9E43', 留连: '#0A6ED1', 速喜: '#C77700', 赤口: '#D70015', 小吉: '#248A3D', 空亡: '#8E8E93' }[p.name],
+    dark: { 大安: '#34C759', 留连: '#0A84FF', 速喜: '#FF9F0A', 赤口: '#FF453A', 小吉: '#30D158', 空亡: '#98989D' }[p.name],
+  });
 
   const isSmall = fam === 'systemSmall';
   const isLarge = fam === 'systemLarge';
@@ -161,7 +164,7 @@ export default async function (ctx) {
     return {
       type: 'widget',
       refreshAfter: refreshTime,
-      children: [{ type: 'text', text: `小六壬 ${hour.name}·${ZHI[zhi]}时`, font: { size: 'caption1', weight: 'semibold' }, textColor: C_ACCENT, lineLimit: 1 }],
+      children: [{ type: 'text', text: `小六壬 ${hour.name}·${ZHI[zhi]}时`, font: { size: 'caption1', weight: 'semibold' }, textColor: C.accent, lineLimit: 1 }],
     };
   }
   // 锁屏圆形
@@ -169,7 +172,7 @@ export default async function (ctx) {
     return {
       type: 'widget', refreshAfter: refreshTime, padding: 2,
       children: [
-        { type: 'text', text: hour.name, font: { size: 'headline', weight: 'heavy' }, textColor: C_ACCENT, textAlign: 'center', lineLimit: 1, minScale: 0.55 },
+        { type: 'text', text: hour.name, font: { size: 'headline', weight: 'heavy' }, textColor: C.accent, textAlign: 'center', lineLimit: 1, minScale: 0.55 },
         { type: 'text', text: ZHI[zhi] + '时', font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center' },
       ],
     };
@@ -180,7 +183,7 @@ export default async function (ctx) {
       type: 'widget', refreshAfter: refreshTime, gap: 2,
       children: [
         { type: 'stack', direction: 'row', alignItems: 'center', gap: 6, children: [
-          { type: 'text', text: `小六壬 ${hour.name}`, font: { size: 'headline', weight: 'bold' }, textColor: C_ACCENT, lineLimit: 1 },
+          { type: 'text', text: `小六壬 ${hour.name}`, font: { size: 'headline', weight: 'bold' }, textColor: C.accent, lineLimit: 1 },
           { type: 'spacer' },
           { type: 'text', text: `${ZHI[zhi]}时`, font: { size: 'caption1' }, textColor: C.secondary },
         ]},
@@ -190,35 +193,25 @@ export default async function (ctx) {
   }
 
   // ---------- 主屏幕 ----------
-  // 三宫：灰卡容器 + 三个宫 chip（参宫淡色、时宫宫色实底反白示「落」）
+  // 三步行：参宫小字，时宫加底托示「落」
   const stepCell = (label, p, active) => {
     const inner = [
-      { type: 'text', text: label, font: { size: 'caption2' },
-        textColor: active ? { light: pColor(p).light + 'CC', dark: pColor(p).dark + 'CC' } : C.tertiary,
-        textAlign: 'center', lineLimit: 1 },
-      { type: 'text', text: p.name,
-        font: { size: active ? 'subheadline' : 'footnote', weight: active ? 'heavy' : 'semibold' },
-        textColor: active ? { light: '#FFFFFF', dark: '#1A1A1A' } : pColor(p),
-        textAlign: 'center', lineLimit: 1, minScale: 0.65 },
+      { type: 'text', text: label, font: { size: 'caption2' }, textColor: active ? C.secondary : C.tertiary, textAlign: 'center', lineLimit: 1 },
+      { type: 'text', text: p.name, font: { size: active ? 'subheadline' : 'footnote', weight: active ? 'heavy' : 'semibold' },
+        textColor: active ? C.primary : pColor(p), textAlign: 'center', lineLimit: 1, minScale: 0.65 },
     ];
-    if (!active) {
-      return {
-        type: 'stack', direction: 'column', alignItems: 'center', gap: 1,
-        flex: 1, padding: [5, 2, 5, 2], borderRadius: 9,
-        backgroundColor: C.card, borderWidth: 0.5, borderColor: C.cardBorder,
-        children: inner,
-      };
-    }
+    if (!active) return { type: 'stack', direction: 'column', alignItems: 'center', gap: 1, children: inner };
     return {
       type: 'stack', direction: 'column', alignItems: 'center', gap: 1,
-      flex: 1.25, padding: [5, 2, 5, 2], borderRadius: 9,
-      backgroundColor: { light: pColor(p).light, dark: pColor(p).dark },
+      padding: [3, 7, 3, 7], borderRadius: 8,
+      backgroundColor: { light: pColor(p).light + '26', dark: pColor(p).dark + '33' },
+      borderWidth: 1, borderColor: { light: pColor(p).light + '55', dark: pColor(p).dark + '66' },
       children: inner,
     };
   };
 
   const stepsRow = {
-    type: 'stack', direction: 'row', alignItems: 'center', gap: 5,
+    type: 'stack', direction: 'row', alignItems: 'center', gap: 3,
     children: [
       stepCell('月宫', month, false),
       { type: 'text', text: '›', font: { size: 'caption1' }, textColor: C.tertiary },
@@ -247,13 +240,12 @@ export default async function (ctx) {
     // 落宫大字 + 副行
     { type: 'stack', direction: 'row', alignItems: 'center', gap: 7, children: [
       { type: 'text', text: hour.name, font: { size: isLarge ? 'largeTitle' : 'title', weight: 'heavy' },
-        textColor: C_ACCENT, lineLimit: 1, minScale: 0.6 },
+        textColor: C.accent, lineLimit: 1, minScale: 0.6 },
       { type: 'text', text: subLine, font: { size: isSmall ? 'caption1' : 'footnote', weight: 'medium' },
         textColor: C.secondary, lineLimit: 1, minScale: 0.7 },
     ]},
     { type: 'text', text: isSmall ? hour.short : hour.brief,
-      font: { size: isSmall ? 'footnote' : 'callout', weight: 'medium' },
-      textColor: C.primary, lineLimit: isLarge ? 2 : 1, minScale: 0.72 },
+      font: { size: isSmall ? 'footnote' : 'callout', weight: 'medium' }, textColor: C.primary, lineLimit: 2, minScale: 0.72 },
   ];
 
   if (isLarge) {
@@ -266,15 +258,6 @@ export default async function (ctx) {
     }
     children.push({ type: 'spacer' });
   }
-
-  // 底部收尾行（大尺寸独有，中小尺寸空间留给内容）
-  if (isLarge) children.push({
-    type: 'stack', direction: 'row', alignItems: 'center', children: [
-      { type: 'text', text: isSmall ? clock : `${clock} 更新`, font: { size: 'caption2' }, textColor: C.tertiary },
-      { type: 'spacer' },
-      { type: 'text', text: isSmall ? SHICHEN_RANGE[zhi] : `时辰 ${SHICHEN_RANGE[zhi]}`, font: { size: 'caption2' }, textColor: C.tertiary },
-    ],
-  });
 
   return {
     type: 'widget',
