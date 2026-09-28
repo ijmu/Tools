@@ -75,7 +75,7 @@ real_ip_domains:
 policy_groups:
 - external:
     name: Subscription
-    type: smart
+    type: select
     urls:
     - 订阅地址1
     - 订阅地址2
