@@ -1,1 +1,14 @@
-Test
+# Direct
+# URL:https://github.com/ijmu/Tools/raw/main/Surge/List/Direct_Own.list
+# Egern 源:https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
+
+DOMAIN-SUFFIX,rilipro.com
+DOMAIN-SUFFIX,egernlicense.com
+DOMAIN-SUFFIX,cdn.jsdelivr.net
+DOMAIN-SUFFIX,liangxin.xyz
+DOMAIN-SUFFIX,m1.tohno-0.top
+DOMAIN-SUFFIX,ipix.ink
+DOMAIN-SUFFIX,ai.ipix.ink
+DOMAIN-SUFFIX,ai2.ipix.ink
+DOMAIN-SUFFIX,duolingo.com
+DOMAIN-SUFFIX,skk.moe
