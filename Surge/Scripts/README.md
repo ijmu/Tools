@@ -1,0 +1,118 @@
+# Surge 版 · 小六壬 / 星云电力补贴
+
+这两份是仓库里 Egern 版脚本（`Egern/Scripts/xiaoliuren.js`、`Egern/Scripts/nebula-power.js`）的 Surge 移植。
+
+## ★ 先说结论：Surge 没有「自定义小组件」这个东西 ★
+
+Egern 那套 `type:'widget'` / `ctx.widgetFamily` / `children` 的 DSL，**在 Surge 上不存在等价物**，不是我没找到写法，是能力本身不存在：
+
+- 官方手册（manual.nssurge.com）脚本部分明确列出 **七种脚本类型**：
+  `http-request` / `http-response` / `rule` / `dns` / `event` / `cron` / `generic` —— 没有 widget。
+- 手册全站搜索索引（2.4 MB，逐字检索）中 **"widget" 只出现在两处**，都是「用系统小组件快速切换策略组」和「从小组件启动 Surge」。
+  Surge 的小组件是**内置的策略组小组件**（App Store 更新说明：「Policy group widgets now support the extra-large size」），**不接受自定义脚本渲染**。
+- 因此 `[Script]` 段里写 `type=widget` 会被直接拒收（未知类型）。
+
+**替代载体 = 信息面板（[Panel] + `type=generic` 脚本）**：
+iOS 显示在「策略选择」界面里，Mac 显示在菜单栏 Panels 子菜单。内容是**纯文本（`\n` 换行）**，没有逐行配色和布局，所以原小组件的多列排布在这里压成了「每档一行」。
+
+```js
+$done({ title, content, style })   // style: good / info / alert / error
+```
+触发参数：`$input = {purpose:"panel", position:"policy-selection", panelName:"..."}`，`$trigger` 为 `button`（点刷新）或 `auto-interval`（到 update-interval 且打开面板）。
+
+> 刷新语义：面板内容由 Surge 缓存，**只在「到点 + 用户打开策略选择界面」时才重跑脚本**。
+> 所以小六壬的起课时间 = 你打开面板那一刻，与 Egern 版「刷新那一刻起课」同义。
+
+## 安装
+
+把下面几行加进你的 Surge 配置（本仓库 `Surge/Surge.conf` 已加好）：
+
+```ini
+[Script]
+xiaoliuren-panel = type=generic, script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js, script-update-interval=86400, timeout=10, argument="zi=1,ju=1"
+nebula-power-panel = type=generic, script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/nebula-power-panel.js, script-update-interval=86400, timeout=12, argument="sort=smart,top=6"
+
+[Panel]
+XiaoLiuRen = title="小六壬", content="打开策略视图即起课", style=info, script-name=xiaoliuren-panel, update-interval=60
+NebulaPower = title="星云电力补贴", content="打开策略视图即刷新", style=info, script-name=nebula-power-panel, update-interval=600
+```
+
+- ⚠️ **`[Panel]` 不能由模块（.sgmodule）添加** —— 手册列出模块可覆盖的段落只有 General / MITM / WireGuard / MTProto / Snell Server / Ruleset / Rule / Script / URL Rewrite / Header Rewrite / Host，**没有 Panel**。所以面板必须写进主配置。
+- ⚠️ `timeout` 默认只有 **5 秒**，星云要联网，务必显式写到 10~12，否则会被掐断。
+- 面板需要 iOS 4.9.3+（且订阅有效）。
+
+### 参数（写在各脚本的 `argument=` 上）
+
+| 脚本 | 参数 | 默认 | 说明 |
+|---|---|---|---|
+| xiaoliuren-panel | `zi` | `1` | `zi=0` 关闭子时换日（23:00 后日宫按次日数） |
+| | `ju` | `1` | `ju=0` 不显示六神断句全诗 |
+| nebula-power-panel | `sort` | `smart` | `smart` 综合（能力 50% + 人气 30% + 补贴 20%）/ `power` 纯能力 / `price` 省钱 |
+| | `top` | `6` | 面板列出档数 1~20 |
+| | `cookie` | 空 | 填 `server_session_xxx=...` 才显示私有余额/电力包；**不填 = 零凭证，只用公开数据** |
+
+## 与原 Egern 版的差异
+
+| | Egern 版 | Surge 版 |
+|---|---|---|
+| 载体 | 主屏/锁屏小组件（4 种尺寸） | 信息面板（纯文本） |
+| 排版 | 多列富文本、SF Symbol、逐行配色 | 每档一行，`style` 决定整卡颜色 |
+| 取数/判定/排序算法 | — | **逐字节复用，未改动** |
+| 农历换算 | 有 bug（见下） | **已修复** |
+| 离线降级 | `$persistentStore` 缓存回放 | 同（标 `缓存 HH:MM`） |
+
+星云版保留：补贴生效三条件（`discount_price` + 日期区间 + 每日时段跨零点环绕）、额度池只提示不改实扣价、能力档位表 + 人气代理 + 综合分排序、断网回放缓存。
+面板比小组件多出的信息：单行内同时给出实扣电价、折扣力度、每日时段、池状态。
+
+## ★ 修掉的 bug：原版农历换算在「闰月年」之后全错 ★
+
+`xiaoliuren.js` 的 `solarToLunar()` 里：
+
+```js
+const dm = isLeap ? leapDays(ly) : monthDays(ly, lm);
+if (offset < dm) break;
+offset -= dm;
+if (lm === leap) isLeap = !isLeap;      // ← 闰月被消费后 isLeap 不复位
+```
+
+闰月消费完（`lm === leap + 1`）之后 `isLeap` 一直保持 `true`，**后面每个月的天数一律按闰月天数（29 或 30）计**，误差逐月累积 —— 而且一直错到次年春节之前。
+
+实测（独立「逐月推进」算法为准）：
+
+| 检查项 | 修复版 | 原版 |
+|---|---:|---:|
+| 1900–2100 全部农历月的首/末日（4972 天） | **0 不符** | 1164 不符 |
+| 闰月年 2020/2023/2025/2028/2031/2033 逐日（2192 天） | **0 不符** | 1124 不符 |
+| 公认基准日 16 条（春节/端午/中秋/闰月首日） | **16/16** | 11/16 |
+
+原版错例：2023-06-22 端午 → 算成「闰六月初六」（应五月初五）；2025-10-06 中秋 → 算成「闰九月十六」（应八月十五）；2026-01-01 → 算成「闰腊月十六」（应冬月十三）。
+
+修复：改成「正常月 → 该月闰月副本」两趟推进，闰月只在本月之后出现一次：
+
+```js
+for (; lm <= 12; lm++) {
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass === 1 && lm !== leap) break;
+    const isL = pass === 1;
+    const dm = isL ? leapDays(ly) : monthDays(ly, lm);
+    if (offset < dm) return { year: ly, month: lm, day: offset + 1, isLeap: isL };
+    offset -= dm;
+  }
+}
+```
+
+> ⚠️ **Egern 版 `Egern/Scripts/xiaoliuren.js` 仍是错的**，需要同样的一处替换（本次未擅自改动你的在用脚本）。
+
+## 验证方式（可复跑）
+
+两个脚本都能脱离 Surge 在 Node 里跑：用假 `$httpClient` / `$persistentStore` / `$argument` 建 vm 上下文执行，断言 `$done()` 的产出。台架已随仓库提供：
+
+```bash
+node Surge/Scripts/tests/validate-lunar.js                        # 农历：独立算法逐日对拍，打印上表
+node Surge/Scripts/tests/simulate-panel.js xiaoliuren-panel.js    # 小六壬面板
+node Surge/Scripts/tests/simulate-panel.js nebula-power-panel.js  # 星云面板（含断网/冷启动降级）
+```
+
+- 小六壬：固定 3 个时间点 + `zi=0/ju=0` 开关，检查落宫/三宫链/农历/下次换宫。
+- 星云：实时抓取 → 模拟断网（应回放缓存并标 `缓存 HH:MM`）→ 冷启动+断网（应报错不崩）→ 恢复网络切 `sort=price,top=3`。
+- 农历：见上表。**基准是独立实现的「逐月推进」算法**，不用原版实现自证（否则会把同一个 bug 验两遍）。
