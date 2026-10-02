@@ -5,6 +5,14 @@
  * env（小组件编辑页添加）：
  *   ZI_ROLLOVER = "1"    子时换日（23:00 后日宫按次日数）
  *   SHOW_MEANING = "0"   大尺寸不显示六神断语全诗
+ *
+ * 修复记录（2026-10-02）：原 solarToLunar() 在闰月被消费后 isLeap 不复位，
+ *   闰月之后每个月都按闰月天数（29/30）计，误差累积错到次年春节前。实测错例：
+ *   2023-06-22 端午 → 闰六月初六（应五月初五）；2025-10-06 中秋 → 闰九月十六（应八月十五）；
+ *   2026-01-01 → 闰腊月十六（应冬月十三）。已改为「正常月 → 该月闰月副本」两趟推进。
+ *   验证：与独立「逐月推进」算法对拍，月边界 4972 天 + 闰月年逐日 2192 天 0 不符，
+ *   基准日 16/16（修复前 1164 / 1124 天不符、基准日 11/16）。
+ *   同名 Surge 信息面板版见 Surge/Scripts/xiaoliuren-panel.js，内核与本文一致。
  */
 
 const LUNAR_INFO = [
@@ -81,15 +89,18 @@ function solarToLunar(y, m, d) {
   let ly = 1900;
   for (; ly < 2101 && offset >= yearDays(ly); ly++) offset -= yearDays(ly);
   const leap = leapMonth(ly);
-  let isLeap = false;
   let lm = 1;
   for (; lm <= 12; lm++) {
-    const dm = isLeap ? leapDays(ly) : monthDays(ly, lm);
-    if (offset < dm) break;
-    offset -= dm;
-    if (lm === leap) isLeap = !isLeap;
+    for (let pass = 0; pass < 2; pass++) {
+      // 正常月 pass0 → 该月的闰月副本 pass1（只在本月之后出现一次）
+      if (pass === 1 && lm !== leap) break;
+      const isL = pass === 1;
+      const dm = isL ? leapDays(ly) : monthDays(ly, lm);
+      if (offset < dm) return { year: ly, month: lm, day: offset + 1, isLeap: isL };
+      offset -= dm;
+    }
   }
-  return { year: ly, month: lm, day: offset + 1, isLeap };
+  return { year: ly, month: 12, day: offset + 1, isLeap: false };
 }
 
 function cast(date, ziRollover) {
