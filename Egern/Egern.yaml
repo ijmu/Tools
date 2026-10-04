@@ -388,6 +388,11 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+    policy: TikTok
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
@@ -488,7 +493,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
     policy: Media
     update_interval: 86400
     disabled: false
@@ -505,11 +510,6 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
     policy: Telegram
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
-    policy: TikTok
     update_interval: 86400
     disabled: false
 - geoip:
