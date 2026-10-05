@@ -141,6 +141,7 @@ policy_groups:
     urls:
     - 订阅地址1
     - 订阅地址2
+    - 订阅地址3
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 21600
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
@@ -158,6 +159,11 @@ policy_groups:
     - Automatic
     - Subscription
     - DIRECT
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/rocket(1).png
     hidden: false
@@ -197,29 +203,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
     hidden: false
 - select:
-    name: Game
-    policies:
-    - DIRECT
-    - HK
-    - US
-    - TW
-    - JP
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/game(1).png
-    hidden: false
-- select:
-    name: GitHub
-    policies:
-    - Manual
-    - DIRECT
-    - HK
-    - US
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/github(1).png
-    hidden: false
-- select:
     name: Microsoft
     policies:
     - DIRECT
@@ -241,16 +224,9 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
     hidden: false
 - select:
-    name: Speedtest
-    policies:
-    - DIRECT
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/speedtest.png
-    hidden: false
-- select:
     name: Telegram
     policies:
+    - Manual
     - HK
     - SG
     flatten: false
@@ -363,22 +339,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -478,11 +444,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
-    policy: GitHub
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: Microsoft
     update_interval: 86400
@@ -498,24 +459,14 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Porn.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/speedtest.yaml
-    policy: Speedtest
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
     policy: Telegram
     update_interval: 86400
     disabled: false
-- geoip:
-    match: CN
+- rule_set:
+    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: DIRECT
-    no_resolve: true
+    update_interval: 86400
     disabled: false
 - default:
     name: Final
@@ -587,9 +538,18 @@ modules:
 - url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/ibl3nd-plugin-hub.yaml
   update_interval: 86400
   enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/adblock-collection.module
+  update_interval: 86400
+  enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/unlock-collection.module
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/cookie-collection.module
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/pingme.sgmodule
   update_interval: 86400
   enabled: false
