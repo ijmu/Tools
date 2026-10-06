@@ -7,6 +7,8 @@ block_quic: true
 close_connections_on_policy_change: true
 hijack_dns:
 - '*:53'
+- 8.8.8.8
+- 114.114.114.114
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
 proxy_latency_test_url: http://1.1.1.1/generate_204
@@ -339,12 +341,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -359,12 +361,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/fmz200/wool_scripts/raw/main/Loon/rule/AI.list
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -439,12 +441,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
@@ -459,7 +461,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
     policy: Telegram
     update_interval: 86400
     disabled: false
