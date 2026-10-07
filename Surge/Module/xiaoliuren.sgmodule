@@ -12,9 +12,11 @@
 
 # 版式对齐 Egern 版：meta → 三宫步进（落宫带【】底托）→ 属性 → 断语 → 断句诗 → 下次换宫
 # 图标 = 每宫专属 SF Symbol + 五行配色（ic=0 可回退系统图标）
+# script-update-interval=60：调 UI 期间用 60s 缓存；脚本 URL 带 ?v=N，改版时换 N 可强制免缓存拉新
+# 稳定后 script-update-interval 可改回 86400
 
 [Script]
-xiaoliuren-panel = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js,script-update-interval=86400,argument="zi={{{zi}}},ju={{{ju}}},ic={{{ic}}}"
+xiaoliuren-panel = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js?v=2,script-update-interval=60,argument="zi={{{zi}}},ju={{{ju}}},ic={{{ic}}}"
 
 [Panel]
 XiaoLiuRen = title="小六壬",content="打开策略选择界面即起课",script-name=xiaoliuren-panel,update-interval=60
