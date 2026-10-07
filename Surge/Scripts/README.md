@@ -25,7 +25,20 @@ $done({ title, content, style })   // style: good / info / alert / error
 
 ## 安装
 
-把下面几行加进你的 Surge 配置（本仓库 `Surge/Surge.conf` 已加好）：
+### 方式一：模块（推荐）
+
+Surge → 模块 → 从 URL 添加：
+
+```
+https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Module/xiaoliuren.sgmodule
+```
+
+模块内自带 `[Script]` 行与 `[Panel]` 行，装完即用；`zi` / `ju` 两个开关在模块参数里直接填。
+国内拉不到 raw 时，把 `script-path` 换成 jsDelivr 镜像 `https://testingcf.jsdelivr.net/gh/ijmu/Tools@main/Surge/Scripts/xiaoliuren-panel.js`。
+
+### 方式二：写进主配置（兜底）
+
+> ⚠️ 本仓库 `Surge.conf` **不含** [Panel] / [Script] 段（它是裸配置示例），下面这些行要手动加进你自己的配置：
 
 ```ini
 [Script]
@@ -37,7 +50,7 @@ XiaoLiuRen = title="小六壬", content="打开策略视图即起课", style=inf
 NebulaPower = title="星云电力补贴", content="打开策略视图即刷新", style=info, script-name=nebula-power-panel, update-interval=600
 ```
 
-- ⚠️ **`[Panel]` 不能由模块（.sgmodule）添加** —— 手册列出模块可覆盖的段落只有 General / MITM / WireGuard / MTProto / Snell Server / Ruleset / Rule / Script / URL Rewrite / Header Rewrite / Host，**没有 Panel**。所以面板必须写进主配置。
+- ⚠️ `[Panel]` 与模块的关系：手册《Module》章列出的可覆盖段落是 General / MITM / WireGuard / MTProto / Snell Server / Ruleset / Rule / Script / URL Rewrite / Header Rewrite / Host / IP Rewrite，**名单里没有 [Panel]**；但社区面板模块（Rabbit-Spec 的 Panel 系列、深巷有喵等，GitHub 上 1100+ 个 `.sgmodule` 均含 `[Panel]`）都是这么分发的，实测生效。本模块同此做法。**如果你的 Surge 版本不吃模块里的 `[Panel]`，把模块 `[Panel]` 那一行抄进主配置即可**（`[Script]` 行由模块提供，不冲突：面板 id 同名，模块会覆盖配置里的同名面板，不会出现两个「小六壬」）。
 - ⚠️ `timeout` 默认只有 **5 秒**，星云要联网，务必显式写到 10~12，否则会被掐断。
 - 面板需要 iOS 4.9.3+（且订阅有效）。
 
