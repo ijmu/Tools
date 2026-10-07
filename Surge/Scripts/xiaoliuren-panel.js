@@ -17,15 +17,19 @@
  *   所以起课时间是「你打开面板的那一刻」，与 Egern 版「刷新那一刻起课」同义。
  *
  * env（不写在脚本里，写在 [Script] 行的 argument= 参数上）：
- *   argument="zi=1,ju=1"
+ *   argument="zi=1,ju=1,ic=1"
  *     zi=0  关闭子时换日（默认开，23:00 后日宫按次日数）
- *     ju=0  大尺寸/面板不显示六神断句全诗（默认显示）
+ *     ju=0  不显示六神断句全诗（默认显示）
+ *     ic=0  图标回退到系统 style 方案（good 绿勾 / info / alert / error）；
+ *           默认 ic=1 = 每宫专属 SF Symbol + 五行配色 —— 图标是 Surge 面板唯一能上色的位置
  *
- * 部署（把下面三行加进你的 Surge 配置）：
- *   [Script]
- *   xiaoliuren-panel = type=generic, script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js, script-update-interval=86400, timeout=10
- *   [Panel]
- *   XiaoLiuRen = title="小六壬", content="打开策略视图即起课", style=info, script-name=xiaoliuren-panel, update-interval=60
+ * 部署：安装模块 Surge/Module/xiaoliuren.sgmodule 即可（Surge → 模块 → 从 URL 添加），
+ *   [Script] 行与 [Panel] 行都由模块提供，无需改主配置：
+ *   https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Module/xiaoliuren.sgmodule
+ *
+ * 版式（对齐 Egern 版的视觉层次）：
+ *   ① 农历+时刻+时辰  ② 三宫步进、落宫带【】底托  ③ 属性行
+ *   ④ 断语  ⑤ 六神断句诗  ⑥ 下次换宫
  *
  * ★ 已知问题修复（相对 Egern 版）★
  *   原版 solarToLunar() 在「有闰月的年份」之后算错：闰月被消费后 isLeap 没有复位，
@@ -166,10 +170,21 @@ const _ARG = (typeof $argument !== 'undefined' && $argument) ? parseArg($argumen
 const _off = (v) => ['0', 'false', 'no', 'off'].indexOf(String(v).toLowerCase()) >= 0;
 const ZI_ROLLOVER = _ARG.zi === undefined ? true : !_off(_ARG.zi);
 const SHOW_MEANING = _ARG.ju === undefined ? true : !_off(_ARG.ju);
+const USE_ICON = _ARG.ic === undefined ? true : !_off(_ARG.ic);
 const pad2 = (n) => String(n).padStart(2, '0');
 
-/** 吉凶 → 面板色：good 绿 / info 蓝 / alert 黄 / error 红 */
+/** ic=0 回退方案：吉凶 → 系统面板 style（good 绿 / info 蓝 / alert 黄 / error 红） */
 const PALACE_STYLE = { '大安': 'good', '速喜': 'good', '小吉': 'good', '留连': 'info', '赤口': 'alert', '空亡': 'error' };
+
+/** ic=1（默认）：六宫专属 SF Symbol + 五行配色 —— 图标是 Surge 面板唯一可上色的位置 */
+const PALACE_THEME = {
+  '大安': { icon: 'checkmark.seal.fill',         color: '#30D158' },
+  '留连': { icon: 'drop.fill',                   color: '#0A84FF' },
+  '速喜': { icon: 'bolt.fill',                   color: '#FF9F0A' },
+  '赤口': { icon: 'exclamationmark.bubble.fill', color: '#FF453A' },
+  '小吉': { icon: 'sparkles',                    color: '#30D158' },
+  '空亡': { icon: 'moon.zzz.fill',               color: '#98989D' },
+};
 
 function buildPanel(now) {
   const r = cast(now, ZI_ROLLOVER);
@@ -181,22 +196,25 @@ function buildPanel(now) {
   const HR = '────────────';
 
   const lines = [
-    '落宫 ' + hour.name + '（' + hour.wuxing + ' · ' + hour.dir + ' · 第' + hour.num + '宫）',
-    '月宫 ' + month.name + ' › 日宫 ' + day.name + ' › 时宫 ' + hour.name,
     lunarStr + ' · ' + clock + ' · ' + ZHI[zhi] + '时',
+    '月 ' + month.name + ' › 日 ' + day.name + ' › 时【' + hour.name + '】',
     HR,
+    hour.wuxing + ' · ' + hour.dir + ' · 第' + hour.num + '宫 · 位置 ' + POSITION_HINT[r.hourIdx],
     hour.brief,
   ];
-  if (SHOW_MEANING) lines.push(hour.ju);
+  if (SHOW_MEANING) { lines.push(HR); lines.push(hour.ju); }
   lines.push(HR);
-  lines.push('位置 ' + POSITION_HINT[r.hourIdx] + ' · ' + hour.short);
   lines.push('下次换宫 ' + pad2(nxt.getHours()) + ':' + pad2(nxt.getMinutes()));
 
-  return {
-    title: '小六壬 · ' + hour.name,
-    content: lines.join('\n'),
-    style: PALACE_STYLE[hour.name] || 'info',
-  };
+  const out = { title: '小六壬 · ' + hour.name, content: lines.join('\n') };
+  if (USE_ICON) {
+    const th = PALACE_THEME[hour.name];
+    out.icon = th.icon;
+    out['icon-color'] = th.color;
+  } else {
+    out.style = PALACE_STYLE[hour.name] || 'info';
+  }
+  return out;
 }
 
 (function () {
@@ -204,7 +222,10 @@ function buildPanel(now) {
   try {
     out = buildPanel(new Date());
   } catch (e) {
-    out = { title: '小六壬', content: '起课失败：' + (e && e.message ? e.message : String(e)), style: 'error' };
+    const msg = '起课失败：' + (e && e.message ? e.message : String(e));
+    out = USE_ICON
+      ? { title: '小六壬', content: msg, icon: 'exclamationmark.triangle.fill', 'icon-color': '#FF453A' }
+      : { title: '小六壬', content: msg, style: 'error' };
   }
   $done(out);
 })();

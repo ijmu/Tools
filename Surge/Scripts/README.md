@@ -33,7 +33,7 @@ Surge → 模块 → 从 URL 添加：
 https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Module/xiaoliuren.sgmodule
 ```
 
-模块内自带 `[Script]` 行与 `[Panel]` 行，装完即用；`zi` / `ju` 两个开关在模块参数里直接填。
+模块内自带 `[Script]` 行与 `[Panel]` 行，装完即用；`zi` / `ju` / `ic` 三个开关在模块参数里直接填（`ic=0` 可把每宫专属图标回退成系统的 good/info/alert/error 风格）。
 国内拉不到 raw 时，把 `script-path` 换成 jsDelivr 镜像 `https://testingcf.jsdelivr.net/gh/ijmu/Tools@main/Surge/Scripts/xiaoliuren-panel.js`。
 
 ### 方式二：写进主配置（兜底）

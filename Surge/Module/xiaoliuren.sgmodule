@@ -1,7 +1,7 @@
 #!name=小六壬 · 马前课
 #!desc=农历月/日/时三宫推演，落宫取时宫。打开「策略选择」界面即起课，显示落宫、断语、五行方位与下次换宫时间。
-#!arguments=zi:1,ju:1
-#!arguments-desc=zi：1=子时换日（23:00 后日宫按次日算），0=不换；ju：1=显示六神断句全诗，0=只显示一句断语
+#!arguments=zi:1,ju:1,ic:1
+#!arguments-desc=zi：1=子时换日（23:00 后日宫按次日算），0=不换；ju：1=显示六神断句全诗，0=只显示一句断语；ic：1=每宫专属图标（默认），0=回退系统图标
 
 # 面板显示：iOS 在「策略选择」界面，Mac 在菜单栏 Panels 子菜单
 # 起课时间 = 打开面板那一刻，内容缓存 60s（update-interval）
@@ -10,8 +10,11 @@
 # 拉不到 raw.githubusercontent.com 时，把下面的 script-path 换成镜像：
 #   https://testingcf.jsdelivr.net/gh/ijmu/Tools@main/Surge/Scripts/xiaoliuren-panel.js
 
+# 版式对齐 Egern 版：meta → 三宫步进（落宫带【】底托）→ 属性 → 断语 → 断句诗 → 下次换宫
+# 图标 = 每宫专属 SF Symbol + 五行配色（ic=0 可回退系统图标）
+
 [Script]
-xiaoliuren-panel = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js,script-update-interval=86400,argument="zi={{{zi}}},ju={{{ju}}}"
+xiaoliuren-panel = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js,script-update-interval=86400,argument="zi={{{zi}}},ju={{{ju}}},ic={{{ic}}}"
 
 [Panel]
-XiaoLiuRen = title="小六壬",content="打开策略选择界面即起课",style=info,script-name=xiaoliuren-panel,update-interval=60
+XiaoLiuRen = title="小六壬",content="打开策略选择界面即起课",script-name=xiaoliuren-panel,update-interval=60

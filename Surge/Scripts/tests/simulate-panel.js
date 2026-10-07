@@ -64,17 +64,22 @@ const file = SRC('Surge/Scripts/' + which);
   if (which === 'xiaoliuren-panel.js') {
     for (const iso of ['2026-10-02T14:23:00', '2026-10-02T23:30:00', '2026-01-01T00:05:00']) {
       FIXED = new Date(iso + '+08:00').getTime();
-      const r = await run(file, 'zi=1,ju=1');
+      const r = await run(file, 'zi=1,ju=1,ic=1');
       console.log('\n===== ' + iso + ' (+08) =====');
       console.log('title  :', r.title);
-      console.log('style  :', r.style);
+      console.log('icon   :', r.icon, r['icon-color'], '| style:', r.style);
       console.log('content:\n' + r.content);
     }
     // 关掉断句全诗
     FIXED = new Date('2026-10-02T14:23:00+08:00').getTime();
-    const r2 = await run(file, 'zi=0,ju=0');
+    const r2 = await run(file, 'zi=0,ju=0,ic=1');
     console.log('\n===== zi=0 ju=0 =====');
+    console.log('icon   :', r2.icon, r2['icon-color']);
     console.log('content:\n' + r2.content);
+    // ic=0 回退到系统 style
+    const r3 = await run(file, 'zi=1,ju=1,ic=0');
+    console.log('\n===== zi=1 ju=1 ic=0（系统图标回退）=====');
+    console.log('icon   :', r3.icon, '| style:', r3.style);
   } else {
     console.log('--- 第 1 次：实时抓取 ---');
     const a = await run(file, 'sort=price,top=6');
