@@ -1,21 +1,17 @@
 #!name=小六壬 · 马前课
-#!desc=农历月/日/时三宫推演，落宫取时宫。实时起课并给出断语、五行方位与下次换宫时间；打开「策略选择」界面即刷新。
+#!desc=农历月/日/时三宫推演，落宫取时宫。打开「策略选择」界面即起课，显示落宫、断语、五行方位与下次换宫时间。
 #!arguments=zi:1,ju:1
-#!arguments-desc=zi：1=子时换日（23:00 后日宫按次日算），0=不换；ju：1=显示六神断句全诗，0=仅显示一句断语
+#!arguments-desc=zi：1=子时换日（23:00 后日宫按次日算），0=不换；ju：1=显示六神断句全诗，0=只显示一句断语
 
-# ── 使用 ────────────────────────────────────────────────────────────
-# iOS：Surge → 策略选择 界面里的「小六壬」面板
-# Mac：菜单栏 → Panels → 小六壬
-# 起课时间 = 打开面板那一刻；面板内容缓存 60s（update-interval）
-# 纯本地农历换算，不联网，无凭证，断网照样出结果
-#
-# 拉不到 raw.githubusercontent.com 时，把下面的 script-path 换成 jsDelivr 镜像：
+# 面板显示：iOS 在「策略选择」界面，Mac 在菜单栏 Panels 子菜单
+# 起课时间 = 打开面板那一刻，内容缓存 60s（update-interval）
+# 纯本地农历换算，不联网、无凭证，断网照样出结果
+# 算法与 Egern 版 Egern/Scripts/xiaoliuren.js 同源（含闰月换算修复）
+# 拉不到 raw.githubusercontent.com 时，把下面的 script-path 换成镜像：
 #   https://testingcf.jsdelivr.net/gh/ijmu/Tools@main/Surge/Scripts/xiaoliuren-panel.js
-#
-# 算法与 Egern 版 Egern/Scripts/xiaoliuren.js 同源（含闰月换算修复，逐日对拍 0 不符）
 
 [Script]
-xiaoliuren-panel = type=generic, timeout=10, script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js, script-update-interval=86400, argument="zi={{{zi}}},ju={{{ju}}}"
+xiaoliuren-panel = type=generic,timeout=10,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js,script-update-interval=86400,argument="zi={{{zi}}},ju={{{ju}}}"
 
 [Panel]
-XiaoLiuRen = title="小六壬", content="打开策略选择界面即起课", style=info, script-name=xiaoliuren-panel, update-interval=60
+XiaoLiuRen = title="小六壬",content="打开策略选择界面即起课",style=info,script-name=xiaoliuren-panel,update-interval=60
