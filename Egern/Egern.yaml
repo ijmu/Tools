@@ -1,7 +1,7 @@
 ipv6: false
 http_port: 3080
 socks_port: 3090
-allow_external_connections: false
+allow_external_connections: true
 vif_only: true
 block_quic: true
 close_connections_on_policy_change: true
@@ -366,7 +366,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AI.yaml
+    match: https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/egern/cn.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/egern/global.yaml
     policy: AIGC
     update_interval: 86400
     disabled: false
@@ -475,21 +480,17 @@ rules:
     policy: Manual
 scriptings:
 - generic:
-    name: 星云AI
-    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/nebula-power.js
+    name: 彩票开奖
+    script_url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.js
+    update_interval: 86400
+- generic:
+    name: 油价
+    script_url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/GasPrice-hark.js
     update_interval: 86400
 - generic:
     name: 小六壬
     script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js
     update_interval: 21600
-- generic:
-    name: 全国彩票开奖
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Lottery-Widget.JS
-    update_interval: 86400
-- generic:
-    name: 全国油价查询
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Oil_Widget.JS
-    update_interval: 86400
 - generic:
     name: 招商实时金价
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
@@ -501,22 +502,23 @@ scriptings:
 mitm:
   
 widgets:
-- name: 星云AI
-  script_name: 星云AI
 - name: 小六壬
   script_name: 小六壬
   env:
     ZI_ROLLOVER: '1'
     SHOW_MEANING: '0'
-- name: 全国彩票开奖
-  script_name: 全国彩票开奖
+- name: 彩票开奖
+  script_name: 彩票开奖
   env:
     彩票类型: 大乐透
-- name: 全国油价查询
-  script_name: 全国油价查询
+    分析期数: '100'
+- name: 油价
+  script_name: 油价
   env:
-    region: fujian/putian
-    SHOW_TREND: 'true'
+    PROVINCE: 福建
+    CITY: 莆田
+    MY_FUEL: '95'
+    TANK_L: '66'
 - name: 招商实时金价
   script_name: 招商实时金价
 - name: 节日倒计时
