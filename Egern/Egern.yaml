@@ -458,7 +458,7 @@ scriptings:
     update_interval: 43200
 - generic:
     name: 节日倒计时
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Holiday_Countdown.js
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js
     update_interval: 86400
 mitm:
   
