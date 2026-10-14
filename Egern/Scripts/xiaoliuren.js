@@ -161,7 +161,10 @@ function bg() {
 const T = (text, size, color, weight = 'regular', extra = {}) =>
   Object.assign({ type: 'text', text: String(text == null ? '' : text), font: { size, weight }, textColor: color, lineLimit: 1, minScale: 0.7 }, extra);
 const ICON = (name, color, size = 12) => ({ type: 'image', src: `sf-symbol:${name}`, width: size, height: size, color });
+// 居中一律用「左右各一个 flex 空位」：Egern 不认 justifyContent，spacer 的 flex 才是可用机制
+const SP = () => ({ type: 'spacer', flex: 1 });
 const ROW = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'row', alignItems: 'center', gap: 4, children }, extra);
+const CENTER = (node, extra = {}) => ROW([SP(), node, SP()], extra);
 const COL = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'column', alignItems: 'center', gap: 4, children }, extra);
 const glass = (children, extra = {}) =>
   Object.assign({ type: 'stack', direction: 'column', alignItems: 'start', gap: 4, padding: [7, 10], borderRadius: 14, backgroundColor: GLASS, children }, extra);
@@ -250,7 +253,7 @@ export default async function (ctx) {
         { textAlign: 'center', minScale: 0.55 })],
     };
   };
-  const discRow = ROW(PALACES.map(ball), { gap: isSmall ? 3 : 6, justifyContent: 'center' });
+  const discRow = ROW([SP(), ...PALACES.map(ball), SP()], { gap: isSmall ? 3 : 6 });
 
   // ---------- 三宫步骤（仅大尺寸，空间够时展示来路） ----------
   const stepCell = (label, p, active) => {
@@ -290,14 +293,17 @@ export default async function (ctx) {
   const heroName = T(hour.name, isLarge ? 'largeTitle' : 'title', pcol(hour), 'heavy', { minScale: 0.6 });
   // 小尺寸窄：名称与信息竖排，避免横向被裁
   const heroBlock = isSmall
-    ? COL([heroName, ...heroSub], { alignItems: 'start', gap: 2 })
-    : ROW([heroName, COL(heroSub, { alignItems: 'start', gap: 0 })], { gap: 7, alignItems: 'center' });
+    ? COL([CENTER(heroName), ...heroSub.map((n) => CENTER(n))], { gap: 2 })
+    : ROW([SP(), heroName, COL(heroSub, { alignItems: 'start', gap: 0 }), SP()], { gap: 7 });
+
+  const shortPill = CENTER(glass(
+    [T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: isSmall ? 2 : 1, minScale: 0.72 })],
+    { alignItems: 'center', padding: [4, 11], gap: 0, borderRadius: 999 }));
 
   const children = [head];
   const gap = isSmall ? 4 : 5;
   if (isSmall) {
-    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock,
-      T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: 2, minScale: 0.72 }));
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
   } else if (isLarge) {
     const panel = [
       ROW([ICON('text.book.closed.fill', TXT.tertiary, 10), T('落宫断语', 'caption2', TXT.tertiary, 'semibold'),
@@ -317,8 +323,7 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock,
-      T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: 2, minScale: 0.72 }));
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
   }
 
   const main = {
