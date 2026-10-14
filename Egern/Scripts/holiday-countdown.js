@@ -7,7 +7,7 @@
  *   SHOW_CN     = "0"   隐藏「国内节日」行
  *   SHOW_JIEQI  = "0"   隐藏「24节气」行
  *   SHOW_INTL   = "0"   隐藏「国际节日」行
- *   PER_ROW     = "3"   每行显示条数（默认：小 1 / 中 2 / 大 3 / 加大 4）
+ *   PER_ROW     = "3"   每行显示条数（默认：小 1 / 中 3 / 大 3 / 加大 4）
  *   LUNAR       = "0"   头部不显示农历
  *   TITLE       = "..." 自定义标题
  *
@@ -20,6 +20,17 @@
  *     对拍 1900-2100 全部 4824 个节气：日期仅 1 处差（1979 大寒，真值
  *     23:59:56，落在午夜 4 秒前），时刻中位误差 8.6 秒。
  *   · 清明同时是节气与法定节日，只在国内行出现一次（按「同名同日期」去重）。
+ *
+ * 配色（语义化，2026-10-14 二轮）：
+ *   · 四季色 —— 春青 / 夏朱 / 秋金 / 冬玄（四立为界，每季 6 个节气）。
+ *     节气条目按「该节气所属季节」上色；节气栏图标随「今天所在季节」变（标签仍为栏位绿，
+ *     避免夏季朱红与国内栏正红撞色）。
+ *   · 节庆性质色 —— 大喜正红（春节/除夕/元宵/国庆/元旦/元旦劳动节等）、团圆金（中秋/重阳/腊八）、
+ *     爱情粉（七夕/情人节/母亲节）、青（端午/龙抬头/护士节）、绿（地球日/环境日）、
+ *     橙（万圣夜/感恩节/读书日）、蓝（平安夜/父亲节）、紫（妇女节/跨年夜）。
+ *   · 素色（清明/中元节 —— 祭祖·鬼节）—— 冷灰蓝，且**不吃紧急度红橙**：临近只加深素色底衬，
+ *     不让扫墓/鬼节被染成喜庆色。
+ *   · 紧急度 —— ≤3 天红、≤7 天橙（素色条目除外）；卡片底色一律取语义色的淡底（亮 8%、暗 14%）。
  *   · 时间基准固定 UTC+8（不依赖设备时区），倒计时与农历都按北京时间算。
  */
 
@@ -192,28 +203,55 @@ function termSerial(year, idx) {
   return (_termCache[key] = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-/* ===================== 节日数据（北京时间） ===================== */
+/* ===================== 色板（语义化） ===================== */
+// 节庆性质色：大喜红 / 团圆金 / 爱情粉 / 青 / 自然绿 / 橙 / 国际蓝 / 紫 / 素（祭祖·凶事）
+const TONE = {
+  red:    { light: '#C82A21', dark: '#FF6B60' },
+  gold:   { light: '#C08A0E', dark: '#FFD166' },
+  pink:   { light: '#BC3F79', dark: '#FF8CBB' },
+  cyan:   { light: '#0E8C84', dark: '#3FD6C8' },
+  green:  { light: '#1E8E3E', dark: '#4CD964' },
+  orange: { light: '#B4621A', dark: '#FFA25C' },
+  blue:   { light: '#1668C4', dark: '#5AA9FF' },
+  violet: { light: '#7A4BC0', dark: '#B98CFF' },
+  mute:   { light: '#5E7A8A', dark: '#A3BAC6' },
+};
+// 四季色（依传统五色：春青 · 夏赤 · 秋金 · 冬玄）
+const SEASON = {
+  spring: { light: '#1E9E63', dark: '#4CD98A' },
+  summer: { light: '#D95B25', dark: '#FF9E63' },
+  autumn: { light: '#C08A0E', dark: '#FFD166' },
+  winter: { light: '#3B6EA5', dark: '#7FB2E8' },
+};
+// 24节气所属季节（四立起算：每季 6 个）
+const TERM_SEASON = ['winter','winter','spring','spring','spring','spring','spring','spring',
+  'summer','summer','summer','summer','summer','summer',
+  'autumn','autumn','autumn','autumn','autumn','autumn',
+  'winter','winter','winter','winter'];
+
+/* ===================== 节日数据（北京时间 + 色调） ===================== */
 // 国内·公历固定
 const CN_FIXED = [
-  ['01-01', '元旦'], ['05-01', '劳动节'], ['05-04', '青年节'], ['06-01', '儿童节'],
-  ['07-01', '建党节'], ['08-01', '建军节'], ['09-10', '教师节'], ['10-01', '国庆节'],
+  ['01-01', '元旦', 'red'], ['05-01', '劳动节', 'red'], ['05-04', '青年节', 'red'],
+  ['06-01', '儿童节', 'red'], ['07-01', '建党节', 'red'], ['08-01', '建军节', 'red'],
+  ['09-10', '教师节', 'red'], ['10-01', '国庆节', 'red'],
 ];
-// 国内·农历（月, 日, 名）——除夕单独算（腊月最后一天）
+// 国内·农历（月, 日, 名, 色调）——除夕与清明单独处理
 const CN_LUNAR = [
-  [1, 1, '春节'], [1, 15, '元宵节'], [2, 2, '龙抬头'], [5, 5, '端午节'], [7, 7, '七夕节'],
-  [7, 15, '中元节'], [8, 15, '中秋节'], [9, 9, '重阳节'], [12, 8, '腊八节'],
+  [1, 1, '春节', 'red'], [1, 15, '元宵节', 'red'], [2, 2, '龙抬头', 'cyan'], [5, 5, '端午节', 'cyan'],
+  [7, 7, '七夕节', 'pink'], [7, 15, '中元节', 'mute'], [8, 15, '中秋节', 'gold'],
+  [9, 9, '重阳节', 'gold'], [12, 8, '腊八节', 'gold'],
 ];
 // 国际·公历固定
 const INTL_FIXED = [
-  ['02-14', '情人节'], ['03-08', '妇女节'], ['04-01', '愚人节'], ['04-22', '世界地球日'],
-  ['04-23', '世界读书日'], ['05-12', '国际护士节'], ['06-05', '世界环境日'], ['10-31', '万圣夜'],
-  ['12-24', '平安夜'], ['12-25', '圣诞节'], ['12-31', '跨年夜'],
+  ['02-14', '情人节', 'pink'], ['03-08', '妇女节', 'violet'], ['04-01', '愚人节', 'gold'],
+  ['04-22', '地球日', 'green'], ['04-23', '读书日', 'orange'], ['05-12', '护士节', 'cyan'],
+  ['06-05', '环境日', 'green'], ['10-31', '万圣夜', 'orange'], ['12-24', '平安夜', 'blue'],
+  ['12-25', '圣诞节', 'red'], ['12-31', '跨年夜', 'violet'],
 ];
-// 国际·浮动（第 n 个周几）
+// 国际·浮动（月, 第几周, 周几, 名, 色调）：母亲节粉色、父亲节蓝色、感恩节橙色
 const INTL_FLOATING = [
-  [5, 0, 2, '母亲节'],   // 5月第2个周日
-  [6, 0, 3, '父亲节'],   // 6月第3个周日
-  [11, 4, 4, '感恩节'],  // 11月第4个周四
+  [5, 2, 0, '母亲节', 'pink'], [6, 3, 0, '父亲节', 'blue'], [11, 4, 4, '感恩节', 'orange'],
 ];
 const nthWeekdaySerial = (year, month, weekday, n) => {
   const first = new Date(Date.UTC(year, month - 1, 1));
@@ -230,63 +268,69 @@ function collect(cst, opt) {
   const lunar = solarToLunar(y, m, d);
   const buckets = { cn: [], jq: [], intl: [] };
   const seen = new Set();
-  const add = (key, name, serial) => {
+  const add = (key, name, serial, tone) => {
     if (serial < today) return;
     const tag = name + '@' + serial;
     if (seen.has(tag)) return;
     seen.add(tag);
-    buckets[key].push({ name, days: Math.round((serial - today) / DAY_MS), serial });
+    buckets[key].push({ name, days: Math.round((serial - today) / DAY_MS), serial, tone });
   };
   // 国内·公历
-  for (const [md, name] of CN_FIXED) {
+  for (const [md, name, tone] of CN_FIXED) {
     const mo = +md.slice(0, 2), da = +md.slice(3);
     let s = Date.UTC(y, mo - 1, da);
     if (s < today) s = Date.UTC(y + 1, mo - 1, da);
-    add('cn', name, s);
+    add('cn', name, s, tone);
   }
   // 国内·农历（以今天所在农历年为基准，跨年自动取下一轮）
-  for (const [lm, ld, name] of CN_LUNAR) {
+  for (const [lm, ld, name, tone] of CN_LUNAR) {
     for (const ly of [lunar.year, lunar.year + 1]) {
       const t = fromBase(lunarMonthStart(ly, lm, false) + ld - 1);
       const s = Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate());
-      if (s >= today) { add('cn', name, s); break; }
+      if (s >= today) { add('cn', name, s, tone); break; }
     }
   }
-  // 除夕：下一轮腊月的最后一天 = 次年正月初一前一天
+  // 除夕：下一轮腊月的最后一天 = 次年正月初一前一天（大喜）
   for (const ly of [lunar.year, lunar.year + 1]) {
     const nx = fromBase(lunarMonthStart(ly + 1, 1, false));
     const s = Date.UTC(nx.getUTCFullYear(), nx.getUTCMonth(), nx.getUTCDate()) - DAY_MS;
-    if (s >= today) { add('cn', '除夕', s); break; }
+    if (s >= today) { add('cn', '除夕', s, 'red'); break; }
   }
-  // 清明节（节气日，法定假日）：默认归「国内节日」行，节气行不再重复
+  // 清明节（节气日，法定假日，祭扫 → 素色）：默认归「国内节日」行，节气行不再重复
   if (qingming !== 'jq') {
     let s = termSerial(y, 6);
     if (s < today) s = termSerial(y + 1, 6);
-    add('cn', '清明节', s);
+    add('cn', '清明节', s, 'mute');
   }
-  // 24节气
+  // 24节气：色调 = 该节气所属季节
   for (let i = 0; i < 24; i++) {
     if (i === 6 && qingming === 'cn') continue;
     let s = termSerial(y, i);
     if (s < today) s = termSerial(y + 1, i);
-    add('jq', TERM_NAMES[i], s);
+    add('jq', TERM_NAMES[i], s, TERM_SEASON[i]);
   }
   // 国际·公历
-  for (const [md, name] of INTL_FIXED) {
+  for (const [md, name, tone] of INTL_FIXED) {
     const mo = +md.slice(0, 2), da = +md.slice(3);
     let s = Date.UTC(y, mo - 1, da);
     if (s < today) s = Date.UTC(y + 1, mo - 1, da);
-    add('intl', name, s);
+    add('intl', name, s, tone);
   }
   // 国际·浮动
-  for (const [mo, wd, n, name] of INTL_FLOATING) {
+  for (const [mo, n, wd, name, tone] of INTL_FLOATING) {
     let s = nthWeekdaySerial(y, mo, wd, n);
     if (s < today) s = nthWeekdaySerial(y + 1, mo, wd, n);
-    add('intl', name, s);
+    add('intl', name, s, tone);
   }
   for (const k in buckets) buckets[k].sort((a, b) => a.days - b.days || a.serial - b.serial);
+  // 今天的季节（四立为界）
+  const t0 = Date.UTC(y, m - 1, d);
+  let season = 'winter';
+  for (const [idx, key] of [[2, 'spring'], [8, 'summer'], [14, 'autumn'], [20, 'winter']]) {
+    if (t0 >= termSerial(y, idx)) season = key;
+  }
   return {
-    buckets, today, lunar,
+    buckets, today, season, lunar,
     ganzhi: GAN[(lunar.year - 4) % 10] + ZHI[(lunar.year - 4) % 12],
     animal: '鼠牛虎兔龙蛇马羊猴鸡狗猪'[(lunar.year - 4) % 12],
     week: new Date(today).getUTCDay(),
@@ -297,9 +341,9 @@ const daysText = (days) => (days === 0 ? '今天' : days === 1 ? '明天' : days
 
 /* ===================== 渲染（Egern Widget DSL） ===================== */
 const SECTIONS = [
-  { key: 'cn',   label: '国内', icon: 'flag.fill', accent: { light: '#D70015', dark: '#FF6B60' } },
-  { key: 'jq',   label: '节气', icon: 'leaf.fill', accent: { light: '#1E8E3E', dark: '#4CD964' } },
-  { key: 'intl', label: '国际', icon: 'globe',     accent: { light: '#0A66D1', dark: '#5AA9FF' } },
+  { key: 'cn',   label: '国内', icon: 'flag.fill', accent: TONE.red },
+  { key: 'jq',   label: '节气', icon: 'leaf.fill', accent: SEASON.spring },  // 随当前季节变
+  { key: 'intl', label: '国际', icon: 'globe',     accent: TONE.blue },
 ];
 const C = {
   bg: { light: '#FFFFFF', dark: '#1C1C1E' },
@@ -310,29 +354,39 @@ const C = {
   cardHot: { light: '#FF3B301A', dark: '#FF453A2E' },
   cardWarm: { light: '#FF950012', dark: '#FF9F0A1F' },
   hot: { light: '#E0342C', dark: '#FF6B60' },
+  mute: { light: '#5E7A8A', dark: '#A3BAC6' },
+  muteBg: { light: '#5E7A8A20', dark: '#A3BAC630' },
   warm: { light: '#C77700', dark: '#FFB340' },
   cal: { light: '#D70015', dark: '#FF6B60' },
 };
 const T = (s, opt) => Object.assign({ type: 'text', text: s }, opt);
 const IMG = (name, size, color) => ({ type: 'image', src: 'sf-symbol:' + name, width: size, height: size, color });
 const STACK = (dir, opt, kids) => Object.assign({ type: 'stack', direction: dir, children: kids }, opt);
-const dayColor = (days, accent) => (days <= 3 ? C.hot : days <= 7 ? C.warm : accent);
-const cardBg = (days) => (days <= 3 ? C.cardHot : days <= 7 ? C.cardWarm : C.card);
+const toneColor = (t) => TONE[t] || SEASON[t] || C.secondary;
+const toneBg = (t) => { const c = toneColor(t); return { light: c.light + '14', dark: c.dark + '24' }; };
+const dayColor = (days, t) => {
+  if (t === 'mute') return C.mute;                       // 祭祖/鬼节：永远素色，不染喜庆红橙
+  return days <= 3 ? C.hot : days <= 7 ? C.warm : toneColor(t);
+};
+const cardBg = (days, t) => {
+  if (t === 'mute') return days <= 7 ? C.muteBg : toneBg(t);
+  return days <= 3 ? C.cardHot : days <= 7 ? C.cardWarm : toneBg(t);
+};
 
 const PROFILES = {
   systemSmall: { pad: [12, 13, 12, 13], gap: 5, perRow: 1, rowGap: 6, label: 10.5, icon: 11,
                  name: 12, day: 12.5, padV: 7, padH: 8, radius: 10, title: 13, date: 10, lunar: false },
-  systemMedium: { pad: [14, 15, 14, 15], gap: 6, perRow: 2, rowGap: 7, label: 11, icon: 11,
-                 name: 11.5, day: 12.5, padV: 7, padH: 8, radius: 9.5, title: 14, date: 10.5, lunar: true },
+  systemMedium: { pad: [14, 15, 14, 15], gap: 6, perRow: 3, rowGap: 6, label: 11, icon: 11,
+                 name: 12, day: 13, padV: 7, padH: 8, radius: 9.5, title: 14, date: 10.5, lunar: true },
   systemLarge: { pad: [16, 18, 16, 18], gap: 8, perRow: 3, rowGap: 10, label: 12, icon: 12,
                  name: 12, day: 13, sub: 9.5, twoLine: true, padV: 8, padH: 8, radius: 11, title: 16, date: 11, lunar: true },
   systemExtraLarge: { pad: [18, 20, 18, 20], gap: 9, perRow: 4, rowGap: 11, label: 12.5, icon: 12.5,
                  name: 13, day: 15, sub: 10, twoLine: true, padV: 9, padH: 10, radius: 12, title: 17, date: 11.5, lunar: true },
 };
 
-function chip(sec, o) {
+function chip(sec, o, season) {
   return STACK('row', { alignItems: 'center', gap: 3 }, [
-    IMG(sec.icon, o.icon, sec.accent),
+    IMG(sec.icon, o.icon, sec.key === 'jq' ? SEASON[season] : sec.accent),
     T(sec.label, { font: { size: o.label, weight: 'semibold' }, textColor: sec.accent, lineLimit: 1 }),
   ]);
 }
@@ -343,10 +397,10 @@ function cell(it, sec, o) {
         T(fmtMD(it.serial), { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1, minScale: 0.7 })])
     : nameText;
   return STACK('row', { alignItems: 'center', flex: 1, padding: [o.padV, o.padH, o.padV, o.padH],
-                        borderRadius: o.radius, backgroundColor: cardBg(it.days) }, [
+                        borderRadius: o.radius, backgroundColor: cardBg(it.days, it.tone) }, [
     left,
     { type: 'spacer' },
-    T(daysText(it.days), { font: { size: o.day, weight: 'bold' }, textColor: dayColor(it.days, sec.accent),
+    T(daysText(it.days), { font: { size: o.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone),
                            textAlign: 'right', lineLimit: 1, minScale: 0.7 }),
   ]);
 }
@@ -373,7 +427,7 @@ function rowsOf(data, o, env) {
     const items = data.buckets[sec.key].slice(0, o.perRow);
     if (!items.length) continue;
     rows.push(STACK('row', { alignItems: 'center', gap: o.rowGap, flex: 1 },
-      [chip(sec, o)].concat(items.map((it) => cell(it, sec, o)))));
+      [chip(sec, o, data.season)].concat(items.map((it) => cell(it, sec, o)))));
   }
   return rows;
 }
@@ -401,10 +455,10 @@ export default async function (ctx) {
       const kids = SECTIONS.map((sec) => {
         const it = data.buckets[sec.key][0];
         return STACK('row', { alignItems: 'center', gap: 3 }, [
-          IMG(sec.icon, 9, sec.accent),
+          IMG(sec.icon, 9, sec.key === 'jq' ? SEASON[data.season] : sec.accent),
           T(it ? it.name.slice(0, 3) : '—', { font: { size: 10, weight: 'medium' }, lineLimit: 1, minScale: 0.6 }),
           { type: 'spacer' },
-          T(it ? daysText(it.days) : '', { font: { size: 10, weight: 'bold' }, textColor: dayColor(it ? it.days : 99, sec.accent), lineLimit: 1, minScale: 0.6 }),
+          T(it ? daysText(it.days) : '', { font: { size: 10, weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), lineLimit: 1, minScale: 0.6 }),
         ]);
       });
       return { type: 'widget', padding: 4, gap: 2, refreshAfter, children: kids };
@@ -413,10 +467,10 @@ export default async function (ctx) {
       const kids = SECTIONS.map((sec) => {
         const it = data.buckets[sec.key][0];
         return STACK('row', { alignItems: 'center', gap: 4 }, [
-          IMG(sec.icon, 10, sec.accent),
+          IMG(sec.icon, 10, sec.key === 'jq' ? SEASON[data.season] : sec.accent),
           T(it ? it.name : '—', { font: { size: 'caption1', weight: 'semibold' }, textColor: C.primary, lineLimit: 1, minScale: 0.7 }),
           { type: 'spacer' },
-          T(it ? daysText(it.days) : '', { font: { size: 'caption1', weight: 'bold' }, textColor: dayColor(it ? it.days : 99, sec.accent), lineLimit: 1, minScale: 0.7 }),
+          T(it ? daysText(it.days) : '', { font: { size: 'caption1', weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), lineLimit: 1, minScale: 0.7 }),
         ]);
       });
       return { type: 'widget', padding: [4, 6, 4, 6], gap: 3, refreshAfter, children: kids };
