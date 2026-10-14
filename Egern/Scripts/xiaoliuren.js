@@ -268,13 +268,14 @@ export default async function (ctx) {
       backgroundColor: tint(p, '2E'), borderWidth: 1, borderColor: tint(p, '66'),
     });
   };
-  const stepsRow = ROW([
+  const stepsRow = ROW([SP(),
     stepCell('月宫', month, false),
     T('›', 'caption1', TXT.tertiary, 'regular'),
     stepCell('日宫', day, false),
     T('›', 'caption1', TXT.tertiary, 'regular'),
     stepCell('时宫', hour, true),
-  ], { gap: 3, justifyContent: 'center' });
+    SP(), SP(), SP(), SP(), SP(), SP(),
+  ], { gap: 3 });
 
   // ---------- 主屏装配 ----------
   const head = ROW([
