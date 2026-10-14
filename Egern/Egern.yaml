@@ -35,7 +35,6 @@ dns:
   - https://doh.pub/dns-query
   - https://dns.google/dns-query
   - https://dns.alidns.com/dns-query
-  public_ip_lookup_url: https://ifconfig.me/ip
 bypass_tunnel_proxy:
 - '*.ts.net'
 - tailscale.com
@@ -312,7 +311,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/AppleServers.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
     policy: Apple
     update_interval: 86400
     disabled: false
@@ -397,37 +396,37 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Google.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Github.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
     policy: GitHub
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Microsoft.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
     policy: Microsoft
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Facebook.yaml
+    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Facebook.yaml
     policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Twitter.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
     policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/Repcz/Tool/raw/X/Egern/Rules/Telegram.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
     policy: Telegram
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -445,21 +444,21 @@ scriptings:
     script_url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.js
     update_interval: 86400
 - generic:
-    name: 油价
+    name: 油价查询
     script_url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/GasPrice-hark.js
     update_interval: 86400
 - generic:
     name: 小六壬
     script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js
-    update_interval: 7200
-- generic:
-    name: 招商实时金价
-    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
-    update_interval: 43200
+    update_interval: 3600
 - generic:
     name: 节日倒计时
     script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js
     update_interval: 86400
+- generic:
+    name: 招商实时金价
+    script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
+    update_interval: 3600
 mitm:
   
 widgets:
@@ -468,13 +467,15 @@ widgets:
   env:
     ZI_ROLLOVER: '1'
     SHOW_MEANING: '0'
+- name: 节日倒计时
+  script_name: 节日倒计时
 - name: 彩票开奖
   script_name: 彩票开奖
   env:
     彩票类型: 大乐透
     分析期数: '100'
-- name: 油价
-  script_name: 油价
+- name: 油价查询
+  script_name: 油价查询
   env:
     PROVINCE: 福建
     CITY: 莆田
@@ -482,8 +483,6 @@ widgets:
     TANK_L: '66'
 - name: 招商实时金价
   script_name: 招商实时金价
-- name: 节日倒计时
-  script_name: 节日倒计时
 modules:
 - url: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   update_interval: 86400
