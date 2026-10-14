@@ -125,165 +125,202 @@ function nextShichenTime(now) {
   return next;
 }
 
+/* ============================================================
+ * 主屏幕渲染（2026-10-14 视觉改版：借鉴 Hark 仪表盘小组件）
+ *  · backgroundGradient 渐变底 + 玻璃面板（与油价/彩票组件同一套观感）
+ *  · 六宫圆盘：六个宫位圆标，落宫实心高亮（Hark 的 ball 语法：stack + width/height/borderRadius）
+ *  · 三宫来路（月→日→时）压进落宫副栏，不额外占高；大尺寸另有步骤卡 + 断语玻璃面板
+ * ============================================================ */
+const GLASS = { light: '#FFFFFFA6', dark: '#FFFFFF1A' };
+const TXT = {
+  primary: { light: '#16161A', dark: '#FFFFFF' },
+  secondary: { light: '#4A4A50', dark: '#B6B6BC' },
+  tertiary: { light: '#8A8A90', dark: '#7E7E85' },
+};
+// 六宫色：大安青绿（木·安稳）· 留连蓝（水·拖延）· 速喜橙（火·喜讯）
+//        · 赤口红（金·口舌）· 小吉紫（贵人·和合）· 空亡灰蓝（土·落空）
+const PAL = {
+  大安: { light: '#1E8E5A', dark: '#3FD98A' },
+  留连: { light: '#1668C4', dark: '#64A8FF' },
+  速喜: { light: '#D9701C', dark: '#FFA35C' },
+  赤口: { light: '#C8202A', dark: '#FF6B6B' },
+  小吉: { light: '#7A4BC0', dark: '#B98CFF' },
+  空亡: { light: '#6E7C8A', dark: '#A3B0BC' },
+};
+function bg() {
+  return {
+    type: 'linear',
+    colors: [{ light: '#FFF1F0', dark: '#2A0E10' }, { light: '#F4F0FF', dark: '#140F26' }, { light: '#EEF6FF', dark: '#07121F' }],
+    stops: [0, 0.55, 1], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
+  };
+}
+const T = (text, size, color, weight = 'regular', extra = {}) =>
+  Object.assign({ type: 'text', text: String(text == null ? '' : text), font: { size, weight }, textColor: color, lineLimit: 1, minScale: 0.7 }, extra);
+const ICON = (name, color, size = 12) => ({ type: 'image', src: `sf-symbol:${name}`, width: size, height: size, color });
+const ROW = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'row', alignItems: 'center', gap: 4, children }, extra);
+const COL = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'column', alignItems: 'center', gap: 4, children }, extra);
+const glass = (children, extra = {}) =>
+  Object.assign({ type: 'stack', direction: 'column', alignItems: 'start', gap: 4, padding: [7, 10], borderRadius: 14, backgroundColor: GLASS, children }, extra);
+
+function errorWidget(e) {
+  return {
+    type: 'widget', padding: 14, gap: 6, backgroundGradient: bg(),
+    children: [
+      ICON('exclamationmark.triangle.fill', { light: '#C77700', dark: '#FFD60A' }, 18),
+      T('起课失败', 14, TXT.primary, 'semibold'),
+      T(String((e && e.message) || e), 10, TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.8 }),
+    ],
+  };
+}
+
 export default async function (ctx) {
-  const ZI_ROLLOVER = (ctx.env.ZI_ROLLOVER || "").trim() === "1";
-  const SHOW_MEANING = (ctx.env.SHOW_MEANING || "true").trim() !== "0";
+  const env = ctx.env || {};
+  const ZI_ROLLOVER = (env.ZI_ROLLOVER || '').trim() === '1';
+  const SHOW_MEANING = (env.SHOW_MEANING || 'true').trim() !== '0';
 
   const now = new Date();
   let result;
   try {
     result = cast(now, ZI_ROLLOVER);
   } catch (e) {
-    return {
-      type: 'widget',
-      padding: 14,
-      backgroundColor: { light: '#FFFFFF', dark: '#1C1C1E' },
-      children: [{ type: 'text', text: '起课失败: ' + e.message, font: { size: 'caption1' }, textColor: '#FF3B30' }],
-    };
+    return errorWidget(e);
   }
   const { lunar, zhi, monthIdx, dayIdx, hourIdx } = result;
   const month = PALACES[monthIdx], day = PALACES[dayIdx], hour = PALACES[hourIdx];
 
-  const pad = (n) => String(n).padStart(2, '0');
-  const clock = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const pcol = (p) => PAL[p.name] || TXT.secondary;
+  const tint = (p, a) => { const c = pcol(p); return { light: c.light + a, dark: c.dark + a }; };
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const clock = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
   const lunarStr = `农历${lunar.isLeap ? '闰' : ''}${MONTH_NAMES[lunar.month - 1]}月${DAY_NAMES[lunar.day - 1]}`;
+  const path = `月${month.name} › 日${day.name} › 时${hour.name}`;
   const refreshTime = nextShichenTime(now).toISOString();
   const fam = ctx.widgetFamily || 'systemSmall';
-
-  // 颜色：light/dark 自适应（参考油价组件写法）
-  const C = {
-    bg: { light: '#FFFFFF', dark: '#1C1C1E' },
-    card: { light: '#EBEBF0', dark: '#2C2C2E' },
-    primary: { light: '#1A1A1A', dark: '#FFFFFF' },
-    secondary: { light: '#666666', dark: '#AAAAAA' },
-    tertiary: { light: '#999999', dark: '#6E6E73' },
-    accent: {
-      light: { 大安: '#1E9E43', 留连: '#0A6ED1', 速喜: '#C77700', 赤口: '#D70015', 小吉: '#248A3D', 空亡: '#8E8E93' }[hour.name],
-      dark: { 大安: '#34C759', 留连: '#0A84FF', 速喜: '#FF9F0A', 赤口: '#FF453A', 小吉: '#30D158', 空亡: '#98989D' }[hour.name],
-    },
-  };
-  const pColor = (p) => ({
-    light: { 大安: '#1E9E43', 留连: '#0A6ED1', 速喜: '#C77700', 赤口: '#D70015', 小吉: '#248A3D', 空亡: '#8E8E93' }[p.name],
-    dark: { 大安: '#34C759', 留连: '#0A84FF', 速喜: '#FF9F0A', 赤口: '#FF453A', 小吉: '#30D158', 空亡: '#98989D' }[p.name],
-  });
-
   const isSmall = fam === 'systemSmall';
-  const isLarge = fam === 'systemLarge';
+  const isLarge = fam === 'systemLarge' || fam === 'systemExtraLarge';
 
-  // 昼夜图标：白天太阳 / 夜晚月亮——refreshAfter 钉在时辰交界，图标随之自然切换
-  const dayIcon = (() => {
-    // 白昼：辰(07)…酉(19)；其余为夜
-    if (zhi >= 4 && zhi <= 9) {
-      return { name: 'sun.max.fill', color: { light: '#C75700', dark: '#FF9F0A' } };
-    }
-    return { name: 'moon.stars.fill', color: { light: '#C77700', dark: '#FFD60A' } };
-  })();
+  // 昼夜图标：昼辰(辰7…酉9)为日，其余为月；refreshAfter 钉在时辰交界，图标随之自然切换
+  const dayIcon = (zhi >= 4 && zhi <= 9)
+    ? { name: 'sun.max.fill', color: { light: '#C75700', dark: '#FF9F0A' } }
+    : { name: 'moon.stars.fill', color: { light: '#C77700', dark: '#FFD60A' } };
 
-  // 锁屏内联
+  // ---------- 锁屏 ----------
   if (fam === 'accessoryInline') {
     return {
-      type: 'widget',
-      refreshAfter: refreshTime,
-      children: [{ type: 'text', text: `小六壬 ${hour.name}·${ZHI[zhi]}时`, font: { size: 'caption1', weight: 'semibold' }, textColor: C.accent, lineLimit: 1 }],
+      type: 'widget', refreshAfter: refreshTime,
+      children: [T(`小六壬 ${hour.name}·${ZHI[zhi]}时`, 'caption1', pcol(hour), 'semibold')],
     };
   }
-  // 锁屏圆形
   if (fam === 'accessoryCircular') {
     return {
-      type: 'widget', refreshAfter: refreshTime, padding: 2,
-      children: [
-        { type: 'text', text: hour.name, font: { size: 'headline', weight: 'heavy' }, textColor: C.accent, textAlign: 'center', lineLimit: 1, minScale: 0.55 },
-        { type: 'text', text: ZHI[zhi] + '时', font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center' },
+      type: 'widget', refreshAfter: refreshTime, padding: 2, children: [
+        T(hour.name, 'headline', pcol(hour), 'heavy', { textAlign: 'center', minScale: 0.55 }),
+        T(ZHI[zhi] + '时', 'caption2', TXT.secondary, 'regular', { textAlign: 'center' }),
       ],
     };
   }
-  // 锁屏矩形
   if (fam === 'accessoryRectangular') {
     return {
-      type: 'widget', refreshAfter: refreshTime, gap: 2,
-      children: [
-        { type: 'stack', direction: 'row', alignItems: 'center', gap: 6, children: [
-          { type: 'text', text: `小六壬 ${hour.name}`, font: { size: 'headline', weight: 'bold' }, textColor: C.accent, lineLimit: 1 },
-          { type: 'spacer' },
-          { type: 'text', text: `${ZHI[zhi]}时`, font: { size: 'caption1' }, textColor: C.secondary },
-        ]},
-        { type: 'text', text: `月${month.name} › 日${day.name} › 时${hour.name}`, font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.7 },
+      type: 'widget', refreshAfter: refreshTime, gap: 2, children: [
+        ROW([T(`小六壬 ${hour.name}`, 'headline', pcol(hour), 'bold'), { type: 'spacer' },
+          T(`${ZHI[zhi]}时`, 'caption1', TXT.secondary)], { gap: 6 }),
+        T(path, 'caption2', TXT.secondary, 'regular', { minScale: 0.65 }),
       ],
     };
   }
 
-  // ---------- 主屏幕 ----------
-  // 三步行：参宫小字，时宫加底托示「落」
-  const stepCell = (label, p, active) => {
-    const inner = [
-      { type: 'text', text: label, font: { size: 'caption2' }, textColor: active ? C.secondary : C.tertiary, textAlign: 'center', lineLimit: 1 },
-      { type: 'text', text: p.name, font: { size: active ? 'subheadline' : 'footnote', weight: active ? 'heavy' : 'semibold' },
-        textColor: active ? C.primary : pColor(p), textAlign: 'center', lineLimit: 1, minScale: 0.65 },
-    ];
-    if (!active) return { type: 'stack', direction: 'column', alignItems: 'center', gap: 1, children: inner };
+  // ---------- 六宫圆盘 ----------
+  const ballSize = isSmall ? 20 : isLarge ? 40 : 30;
+  const ball = (p) => {
+    const active = p.name === hour.name;
+    const c = pcol(p);
+    const extra = {
+      alignItems: 'center', justifyContent: 'center', gap: 0,
+      width: ballSize, height: ballSize, borderRadius: ballSize / 2,
+      backgroundColor: active ? c : tint(p, isLarge ? '33' : '26'),
+    };
+    if (!active) { extra.borderWidth = 1; extra.borderColor = tint(p, '55'); }
     return {
-      type: 'stack', direction: 'column', alignItems: 'center', gap: 1,
-      padding: [3, 7, 3, 7], borderRadius: 8,
-      backgroundColor: { light: pColor(p).light + '26', dark: pColor(p).dark + '33' },
-      borderWidth: 1, borderColor: { light: pColor(p).light + '55', dark: pColor(p).dark + '66' },
-      children: inner,
+      type: 'stack', direction: 'row', ...extra,
+      children: [T(p.name, Math.round(ballSize * 0.36), active ? { light: '#FFFFFF', dark: '#0D0D10' } : c, 'semibold',
+        { textAlign: 'center', minScale: 0.55 })],
     };
   };
+  const discRow = ROW(PALACES.map(ball), { gap: isSmall ? 3 : 6, justifyContent: 'center' });
 
-  const stepsRow = {
-    type: 'stack', direction: 'row', alignItems: 'center', gap: 3,
-    children: [
-      stepCell('月宫', month, false),
-      { type: 'text', text: '›', font: { size: 'caption1' }, textColor: C.tertiary },
-      stepCell('日宫', day, false),
-      { type: 'text', text: '›', font: { size: 'caption1' }, textColor: C.tertiary },
-      stepCell('时宫', hour, true),
-    ],
+  // ---------- 三宫步骤（仅大尺寸，空间够时展示来路） ----------
+  const stepCell = (label, p, active) => {
+    const inner = [
+      T(label, 'caption2', active ? TXT.secondary : TXT.tertiary, 'regular', { textAlign: 'center' }),
+      T(p.name, active ? 'subheadline' : 'footnote', active ? TXT.primary : pcol(p), active ? 'heavy' : 'semibold',
+        { textAlign: 'center', minScale: 0.65 }),
+    ];
+    if (!active) return COL(inner, { gap: 1 });
+    return COL(inner, {
+      gap: 1, padding: [3, 7, 3, 7], borderRadius: 9,
+      backgroundColor: tint(p, '2E'), borderWidth: 1, borderColor: tint(p, '66'),
+    });
   };
+  const stepsRow = ROW([
+    stepCell('月宫', month, false),
+    T('›', 'caption1', TXT.tertiary, 'regular'),
+    stepCell('日宫', day, false),
+    T('›', 'caption1', TXT.tertiary, 'regular'),
+    stepCell('时宫', hour, true),
+  ], { gap: 3, justifyContent: 'center' });
 
-  const subLine = isSmall
-    ? `${hour.num}·${POSITION_HINT[hourIdx]}`
-    : `${hour.num}·${POSITION_HINT[hourIdx]} · ${hour.wuxing} · ${hour.dir}`;
+  // ---------- 主屏装配 ----------
+  const head = ROW([
+    ICON(dayIcon.name, dayIcon.color, 13),
+    T('小六壬', 'subheadline', TXT.primary, 'bold'),
+    { type: 'spacer' },
+    T(isSmall ? `${ZHI[zhi]}时` : `${lunarStr} · ${clock}`, 'caption2', TXT.secondary, 'regular',
+      { textAlign: 'right', minScale: 0.6 }),
+  ]);
 
-  const children = [
-    // header
-    { type: 'stack', direction: 'row', alignItems: 'center', gap: 4, children: [
-      { type: 'image', src: `sf-symbol:${dayIcon.name}`, width: 13, height: 13, color: dayIcon.color },
-      { type: 'text', text: '小六壬', font: { size: 'subheadline', weight: 'bold' }, textColor: C.primary, lineLimit: 1 },
-      { type: 'spacer' },
-      { type: 'text', text: isSmall ? `${ZHI[zhi]}时` : `${lunarStr} · ${clock}`,
-        font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'right', lineLimit: 1, minScale: 0.6 },
-    ]},
-    { type: 'spacer', length: isLarge ? 6 : 3 },
-    stepsRow,
-    { type: 'spacer', length: isLarge ? 8 : 4 },
-    // 落宫大字 + 副行
-    { type: 'stack', direction: 'row', alignItems: 'center', gap: 7, children: [
-      { type: 'text', text: hour.name, font: { size: isLarge ? 'largeTitle' : 'title', weight: 'heavy' },
-        textColor: C.accent, lineLimit: 1, minScale: 0.6 },
-      { type: 'text', text: subLine, font: { size: isSmall ? 'caption1' : 'footnote', weight: 'medium' },
-        textColor: C.secondary, lineLimit: 1, minScale: 0.7 },
-    ]},
-    { type: 'text', text: isSmall ? hour.short : hour.brief,
-      font: { size: isSmall ? 'footnote' : 'callout', weight: 'medium' }, textColor: C.primary, lineLimit: 2, minScale: 0.72 },
+  const heroSub = [
+    T(`第${hour.num}宫 · ${hour.wuxing} · ${hour.dir}`, isSmall ? 'caption1' : 'footnote', TXT.secondary, 'medium', { minScale: 0.7 }),
   ];
+  if (!isSmall) heroSub.push(T(path, 'caption2', TXT.tertiary, 'regular', { minScale: 0.65, lineLimit: 1 }));
+  const heroName = T(hour.name, isLarge ? 'largeTitle' : 'title', pcol(hour), 'heavy', { minScale: 0.6 });
+  // 小尺寸窄：名称与信息竖排，避免横向被裁
+  const heroBlock = isSmall
+    ? COL([heroName, ...heroSub], { alignItems: 'start', gap: 2 })
+    : ROW([heroName, COL(heroSub, { alignItems: 'start', gap: 0 })], { gap: 7, alignItems: 'center' });
 
-  if (isLarge) {
+  const children = [head];
+  const gap = isSmall ? 4 : 5;
+  if (isSmall) {
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock,
+      T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: 2, minScale: 0.72 }));
+  } else if (isLarge) {
+    const panel = [
+      ROW([ICON('text.book.closed.fill', TXT.tertiary, 10), T('落宫断语', 'caption2', TXT.tertiary, 'semibold'),
+        { type: 'spacer' }, T('仅供玩味', 'caption2', TXT.tertiary, 'regular')], { gap: 5 }),
+      T(hour.brief, 'footnote', TXT.primary, 'medium', { lineLimit: 2, minScale: 0.8 }),
+    ];
+    if (SHOW_MEANING) panel.push(T(hour.ju, 'caption1', TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.8 }));
     children.push(
+      { type: 'spacer' },
+      discRow,
+      { type: 'spacer', length: 8 },
+      stepsRow,
+      { type: 'spacer' },
+      heroBlock,
       { type: 'spacer', length: 6 },
-      { type: 'text', text: '六神断语', font: { size: 'caption2', weight: 'semibold' }, textColor: C.tertiary },
+      glass(panel, { padding: [9, 12], gap: 4 }),
+      { type: 'spacer' },
     );
-    if (SHOW_MEANING) {
-      children.push({ type: 'text', text: hour.ju, font: { size: 'footnote' }, textColor: C.secondary, lineLimit: 4, minScale: 0.75 });
-    }
-    children.push({ type: 'spacer' });
+  } else {
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock,
+      T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: 2, minScale: 0.72 }));
   }
 
   return {
     type: 'widget',
     padding: isSmall ? [12, 13, 12, 13] : [14, 16, 14, 16],
-    gap: isSmall ? 4 : 5,
-    backgroundColor: C.bg,
+    gap,
+    backgroundGradient: bg(),
     refreshAfter: refreshTime,
     children,
   };

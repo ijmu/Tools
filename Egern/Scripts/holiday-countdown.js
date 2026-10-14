@@ -8,6 +8,8 @@
  *   SHOW_JIEQI  = "0"   隐藏「24节气」行
  *   SHOW_INTL   = "0"   隐藏「国际节日」行
  *   PER_ROW     = "3"   每行显示条数（默认：小 1 / 中 3 / 大 3 / 加大 4）
+ *   PLAINBG     = "1"   关闭渐变底，回退纯色底（若某些系统版本渐变白屏时的保险开关）
+ *   URL         = "…"   点按组件跳转的链接（默认 calshow:// 打开系统日历）
  *   LUNAR       = "0"   头部不显示农历
  *   TITLE       = "..." 自定义标题
  *
@@ -20,6 +22,11 @@
  *     对拍 1900-2100 全部 4824 个节气：日期仅 1 处差（1979 大寒，真值
  *     23:59:56，落在午夜 4 秒前），时刻中位误差 8.6 秒。
  *   · 清明同时是节气与法定节日，只在国内行出现一次（按「同名同日期」去重）。
+ *
+ * 视觉（2026-10-14 四轮，借鉴 Hark 仪表盘组件）：
+ *   · 根节点 backgroundGradient 线性渐变底（与油价/彩票等组件同款配色，视觉统一）
+ *   · 卡片=语义色淡底玻璃片（亮 8%→现 13%）；大/加大页脚加「本年进度条」（SVG data URI + image 节点）
+ *   · 根节点 url：点组件即打开系统日历（calshow://，可用 URL 覆盖）
  *
  * 尺寸自适应（2026-10-14 三轮）：
  *   小 1×1 / 中 3×1 / 大 3×2 / 加大 4×2（每栏「每行几个 × 几行」卡片矩阵）。
@@ -336,7 +343,7 @@ function collect(cst, opt) {
     if (t0 >= termSerial(y, idx)) season = key;
   }
   return {
-    buckets, today, season, lunar,
+    buckets, today, season, year: y, lunar,
     ganzhi: GAN[(lunar.year - 4) % 10] + ZHI[(lunar.year - 4) % 12],
     animal: '鼠牛虎兔龙蛇马羊猴鸡狗猪'[(lunar.year - 4) % 12],
     week: new Date(today).getUTCDay(),
@@ -368,8 +375,24 @@ const C = {
 const T = (s, opt) => Object.assign({ type: 'text', text: s }, opt);
 const IMG = (name, size, color) => ({ type: 'image', src: 'sf-symbol:' + name, width: size, height: size, color });
 const STACK = (dir, opt, kids) => Object.assign({ type: 'stack', direction: dir, children: kids }, opt);
+const svgUri = (svg) => 'data:image/svg+xml,' + encodeURIComponent(svg);
+function barSvg(pct, color, w, h) {
+  const r = h / 2, fw = Math.max(h, w * Math.max(0, Math.min(1, pct))).toFixed(1);
+  return svgUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}'>` +
+    `<rect width='${w}' height='${h}' rx='${r}' fill='${color}' fill-opacity='0.26'/>` +
+    `<rect width='${fw}' height='${h}' rx='${r}' fill='${color}'/></svg>`);
+}
+// 与油价/彩票等组件统一的渐变底（Hark 同款）
+function bg() {
+  return {
+    type: 'linear',
+    colors: [{ light: '#FFF1F0', dark: '#2A0E10' }, { light: '#F4F0FF', dark: '#140F26' }, { light: '#EEF6FF', dark: '#07121F' }],
+    stops: [0, 0.55, 1], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
+  };
+}
+
 const toneColor = (t) => TONE[t] || SEASON[t] || C.secondary;
-const toneBg = (t) => { const c = toneColor(t); return { light: c.light + '14', dark: c.dark + '24' }; };
+const toneBg = (t) => { const c = toneColor(t); return { light: c.light + '22', dark: c.dark + '30' }; };
 const dayColor = (days, t) => {
   if (t === 'mute') return C.mute;                       // 祭祖/鬼节：永远素色，不染喜庆红橙
   return days <= 3 ? C.hot : days <= 7 ? C.warm : toneColor(t);
@@ -384,12 +407,12 @@ const PROFILES = {
                  name: 12, day: 12.5, padV: 7, padH: 8, radius: 10, title: 13, date: 10, lunar: false },
   systemMedium: { pad: [14, 15, 14, 15], gap: 6, rows: 1, perRow: 3, rowGap: 6, label: 11, icon: 11,
                  name: 12, day: 13, padV: 7, padH: 8, radius: 9.5, title: 14, date: 10.5, lunar: true },
-  systemLarge: { pad: [16, 18, 16, 18], gap: 8, rows: 2, perRow: 3, rowGap: 7, sectionGap: 10, cardRowGap: 5,
+  systemLarge: { pad: [16, 18, 16, 18], gap: 8, rows: 2, perRow: 3, rowGap: 7, sectionGap: 10, cardRowGap: 5, barW: 110,
                  label: 12, icon: 12, name: 12, day: 13, sub: 9.5, twoLine: true,
-                 padV: 5, padH: 8, radius: 11, title: 16, date: 11, lunar: true },
-  systemExtraLarge: { pad: [18, 20, 18, 20], gap: 9, rows: 2, perRow: 4, rowGap: 8, sectionGap: 12, cardRowGap: 6,
+                 padV: 5, padH: 8, radius: 11, title: 16, date: 11, lunar: true, rowFlex: false },
+  systemExtraLarge: { pad: [18, 20, 18, 20], gap: 9, rows: 2, perRow: 4, rowGap: 8, sectionGap: 12, cardRowGap: 6, barW: 170,
                  label: 13, icon: 13, name: 13, day: 15, sub: 10, twoLine: true,
-                 padV: 6, padH: 10, radius: 12, title: 17, date: 11.5, lunar: true },
+                 padV: 6, padH: 10, radius: 12, title: 17, date: 11.5, lunar: true, rowFlex: false },
 };
 
 function chip(sec, o, season) {
@@ -412,13 +435,26 @@ function cell(it, sec, o) {
                            textAlign: 'right', lineLimit: 1, minScale: 0.7 }),
   ]);
 }
+function footer(data, o, env) {
+  if (!o.barW) return null;
+  const y = data.year;
+  const pct = (data.today - Date.UTC(y, 0, 1)) / (Date.UTC(y + 1, 0, 1) - Date.UTC(y, 0, 1));
+  const tone = SEASON[data.season] || TONE.red;
+  return STACK('row', { alignItems: 'center', gap: 6 }, [
+    T(`${y} 年已过 ${Math.round(pct * 100)}%`, { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1 }),
+    { type: 'spacer' },
+    { type: 'image', src: barSvg(pct, tone.light, o.barW, 5), width: o.barW, height: 5 },
+  ]);
+}
+
 function header(data, o, env, fam) {
   const { lunar } = data;
   const title = (env.TITLE || '').trim() || (fam === 'systemSmall' ? '倒计时' : '节日倒计时');
   const ok = lunar.month >= 1 && lunar.month <= 12 && lunar.day >= 1 && lunar.day <= 30;
   const showLunar = o.lunar && ok && (env.LUNAR || '1').trim() !== '0';
+  const lunarTail = `${data.ganzhi}${data.animal}年${MONTH_CN[lunar.month - 1]}月${DAY_CN[lunar.day - 1]}`;
   const right = `${fmtMD(data.today)} 周${WEEK_CN[data.week]}` +
-    (showLunar ? ` · 农历${MONTH_CN[lunar.month - 1]}月${DAY_CN[lunar.day - 1]}` : '');
+    (showLunar ? (o.twoLine ? ` · ${lunarTail}` : ` · 农历${MONTH_CN[lunar.month - 1]}月${DAY_CN[lunar.day - 1]}`) : '');
   return STACK('row', { alignItems: 'center', gap: 4 }, [
     IMG('calendar', o.icon + 2, C.cal),
     T(title, { font: { size: o.title, weight: 'bold' }, textColor: C.primary, lineLimit: 1, minScale: 0.7 }),
@@ -434,8 +470,10 @@ function rowsOf(data, o, env) {
     if (!on(flag)) continue;
     const items = data.buckets[sec.key].slice(0, o.perRow * o.rows);
     if (!items.length) continue;
+    const rowExtra = { alignItems: 'center', gap: o.rowGap };
+    if (o.rowFlex !== false) rowExtra.flex = 1;
     if (o.rows <= 1) {
-      rows.push(STACK('row', { alignItems: 'center', gap: o.rowGap, flex: 1 },
+      rows.push(STACK('row', rowExtra,
         [chip(sec, o, data.season)].concat(items.map((it) => cell(it, sec, o)))));
       continue;
     }
@@ -447,7 +485,7 @@ function rowsOf(data, o, env) {
       for (let k = chunk.length; k < o.perRow; k++) kids.push({ type: 'spacer', flex: 1 });
       cardRows.push(STACK('row', { alignItems: 'center', gap: o.rowGap }, kids));
     }
-    rows.push(STACK('row', { alignItems: 'center', gap: o.sectionGap, flex: 1 }, [
+    rows.push(STACK('row', Object.assign({ alignItems: 'center', gap: o.sectionGap }, o.rowFlex === false ? {} : { flex: 1 }), [
       chip(sec, o, data.season),
       STACK('column', { gap: o.cardRowGap, flex: 1 }, cardRows),
     ]));
@@ -505,16 +543,22 @@ export default async function (ctx) {
     const per = parseInt((env.PER_ROW || '').trim(), 10);
     if (per >= 1 && per <= 6) o.perRow = per;
     const kids = [header(data, o, env, fam)];
-    if (fam === 'systemLarge' || fam === 'systemExtraLarge') {
-      const left = Math.round((Date.UTC(cst.y + 1, 0, 1) - Date.UTC(cst.y, cst.m - 1, cst.d)) / DAY_MS);
-      kids.push(T(`${data.ganzhi}${data.animal}年 · ${cst.y} 还剩 ${left} 天`,
-        { font: { size: o.date }, textColor: C.tertiary, lineLimit: 1, minScale: 0.7 }));
-    }
     const rows = rowsOf(data, o, env);
     kids.push(...rows);
-    // 三行时让行均分剩余高度铺满画布；只剩一两行时留白由尾部空位吸收
-    if (rows.length <= 2) kids.push({ type: 'spacer' });
-    return { type: 'widget', padding: o.pad, gap: o.gap, backgroundColor: C.bg, refreshAfter, children: kids };
+    const foot = footer(data, o, env);
+    if (o.rowFlex === false) {
+      // 大/加大：卡片密度已够，行不拉伸（防挤压裁切）；页脚钉底，余量落在页脚上方
+      if (foot) { kids.push({ type: 'spacer' }); kids.push(foot); }
+    } else {
+      if (foot) { kids.push({ type: 'spacer', length: 6 }); kids.push(foot); }
+      // 三行时让行均分剩余高度铺满画布；只剩一两行时留白由尾部空位吸收
+      if (rows.length <= 2) kids.push({ type: 'spacer' });
+    }
+    const plain = (env.PLAINBG || '').trim() === '1';
+    const root = { type: 'widget', padding: o.pad, gap: o.gap, refreshAfter, children: kids };
+    if (plain) root.backgroundColor = C.bg; else root.backgroundGradient = bg();
+    if (env.URL) root.url = env.URL; else root.url = 'calshow://';
+    return root;
   } catch (e) {
     return {
       type: 'widget', padding: 14, backgroundColor: C.bg,
