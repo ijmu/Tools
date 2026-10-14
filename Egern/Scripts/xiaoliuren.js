@@ -15,11 +15,13 @@
  *   同名 Surge 信息面板版见 Surge/Scripts/xiaoliuren-panel.js，内核与本文一致。
  */
 
+// 1900-2100 农历编码表。2026-10-14 勘误两处：1933→0x16a95（闰五月应 30 天）、2060→0x92e0
+// （原表这两处与《中国天文年历》/lunar-javascript 不符，逐日对拍 73365 天定位）。
 const LUNAR_INFO = [
 0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
 0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
 0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
-0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+0x06566,0x0d4a0,0x0ea50,0x16a95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
 0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
 0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
 0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
@@ -32,11 +34,12 @@ const LUNAR_INFO = [
 0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
 0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
 0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
-0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+0x92e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
 0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
 0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
 0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,
-0x0d520];
+0x0d520,
+];
 
 // 六宫：序 1→6 = 大安 留连 速喜 赤口 小吉 空亡
 const PALACES = [
@@ -132,6 +135,7 @@ function nextShichenTime(now) {
  *  · 三宫来路（月→日→时）压进落宫副栏，不额外占高；大尺寸另有步骤卡 + 断语玻璃面板
  * ============================================================ */
 const GLASS = { light: '#FFFFFFA6', dark: '#FFFFFF1A' };
+const BG_PLAIN = { light: '#FFFFFF', dark: '#1C1C1E' };   // PLAINBG=1 时的纯色底
 const TXT = {
   primary: { light: '#16161A', dark: '#FFFFFF' },
   secondary: { light: '#4A4A50', dark: '#B6B6BC' },
@@ -274,12 +278,13 @@ export default async function (ctx) {
     ICON(dayIcon.name, dayIcon.color, 13),
     T('小六壬', 'subheadline', TXT.primary, 'bold'),
     { type: 'spacer' },
-    T(isSmall ? `${ZHI[zhi]}时` : `${lunarStr} · ${clock}`, 'caption2', TXT.secondary, 'regular',
+    T(isSmall ? `${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}` : `${lunarStr} · ${clock}`, 'caption2', TXT.secondary, 'regular',
       { textAlign: 'right', minScale: 0.6 }),
   ]);
 
   const heroSub = [
-    T(`第${hour.num}宫 · ${hour.wuxing} · ${hour.dir}`, isSmall ? 'caption1' : 'footnote', TXT.secondary, 'medium', { minScale: 0.7 }),
+    T(`第${hour.num}宫 · ${hour.wuxing} · ${hour.dir}` + (isSmall ? '' : ` · 宜往${POSITION_HINT[hourIdx]}`),
+      isSmall ? 'caption1' : 'footnote', TXT.secondary, 'medium', { minScale: 0.7 }),
   ];
   if (!isSmall) heroSub.push(T(path, 'caption2', TXT.tertiary, 'regular', { minScale: 0.65, lineLimit: 1 }));
   const heroName = T(hour.name, isLarge ? 'largeTitle' : 'title', pcol(hour), 'heavy', { minScale: 0.6 });
@@ -316,12 +321,14 @@ export default async function (ctx) {
       T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: 2, minScale: 0.72 }));
   }
 
-  return {
+  const main = {
     type: 'widget',
     padding: isSmall ? [12, 13, 12, 13] : [14, 16, 14, 16],
     gap,
-    backgroundGradient: bg(),
     refreshAfter: refreshTime,
     children,
   };
+  // 渐变底和节日倒计时保持一套；PLAINBG=1 可回退纯色底（某些系统版本白屏时的保险）
+  if ((env.PLAINBG || '').trim() === '1') main.backgroundColor = BG_PLAIN; else main.backgroundGradient = bg();
+  return main;
 }
