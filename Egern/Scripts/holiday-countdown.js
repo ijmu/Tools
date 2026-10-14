@@ -21,6 +21,12 @@
  *     23:59:56，落在午夜 4 秒前），时刻中位误差 8.6 秒。
  *   · 清明同时是节气与法定节日，只在国内行出现一次（按「同名同日期」去重）。
  *
+ * 尺寸自适应（2026-10-14 三轮）：
+ *   小 1×1 / 中 3×1 / 大 3×2 / 加大 4×2（每栏「每行几个 × 几行」卡片矩阵）。
+ *   大与加大改为「栏标竖排在左 + 右侧卡片矩阵」，行按 flex 均分铺满 —— 大画布靠显示更多条目
+ *   填满，而不是把 3 行拉高留大空隙（上一版就是把 9 个条目拉伸，中间空得难看）。
+ *   末行不足时用透明占位撑住列宽，保证上下两行卡片对齐。
+ *
  * 配色（语义化，2026-10-14 二轮）：
  *   · 四季色 —— 春青 / 夏朱 / 秋金 / 冬玄（四立为界，每季 6 个节气）。
  *     节气条目按「该节气所属季节」上色；节气栏图标随「今天所在季节」变（标签仍为栏位绿，
@@ -374,14 +380,16 @@ const cardBg = (days, t) => {
 };
 
 const PROFILES = {
-  systemSmall: { pad: [12, 13, 12, 13], gap: 5, perRow: 1, rowGap: 6, label: 10.5, icon: 11,
+  systemSmall: { pad: [12, 13, 12, 13], gap: 5, rows: 1, perRow: 1, rowGap: 6, label: 10.5, icon: 11,
                  name: 12, day: 12.5, padV: 7, padH: 8, radius: 10, title: 13, date: 10, lunar: false },
-  systemMedium: { pad: [14, 15, 14, 15], gap: 6, perRow: 3, rowGap: 6, label: 11, icon: 11,
+  systemMedium: { pad: [14, 15, 14, 15], gap: 6, rows: 1, perRow: 3, rowGap: 6, label: 11, icon: 11,
                  name: 12, day: 13, padV: 7, padH: 8, radius: 9.5, title: 14, date: 10.5, lunar: true },
-  systemLarge: { pad: [16, 18, 16, 18], gap: 8, perRow: 3, rowGap: 10, label: 12, icon: 12,
-                 name: 12, day: 13, sub: 9.5, twoLine: true, padV: 8, padH: 8, radius: 11, title: 16, date: 11, lunar: true },
-  systemExtraLarge: { pad: [18, 20, 18, 20], gap: 9, perRow: 4, rowGap: 11, label: 12.5, icon: 12.5,
-                 name: 13, day: 15, sub: 10, twoLine: true, padV: 9, padH: 10, radius: 12, title: 17, date: 11.5, lunar: true },
+  systemLarge: { pad: [16, 18, 16, 18], gap: 8, rows: 2, perRow: 3, rowGap: 7, sectionGap: 10, cardRowGap: 5,
+                 label: 12, icon: 12, name: 12, day: 13, sub: 9.5, twoLine: true,
+                 padV: 5, padH: 8, radius: 11, title: 16, date: 11, lunar: true },
+  systemExtraLarge: { pad: [18, 20, 18, 20], gap: 9, rows: 2, perRow: 4, rowGap: 8, sectionGap: 12, cardRowGap: 6,
+                 label: 13, icon: 13, name: 13, day: 15, sub: 10, twoLine: true,
+                 padV: 6, padH: 10, radius: 12, title: 17, date: 11.5, lunar: true },
 };
 
 function chip(sec, o, season) {
@@ -424,10 +432,25 @@ function rowsOf(data, o, env) {
   for (const sec of SECTIONS) {
     const flag = sec.key === 'cn' ? 'SHOW_CN' : sec.key === 'jq' ? 'SHOW_JIEQI' : 'SHOW_INTL';
     if (!on(flag)) continue;
-    const items = data.buckets[sec.key].slice(0, o.perRow);
+    const items = data.buckets[sec.key].slice(0, o.perRow * o.rows);
     if (!items.length) continue;
-    rows.push(STACK('row', { alignItems: 'center', gap: o.rowGap, flex: 1 },
-      [chip(sec, o, data.season)].concat(items.map((it) => cell(it, sec, o)))));
+    if (o.rows <= 1) {
+      rows.push(STACK('row', { alignItems: 'center', gap: o.rowGap, flex: 1 },
+        [chip(sec, o, data.season)].concat(items.map((it) => cell(it, sec, o)))));
+      continue;
+    }
+    // 多行档位：栏标竖排在左，右侧 perRow 列的卡片矩阵（末行用透明占位保持列宽一致）
+    const cardRows = [];
+    for (let i = 0; i < items.length; i += o.perRow) {
+      const chunk = items.slice(i, i + o.perRow);
+      const kids = chunk.map((it) => cell(it, sec, o));
+      for (let k = chunk.length; k < o.perRow; k++) kids.push({ type: 'spacer', flex: 1 });
+      cardRows.push(STACK('row', { alignItems: 'center', gap: o.rowGap }, kids));
+    }
+    rows.push(STACK('row', { alignItems: 'center', gap: o.sectionGap, flex: 1 }, [
+      chip(sec, o, data.season),
+      STACK('column', { gap: o.cardRowGap, flex: 1 }, cardRows),
+    ]));
   }
   return rows;
 }
