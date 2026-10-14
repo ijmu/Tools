@@ -18,6 +18,9 @@ include_apns: false
 include_cellular_services: false
 include_local_networks: false
 dns:
+  bootstrap:
+  - 119.29.29.29
+  - 223.5.5.5
   upstreams:
     iBL3ND-DNS:
     - https://doh.pub/dns-query
@@ -79,7 +82,6 @@ policy_groups:
     type: select
     urls:
     - 订阅地址1
-    - 订阅地址2
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
@@ -411,11 +413,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/Repcz/Tool/X/Egern/Rules/Facebook.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
     policy: Media
     update_interval: 86400
@@ -426,7 +423,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
