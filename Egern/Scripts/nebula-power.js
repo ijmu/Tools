@@ -1,6 +1,7 @@
 /**
  * ⚡ 星云AI 电力补贴 · Egern 小组件脚本（generic）
- * 每次刷新扫一遍官网模型表，列出「补贴中 / 最划算」的档位；填 Cookie 可加显示自己的余额。
+ * 每次刷新扫一遍官网模型表，默认按「今日用量」排行（谁在被用得多谁在前），
+ * 也可切综合分/能力/省钱；填 Cookie 可加显示自己的余额。
  *
  * 数据源（公开接口，无需登录）：POST https://ai.ipix.ink/guest/models   body {"key":"public"}
  *   → 全量模型 data[]（含 discount_* 补贴字段、price 原价、上下文、描述）+ groups + rmb_rate；
@@ -18,7 +19,7 @@
  * 参数（Env，全部可选）：
  *   NEBULA_COOKIE = "server_session_xxx=..."   追加显示自己的余额 / 电力包剩余
  *   NEBULA_TOP    = "6"                        大尺寸列出档数（默认 中 4 / 大 6）
- *   NEBULA_SORT   = smart(默认) | power | price  综合分 / 能力优先 / 省钱优先
+ *   NEBULA_SORT   = usage(默认) | smart | power | price   今日用量榜 / 综合分 / 能力优先 / 省钱优先
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
@@ -68,14 +69,17 @@ function capabilityScorer(list) {
   return (m) => scoreModel(m, ref, rankBonus);
 }
 
-/** 展示排序：smart=综合分（默认：能力50%+人气30%+补贴20%，分高在前）
- *  power=纯能力优先；price=省钱优先（有效电价升序）。
- *  可用度分层永远最优先：生效档 > 时段内但额度耗尽 > 时段外。 */
+/** 展示排序：usage=今日用量榜（默认，用量降序）· smart=综合分（能力50%+人气30%+补贴20%）
+ *  power=纯能力优先 · price=省钱优先（有效电价升序）。
+ *  除 usage 外，可用度分层最优先：生效档 > 时段内但额度耗尽 > 时段外。 */
 function displayRows(rows, mode) {
   const arr = (rows || []).slice();
-  const tier = (a, b) => ((b.usable - a.usable)
-    || (mode === 'price' ? (a.eff - b.eff) || (b.depthEff - a.depthEff) : mode === 'power' ? (b.cap - a.cap) || (a.eff - b.eff) : (b.score - a.score) || (a.eff - b.eff))
-    || String(a.m.display_name).localeCompare(String(b.m.display_name)));
+  const byName = (a, b) => String(a.m.display_name).localeCompare(String(b.m.display_name));
+  const tier = (a, b) => (mode === 'usage'
+    ? (b.useRaw - a.useRaw) || (a.eff - b.eff) || byName(a, b)
+    : ((b.usable - a.usable)
+      || (mode === 'price' ? (a.eff - b.eff) || (b.depthEff - a.depthEff) : mode === 'power' ? (b.cap - a.cap) || (a.eff - b.eff) : (b.score - a.score) || (a.eff - b.eff))
+      || byName(a, b)));
   return arr.sort(tier);
 }
 
@@ -291,24 +295,27 @@ function cacheWrite(c) {
 
 /* ============================ 取数 ============================ */
 
-/** 人气分 0-100（对数刻度）：lb 有平台排行榜(需 Cookie)用真实 tokens；否则用公开的
- *  补贴池今日消耗(discount_used)作代理——它本身就是全站用户在补贴价下的真实用量。 */
-function popularityMap(lbModels, rows) {
-  const vals = {};
-  let max = 0;
-  const src = (Array.isArray(lbModels) && lbModels.length) ? lbModels : null;
-  if (src) {
-    for (const it of src) {
-      const v = Number(it.tokens || it.credit || 0);
-      if (v > 0) { vals[it.model] = v; if (v > max) max = v; }
-    }
-  } else {
-    for (const it of rows || []) { // 原始模型表：补贴池今日消耗 = 全站用户的真实用票
-      const v = Number((it && it.discount_used) || 0);
-      const key = (it && (it.id || it.display_name)) || '';
-      if (v > 0) { vals[key] = v; if (v > max) max = v; }
-    }
+/** 今日用量原始值（"当前使用量"）：有平台排行榜（Cookie 模式）用真实 tokens，
+ *  否则用接口公开的 discount_used —— 补贴池今日消耗，就是全站今天在这个模型上的真实用票。 */
+function usageMap(lbModels, rows) {
+  const out = {};
+  if (Array.isArray(lbModels) && lbModels.length) {
+    for (const it of lbModels) { const v = Number(it.tokens || it.credit || 0); if (it.model && v > 0) out[it.model] = v; }
+    return out;
   }
+  for (const it of rows || []) {
+    const v = Number((it && it.discount_used) || 0);
+    const key = (it && (it.id || it.display_name)) || '';
+    if (key && v > 0) out[key] = v;
+  }
+  return out;
+}
+
+/** 用量 → 人气分 0-100（对数刻度，只作 smart 模式的次要项） */
+function popularityMap(raw) {
+  const vals = raw || {};
+  let max = 0;
+  for (const k in vals) if (vals[k] > max) max = vals[k];
   const out = {};
   const L = Math.log(1 + Math.max(max, 1));
   for (const k in vals) out[k] = Math.max(1, Math.min(100, Math.round(100 * Math.log(1 + vals[k]) / L)));
@@ -319,7 +326,9 @@ function popularityMap(lbModels, rows) {
 function computeSubsidy(json, now, lb, prevJson) {
   const list = json.data || json.models || [];
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
-  const popMap = popularityMap(lb, list);
+  const useMap = usageMap(lb, list);       // 原始今日用量
+  const popMap = popularityMap(useMap);    // 对数归一 0-100（smart 模式用）
+  const useUnit = (Array.isArray(lb) && lb.length) ? 'tk' : '⚡';
   const capOf = capabilityScorer(list);   // 评分基准取本次列表自身：新老模型同一标度
   // 新模型：与上一次成功拉取的名单对比（管理员上新即刻标出，无需改脚本、无需重新推送）
   const prevNames = new Set((((prevJson || {}).data || (prevJson || {}).models) || []).map((x) => x && x.display_name));
@@ -332,6 +341,8 @@ function computeSubsidy(json, now, lb, prevJson) {
     const price = effPrice(m, timeOk);
     const pop = popMap[m.id] != null ? popMap[m.id]
       : (popMap[m.display_name] != null ? popMap[m.display_name] : 0);
+    const useRaw = useMap[m.id] != null ? useMap[m.id]
+      : (useMap[m.display_name] != null ? useMap[m.display_name] : 0);
     const cap = capOf(m);
     // 实扣价只看时段：额度池耗尽不改实扣价（实账单证实，计数器到 quota 封顶只是记账）
     const active = timeOk;
@@ -340,6 +351,8 @@ function computeSubsidy(json, now, lb, prevJson) {
       m, q, timeOk, active, price,
       hasSubsidy: m.discount_price != null,
       isNew: newNames.indexOf(m.display_name) >= 0,
+      useRaw,
+      useTxt: useRaw > 0 ? (useUnit === 'tk' ? fmtPower(useRaw) + ' tk' : '⚡' + fmtPower(useRaw)) : '',
       depth: depth(m),
       depthEff,
       eff: price,
@@ -355,7 +368,8 @@ function computeSubsidy(json, now, lb, prevJson) {
   const best = rows[0] || null;
   const deepest = subsidised.slice().sort((a, b) => b.depth - a.depth)[0] || null;
   const siteCount = rows.filter((r) => r.timeOk).length; // 官网「补贴生效中」口径：只看时段
-  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, siteCount, newNames, newCount: newNames.length, lbUsed: !!(Array.isArray(lb) && lb.length) };
+  const usedN = rows.filter((r) => r.useRaw > 0).length; // 今日有用量的模型数
+  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, siteCount, usedN, useUnit, newNames, newCount: newNames.length, lbUsed: !!(Array.isArray(lb) && lb.length) };
 }
 
 /** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错。
@@ -476,15 +490,18 @@ function foot(parts) {
   };
 }
 
-/** 补贴/价格一行；first=true 时加「首推」标 */
-function rowLine(r, wide, first) {
+/** 补贴/价格一行。mode='usage' 时行首带名次、右侧显示今日用量（排行榜口径） */
+function rowLine(r, wide, first, mode, idx) {
   const m = r.m;
+  const isUse = mode === 'usage';
   const priceColor = r.active ? C.gold : C.tertiary;
   const kids = [
-    T((r.isNew ? '新 ' : '') + (first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
+    T((r.isNew ? '新 ' : '') + (isUse ? `${(idx || 0) + 1}. ` : (first ? '首推 ' : '')) + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
     { type: 'spacer' },
   ];
-  if (wide) {
+  if (isUse) {
+    kids.push(T(r.useTxt || '0', { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1, minScale: 0.7 }));
+  } else if (wide) {
     kids.push(T(windowLabel(m) || '全天', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }));
   }
   kids.push(T(`⚡${fmtPower(r.eff)}`, { font: { size: 'footnote', weight: 'heavy' }, textColor: priceColor, lineLimit: 1 }));
@@ -498,8 +515,14 @@ function rowLine(r, wide, first) {
   return { type: 'stack', direction: 'row', alignItems: 'center', gap: 5, children: kids };
 }
 
-function subsidyRowList(data, disp, limit, wide) {
-  // 计数口径与官网一致：时段内就算「补贴中」（含额度耗尽的档，黄字标出）
+function subsidyRowList(data, disp, limit, wide, mode) {
+  // usage 榜：今日用量降序，且**不按模型组去重** —— 同组里多个模型都有人用，就该各自占位
+  if (mode === 'usage') {
+    const ul = disp.filter((r) => r.useRaw > 0);
+    if (ul.length) return ul.slice(0, limit).map((r, i) => rowLine(r, wide, i === 0, mode, i));
+  }
+  // 非 usage 模式，或接口没给用量时：回退「补贴/价格」口径
+  // 计数与官网一致：时段内就算「补贴中」（含额度耗尽的档，黄字标出）
   let list = disp.filter((r) => r.timeOk);
   if (!list.length) list = disp.filter((r) => r.hasSubsidy && !r.q.depleted);
   const seen = {};
@@ -509,7 +532,7 @@ function subsidyRowList(data, disp, limit, wide) {
     seen[g] = true;
     return true;
   });
-  return list.slice(0, limit).map((r, i) => rowLine(r, wide, i === 0));
+  return list.slice(0, limit).map((r, i) => rowLine(r, wide, i === 0, mode, i));
 }
 
 /* ============================ 入口 ============================ */
@@ -542,8 +565,8 @@ async function renderWidget(ctx) {
     };
   }
 
-  const orderRaw = String(env.NEBULA_SORT || 'smart').toLowerCase();
-  const order = ['smart', 'power', 'price'].includes(orderRaw) ? orderRaw : 'smart';
+  const orderRaw = String(env.NEBULA_SORT || 'usage').toLowerCase();
+  const order = ['usage', 'smart', 'power', 'price'].includes(orderRaw) ? orderRaw : 'usage';
   const disp = displayRows(data.rows, order);
   const best = disp[0] || data.best;
   const onN = data.siteCount != null ? data.siteCount : data.activeRows.length; // 官网口径：时段内即计数（含耗尽档）
@@ -599,34 +622,40 @@ async function renderWidget(ctx) {
   const wide = isLarge;
   const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 4);
 
-  const children = [header((data.fromCache ? `缓存 ${bjNow(data.staleAt).hm} · ` : '')
-    + (onN ? `补贴中 ${onN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴'))
-    + (data.newCount ? ` · 新 ${data.newCount}` : ''))];
+  const subParts = [];
+  if (data.fromCache) subParts.push(`缓存 ${bjNow(data.staleAt).hm}`);
+  subParts.push(order === 'usage'
+    ? `用量榜 ${data.usedN}`
+    : (onN ? `补贴中 ${onN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴')));
+  if (data.newCount) subParts.push(`新 ${data.newCount}`);
+  const children = [header(subParts.join(' · '))];
 
   if (isSmall) {
+    const isUse = order === 'usage';
     children.push(
       { type: 'spacer', length: 2 },
       T(cheapest, { font: { size: 'title3', weight: 'heavy' }, textColor: best.active ? C.gold : C.primary, lineLimit: 1, minScale: 0.55 }),
       {
         type: 'stack', direction: 'row', alignItems: 'baseline', gap: 5, children: [
-          T(priceTxt, { font: { size: 'headline', weight: 'heavy' }, textColor: C.primary, lineLimit: 1 }),
-          T('/100K', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }),
+          T(isUse ? (best.useTxt || priceTxt) : priceTxt, { font: { size: 'headline', weight: 'heavy' }, textColor: isUse ? C.accent : C.primary, lineLimit: 1 }),
+          T(isUse ? '今日用量' : '/100K', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }),
           { type: 'spacer' },
           best.active
             ? T(`-${pct(best.depth)}%`, { font: { size: 'caption1', weight: 'semibold' }, textColor: C.accent, lineLimit: 1 })
             : T(`¥${fmtCny(best.eff * data.rate)}/100K`, { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }),
         ],
       },
-      T(best.active
-        ? `原 ⚡${fmtPower(best.m.price)}${win ? ' · ' + win : ' · 全天'}`
-        : (next ? `下一档 ${next.ds}-${next.de} ${next.name}` : '全天无补贴时段'),
+      T(isUse
+        ? `原 ⚡${fmtPower(best.m.price)}${best.hasSubsidy ? (best.active ? ` · 补贴 ⚡${fmtPower(best.m.discount_price)}` : ' · 补贴待启') : ' · 无补贴'}`
+        : (best.active ? `原 ⚡${fmtPower(best.m.price)}${win ? ' · ' + win : ' · 全天'}` : (next ? `下一档 ${next.ds}-${next.de} ${next.name}` : '全天无补贴时段')),
         { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.65 }),
       { type: 'spacer' },
-      foot(deep ? [`最深-${pct(deep.depth)}%`, usageParts.length ? usageParts[0] : `${data.total} 模型`] : [`${data.total} 模型`, now.hm])
+      foot(isUse ? [`${data.usedN} 个在用`, now.hm]
+        : (deep ? [`最深-${pct(deep.depth)}%`, usageParts.length ? usageParts[0] : `${data.total} 模型`] : [`${data.total} 模型`, now.hm]))
     );
   } else {
     children.push({ type: 'spacer', length: 2 });
-    children.push(...subsidyRowList(data, disp, topN, wide));
+    children.push(...subsidyRowList(data, disp, topN, wide, order));
     children.push({ type: 'spacer' });
     const footParts = [];
     if (usage) footParts.push(`⚡${fmtPower(usage.remaining)}`, `${usage.packCount} 包`);
@@ -656,7 +685,7 @@ function nextRefresh() {
 export const __internals = {
   bjNow, normEnd, endExpired, inDailyWindow, subsidyActive, quotaState,
   effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpJson,
-  capabilityScorer, scoreModel, displayRows, computeSubsidy,
+  capabilityScorer, scoreModel, displayRows, computeSubsidy, usageMap, popularityMap,
   _testResetCache: () => { _memCache = null; },
 };
 
