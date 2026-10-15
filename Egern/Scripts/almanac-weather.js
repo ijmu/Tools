@@ -808,7 +808,7 @@ const T = (text, opt) => {
   if (o.size !== undefined) { f.size = o.size; delete o.size; }
   if (o.weight !== undefined) { f.weight = o.weight; delete o.weight; }
   if (Object.keys(f).length) o.font = f;
-  if (o.lineLimit !== undefined) o.maxLines = o.lineLimit;
+  if (o.lineLimit !== undefined) { o.maxLines = o.lineLimit; delete o.lineLimit; }
   return Object.assign({ type: 'text', text: String(text) }, o);
 };
 const IMG = (name, size, color) => ({ type: 'image', src: 'sf-symbol:' + name, width: size, height: size, color });
@@ -817,9 +817,16 @@ const COL = (opt, kids) => STACK('column', Object.assign({ alignItems: 'start' }
 const ROW = (opt, kids) => STACK('row', Object.assign({ alignItems: 'center' }, opt || {}), kids);
 const SP = (flex) => ({ type: 'spacer', flex: flex === undefined ? 1 : flex });
 const CARD = (opt, kids) => COL(Object.assign({ padding: 10, borderRadius: 13, backgroundColor: C.card }, opt), kids);
-// 行级居中：靠左右弹性 spacer（Egern 不认行级 justifyContent，这是可靠机制之一）
-const CENTER = (kids, opt) => ROW(Object.assign({ gap: 6 }, opt || {}), [SP(), ...kids, SP()]);
-const root = (opt, kids) => STACK('column', opt, kids);
+// 行内容器：靠父 column 的 alignItems:"center" 实现水平居中（官方语义：column + center = 子元素水平居中）
+const CENTER = (kids, opt) => ROW(Object.assign({ gap: 6 }, opt || {}), kids);
+// 根节点必须是 widget（官方：垂直布局、对齐固定左上角、唯一支持 refreshAfter 的元素）
+const WIDGET_ONLY = ['children', 'gap', 'padding', 'backgroundColor', 'backgroundGradient', 'backgroundImage',
+  'refreshAfter', 'url', 'flex', 'borderRadius', 'shadowColor', 'shadowRadius', 'shadowOffset'];
+const root = (opt, kids) => {
+  const o = Object.assign({}, opt || {});
+  for (const k of Object.keys(o)) if (WIDGET_ONLY.indexOf(k) < 0) delete o[k];   // 剔除 stack 专属属性
+  return Object.assign({ type: 'widget', children: kids || [] }, o);
+};
 const bgGradient = () => ({
   type: 'linear', colors: [C.bg, C.bg2, C.bg3], stops: [0, 0.55, 1],
   startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
@@ -885,7 +892,7 @@ function buildSmall(A, W, env, o) {
 
 
 function buildMedium(A, W, env, o) {
-  const left = o.wantA ? COL({ gap: 5, flex: 2.4, alignItems: 'stretch' }, [
+  const left = o.wantA ? COL({ gap: 5, flex: 2.4, alignItems: 'center' }, [
     CENTER([
       T(A.lunarText, { size: 21, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
       T(`${A.yearGZ}年(${A.sx})`, { size: 10.5, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.72 }),
@@ -939,7 +946,7 @@ function buildLarge(A, W, env, o) {
 
   }
   if (o.wantA) {
-    cards.push(CARD({ gap: 4, flex: 1 }, [
+    cards.push(CARD({ gap: 4, flex: 1, alignItems: 'center' }, [
       ROW({ gap: 6, alignItems: 'center' }, [
         T(A.lunarText, { size: 23, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
         T(`${A.yearGZ}年(${A.sx})`, { size: 11, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.75 }),
@@ -962,22 +969,22 @@ function buildLarge(A, W, env, o) {
 
 /* ===================== 锁屏（accessory） ===================== */
 function buildLockRect(A, W) {
-  return root({ padding: 3, gap: 1, alignItems: 'start' }, [
+  return root({ padding: 3, gap: 1 }, [COL({ gap: 1, flex: 1 }, [
     T(`${A.lunarText} 宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)}`, { size: 11, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
     T(`${A.zhiXing}日 冲${A.chongSX}${W ? ' · ' + W.temp + '° ' + W.desc : ''}`, { size: 9, textColor: '#FFFFFFCC', lineLimit: 1, minScale: 0.6 }),
-  ]);
+  ])]);
 }
 function buildLockCirc(A, W) {
-  return root({ padding: 2, gap: 0, alignItems: 'center', justifyContent: 'center' }, [
+  return root({ padding: 2, gap: 0 }, [COL({ gap: 0, flex: 1, alignItems: 'center' }, [
     W ? IMG(wxIcon(W), 18, '#FFFFFF') : T('历', { size: 14, weight: 'bold', textColor: '#FFFFFF' }),
     W ? T(`${W.temp}°`, { size: 14, weight: 'bold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 })
       : T(A.lunarText, { size: 11, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
-  ]);
+  ])]);
 }
 function buildLockInline(A, W) {
-  return root({ padding: 0, gap: 0, alignItems: 'start' }, [
+  return root({ padding: 0, gap: 0 }, [COL({ gap: 0, flex: 1 }, [
     T(`${A.lunarText} 宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)}${W ? ' ' + W.temp + '°' : ''}`, { size: 12, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
-  ]);
+  ])]);
 }
 
 
