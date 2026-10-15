@@ -1,53 +1,24 @@
 /**
- * 星云AI 电力补贴 · Egern 小组件脚本（generic）
- * ==========================================================================
- * 数据源（公开接口，无需登录）：
- *   POST https://ai.ipix.ink/guest/models   body {"key":"public"}
- *   → { data:[24 个模型], groups:[8 个模型组], rmb_rate:0.01 }
- *   公开接口只校验 key 非空，因此任意字符串都能读到与网站「模型电耗」页
- *   完全一致的数据（含 discount_* 补贴字段、上下文、描述）。
+ * ⚡ 星云AI 电力补贴 · Egern 小组件脚本（generic）
+ * 每次刷新扫一遍官网模型表，列出「补贴中 / 最划算」的档位；填 Cookie 可加显示自己的余额。
  *
- * 补贴判定 —— 与 ai.ipix.ink 前端 /user/js/models.js 同口径（逐行对齐）：
- *   ① discount_price 非空才存在补贴；
- *   ② discount_start / discount_end 限定日期区间：
- *        10 位纯日期   → 当天 23:59:59 止
- *        16 位带时刻   → 精确到分钟
- *        带时刻但无时区 → 按北京时间（后端同款处理）
- *   ③ discount_daily_start ~ discount_daily_end 限定北京时间每日时段；
- *        区间跨零点（如 22:00 - 02:00）按环绕判定；
- *        只有一端有值 → 该段不生效（与前端一致）；
- *   ④ discount_used ≥ discount_quota → 当日额度已耗尽，前端不再显示「补贴中」，
- *        后端也不再打折。本脚本把它单列为「已耗尽」而不是「补贴中」。
+ * 数据源（公开接口，无需登录）：POST https://ai.ipix.ink/guest/models   body {"key":"public"}
+ *   → 全量模型 data[]（含 discount_* 补贴字段、price 原价、上下文、描述）+ groups + rmb_rate；
+ *     接口只校验 key 非空，任意字符串即可读到与网站「模型电耗」页一致的数据。
+ * 补贴口径（与站点前端逐行对齐）：discount_price 非空才算有补贴；discount_start/end 限日期区间；
+ *   discount_daily_start/end 限北京时间每日时段（跨零点按环绕判定，只有一端有值则不生效）；
+ *   discount_used ≥ discount_quota 视为当日额度耗尽（单列「池满」，不改实扣价）。
+ * 能力分不内置模型名单：按「官网原价 + 名字里的代次与档位 + 上下文」当场算，管理员新增模型
+ *   立即生效，本轮新出现的模型会标「新」。电价单位 ⚡/100K tokens（1M = ×10）；
+ *   金额 = 电价 × rmb_rate（元/⚡）。
  *
- * 计价口径：
- *   电价单位 = ⚡ / 100K tokens（1M = ×10）
- *   余额口径 = 电价 × rmb_rate（元/⚡，当前 0.01）→ 例：0.1⚡/100K = ¥0.001/100K = ¥0.01/M
- *
- * env（小组件编辑页 Env 区，全部可选）：
- *   NEBULA_COOKIE = "server_session_xxx=..."  → 追加显示你的余额 / 电力包剩余（私有）
- *                                                不填 = 只显示公开补贴（零凭证）
- *   NEBULA_TOP    = "6"                       → 大尺寸列出的补贴档数（默认 medium 4 / large 6）
- *   NEBULA_SORT   = "power" | "price"          → power=能力优先（默认，新/强在前，首行标「首推」）
- *                                                price=省钱优先（有效电价升序，v1 行为）
- *
- * 部署：
- *   1) 工具 → 脚本 → + ：名称 nebula-power，类型 generic，文件位置「本地」，文件名 nebula-power.js
- *   2) 编辑文件，粘贴本文件内容，保存
- *   3) 分析 → 左上角 → 小组件画廊 → +，名称任意，脚本选 nebula-power
- *   4) 主屏幕长按 → + → Egern → 选尺寸 → 长按小组件 → 编辑小组件 → 选该名称
- *
- * v2（2026-09-21）：HTTP 垫片对齐 Egern 实机 API —— ctx.http.get/post(url, {timeout})
- *   返回 Response，需 await res.text()（社区实机组件 xcgtb/Egern-Widgets 核实）；
- *   依次尝试 ctx.http(url,init) → ctx.http({url,...}) → $httpClient 回调 → fetch，
- *   全挂时把各通道死因显示在卡片上。
- * v5（2026-09-22）：刷新韧性——成功数据写入 $persistentStore，断网/超时自动回放缓存
- *   （头部标「缓存 HH:MM」）；记住可用通道走快路径（单通道 5s、总预算 9s）；
- *   整体 11s 看门狗，超时也交付可用卡片，小部件进程掐不死渲染。
- * v6（2026-09-22）：综合排行——综合分 = 能力档位 50% + 平台人气 30% + 补贴力度 20%。
- *   人气项：配 NEBULA_COOKIE 时取 /user/leaderboard 的平台模型榜(真实 tokens，对数刻度)；
- *   未配置时用公开的补贴池今日消耗(discount_used)作代理。NEBULA_SORT=smart(默认)/power/price。
- * v6.2（2026-09-22）：实扣价语义修正——时段内即补贴价；额度池(discount_used 到 quota 封顶)
- *   只是平台记账，不改实扣价（实账单证实）。池状态仅在大尺寸做黄字信息位，不参与计价。
+ * 接入：
+ *   ① 工具 → 脚本 → +，类型 generic、文件位置「本地」，文件名 nebula-power.js，粘贴本文件内容保存
+ *   ② 分析 → 小组件画廊 → + → 脚本选 nebula-power → 主屏长按添加 Egern 组件并选中它
+ * 参数（Env，全部可选）：
+ *   NEBULA_COOKIE = "server_session_xxx=..."   追加显示自己的余额 / 电力包剩余
+ *   NEBULA_TOP    = "6"                        大尺寸列出档数（默认 中 4 / 大 6）
+ *   NEBULA_SORT   = smart(默认) | power | price  综合分 / 能力优先 / 省钱优先
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';
@@ -55,32 +26,46 @@ const USAGE_API = 'https://ai.ipix.ink/user/usage';
 const LEADERBOARD_API = 'https://ai.ipix.ink/user/leaderboard';
 const CNY_PER_POWER = 0.01; // 兜底单价；实际以接口 rmb_rate 为准
 
-/* 能力档位（0-100）：越新越强越高。依据站点模型描述的参数量/定位词手工标定，
- * 排序模式 power（默认）按它从高到低；表外模型走后缀+描述启发式。
- * 标定原则：同代旗舰(Pro/Max) > 标准 > Flash/轻量；新一代可越上一代旗舰
- * （定案：GLM-5.3-Flash 90 > GLM-5.2 88 —— 补后同价 ⚡1.0，新一代原生多模态优先）。 */
-const CAPABILITY = {
-  'Qwen3.8-Max': 96, 'Kimi-K3': 95, 'MiMo-V2.5-Pro': 93, 'GLM-5.3': 92,
-  'GLM-5.3-Flash': 90, 'GLM-5.2': 88, 'GLM-5.3-FlashX': 86, 'DeepSeek-V4-Pro-0813': 90,
-  'MiniMax-M3': 88, 'DeepSeek-V4-Pro': 88, 'Kimi-K2.7-Code': 86, 'Hy4-Preview': 85,
-  'Kimi-K2.6': 82, 'Qwen3.8-Flash': 82, 'DeepSeek-V4.1-Flash': 80, 'GLM-5.1': 78,
-  'MiMo-V2.5': 78, 'Qwen3.7-Plus': 76, 'DeepSeek-V4-Flash-0731': 74,
-  'DeepSeek-V4-Flash-Vision-Exp': 72, 'DeepSeek-V4-Flash': 70, 'Hy3': 70,
-  'Qwen3.7-Flash': 68, 'MiniMax-M2.7': 66,
-};
-function capabilityScore(m) {
-  if (CAPABILITY[m && m.display_name] != null) return CAPABILITY[m.display_name];
+/* 能力分（0-100）：**不内置模型名单** —— 全部按本次接口数据 + 模型名当场算，
+ * 管理员上新立即生效，不需要改脚本。
+ * ① 官网原价 price（不含补贴价）在本次列表内对数归一：站点定价 = 管理员给的市场定位（70 分）
+ * ② 同族代次：家族内按 主版本.次版本 排名，最新 +14 / 次新 +8 / 其余 +3（新一代可越上一代旗舰）
+ * ③ 档位词：Ultra·Max·Pro·Plus +8 / 标准 0 / Flash·Turbo -8 / Lite·Mini·Nano -12 / Exp·Preview -4
+ * ④ 描述与上下文微调：万亿参数 +6、旗舰 +4、轻量·极速 -4、context ≥ 1M +4 */
+const TIER_WORDS = [[/Ultra|Max|Pro|Plus|Opus/i, 8], [/Flash|Turbo|Air/i, -8], [/Lite|Mini|Nano/i, -12], [/Exp|Preview/i, -4]];
+const tierScore = (name) => TIER_WORDS.reduce((s, [re, w]) => (re.test(name) ? s + w : s), 0);
+const familyOf = (name) => String(name).split(/[-_ ]/)[0].replace(/\d+.*$/, '') || String(name);
+const verOf = (name) => { const m = String(name).match(/(\d+)(?:\.(\d+))?/); return m ? Number(m[1]) * 100 + Number(m[2] || 0) : 0; };
+
+/** 单模型打分。ref = 原价归一基准（本次列表最大原价的对数），rankBonus = 同族代次加成表 */
+function scoreModel(m, ref, rankBonus) {
   const name = String((m && m.display_name) || '');
   const desc = String((m && m.description) || '');
-  let s = 50;
-  if (/(^|[^a-z])Max|Pro|Plus/.test(name)) s += 18;
-  if (/Flash/i.test(name)) s -= 6;
-  if (/Exp|Preview/i.test(name)) s -= 4;
-  if (/万亿|2\.4T|2\.8万亿|7430 亿|千亿/.test(desc)) s += 16;
-  if (/旗舰|最强|第一|Opus/.test(desc)) s += 10;
-  if (/轻量|高速|极速|更快/.test(desc)) s -= 6;
-  if ((m && m.context_limit || 0) >= 1000000) s += 4;
-  return Math.max(0, Math.min(100, s));
+  let s = ref > 0 ? (70 * Math.log(1 + Math.max(0, Number((m && m.price) || 0)))) / ref : 35;
+  s += (rankBonus && rankBonus[name]) || 3;
+  s += tierScore(name);
+  if (/万亿|2\.4T|2\.8万亿|7430 亿|千亿/.test(desc)) s += 6;
+  if (/旗舰|最强|第一|Opus/.test(desc)) s += 4;
+  if (/轻量|高速|极速|更快/.test(desc)) s -= 4;
+  if (Number((m && m.context_limit) || 0) >= 1000000) s += 4;
+  return Math.max(0, Math.min(100, Math.round(s)));
+}
+
+/** 由「本次接口返回的模型表」生成评分函数：基准、家族代次全部取自数据本身 */
+function capabilityScorer(list) {
+  const ref = Math.log(1 + Math.max(1, ...list.map((m) => Number((m && m.price) || 0))));
+  const fams = {};
+  for (const m of list) {
+    const f = familyOf(m && m.display_name);
+    (fams[f] = fams[f] || []).push(m);
+  }
+  const rankBonus = {};
+  for (const f in fams) {
+    fams[f].slice()
+      .sort((a, b) => (verOf(b.display_name) - verOf(a.display_name)) || (tierScore(b.display_name) - tierScore(a.display_name)))
+      .forEach((m, i) => { rankBonus[m.display_name] = i ? (i === 1 ? 8 : 3) : 14; });
+  }
+  return (m) => scoreModel(m, ref, rankBonus);
 }
 
 /** 展示排序：smart=综合分（默认：能力50%+人气30%+补贴20%，分高在前）
@@ -331,10 +316,14 @@ function popularityMap(lbModels, rows) {
 }
 
 /** 纯计算：接口 JSON → 汇总结构（不碰网络）。lb = 平台模型排行榜（可选，Cookie 模式才有） */
-function computeSubsidy(json, now, lb) {
+function computeSubsidy(json, now, lb, prevJson) {
   const list = json.data || json.models || [];
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
   const popMap = popularityMap(lb, list);
+  const capOf = capabilityScorer(list);   // 评分基准取本次列表自身：新老模型同一标度
+  // 新模型：与上一次成功拉取的名单对比（管理员上新即刻标出，无需改脚本、无需重新推送）
+  const prevNames = new Set((((prevJson || {}).data || (prevJson || {}).models) || []).map((x) => x && x.display_name));
+  const newNames = prevNames.size ? list.map((m) => m && m.display_name).filter((n) => n && !prevNames.has(n)) : [];
 
   const rows = [];
   for (const m of list) {
@@ -343,13 +332,14 @@ function computeSubsidy(json, now, lb) {
     const price = effPrice(m, timeOk);
     const pop = popMap[m.id] != null ? popMap[m.id]
       : (popMap[m.display_name] != null ? popMap[m.display_name] : 0);
-    const cap = capabilityScore(m);
+    const cap = capOf(m);
     // 实扣价只看时段：额度池耗尽不改实扣价（实账单证实，计数器到 quota 封顶只是记账）
     const active = timeOk;
     const depthEff = depth(m);
     rows.push({
       m, q, timeOk, active, price,
       hasSubsidy: m.discount_price != null,
+      isNew: newNames.indexOf(m.display_name) >= 0,
       depth: depth(m),
       depthEff,
       eff: price,
@@ -365,7 +355,7 @@ function computeSubsidy(json, now, lb) {
   const best = rows[0] || null;
   const deepest = subsidised.slice().sort((a, b) => b.depth - a.depth)[0] || null;
   const siteCount = rows.filter((r) => r.timeOk).length; // 官网「补贴生效中」口径：只看时段
-  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, siteCount, lbUsed: !!(Array.isArray(lb) && lb.length) };
+  return { rows, subsidised, activeRows, deepest, best, rate, total: rows.length, siteCount, newNames, newCount: newNames.length, lbUsed: !!(Array.isArray(lb) && lb.length) };
 }
 
 /** 公开补贴数据：实时优先；失败回放上次成功缓存（标「缓存 HH:MM」），冷启动全挂才抛错。
@@ -382,8 +372,9 @@ async function loadSubsidy(ctx, now, lb) {
       budget: 9000,
     });
     const json = res.json || JSON.parse(res.text);
+    const prev = memo && memo.json;   // 上一轮名单：用于标出本次新上架的模型
     cacheWrite({ t: Date.now(), tr: res.via, json });
-    return computeSubsidy(json, now, lb);
+    return computeSubsidy(json, now, lb, prev);
   } catch (e) {
     if (memo && memo.json) {
       const out = computeSubsidy(memo.json, now, lb);
@@ -490,7 +481,7 @@ function rowLine(r, wide, first) {
   const m = r.m;
   const priceColor = r.active ? C.gold : C.tertiary;
   const kids = [
-    T((first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
+    T((r.isNew ? '新 ' : '') + (first ? '首推 ' : '') + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
     { type: 'spacer' },
   ];
   if (wide) {
@@ -609,7 +600,8 @@ async function renderWidget(ctx) {
   const topN = Number(env.NEBULA_TOP || 0) || (isLarge ? 6 : 4);
 
   const children = [header((data.fromCache ? `缓存 ${bjNow(data.staleAt).hm} · ` : '')
-    + (onN ? `补贴中 ${onN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴')))];
+    + (onN ? `补贴中 ${onN}` : (subN ? `补贴 ${subN} 档待启` : '无补贴'))
+    + (data.newCount ? ` · 新 ${data.newCount}` : ''))];
 
   if (isSmall) {
     children.push(
@@ -664,7 +656,7 @@ function nextRefresh() {
 export const __internals = {
   bjNow, normEnd, endExpired, inDailyWindow, subsidyActive, quotaState,
   effPrice, depth, windowLabel, nextWindow, fmtPower, fmtCny, loadSubsidy, httpJson,
-  capabilityScore, displayRows, computeSubsidy,
+  capabilityScorer, scoreModel, displayRows, computeSubsidy,
   _testResetCache: () => { _memCache = null; },
 };
 
