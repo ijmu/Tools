@@ -478,8 +478,8 @@ widgets:
 - name: 油价查询
   script_name: 油价查询
   env:
-    PROVINCE: 福建
-    CITY: 莆田
+    PROVINCE: 江苏
+    CITY: 苏州
     MY_FUEL: '95'
     TANK_L: '66'
 - name: 招商实时金价
@@ -487,8 +487,8 @@ widgets:
 - name: 每日黄历天气
   script_name: 每日黄历天气
   env:
-    CITY: 莆田
-    PROVINCE: 福建
+    CITY: 北京
+    PROVINCE: 北京
     TEMP_UNIT: c
     REFRESH: '30'
 modules:
