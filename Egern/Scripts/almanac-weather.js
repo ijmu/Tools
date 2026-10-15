@@ -907,7 +907,7 @@ function buildMedium(A, W, env, o) {
   const right = (o.wantW && W) ? COL({ flex: 1, gap: 2, alignItems: 'center', padding: [10, 6], borderRadius: 16, backgroundColor: C.card }, [
     SP(0.2),
     IMG(wxIcon(W), 22, C.gold),
-    T(`${W.temp}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65 }),
+    T(`${W.temp}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65, textAlign: 'center' }),
     T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.72 }),
     T(`↑${W.days[0] ? W.days[0].max : '--'}° ↓${W.days[0] ? W.days[0].min : '--'}°`, { size: 11, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
     T(`湿${W.hum}% 风${W.wind}`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
