@@ -817,6 +817,8 @@ const COL = (opt, kids) => STACK('column', Object.assign({ alignItems: 'start' }
 const ROW = (opt, kids) => STACK('row', Object.assign({ alignItems: 'center' }, opt || {}), kids);
 const SP = (flex) => ({ type: 'spacer', flex: flex === undefined ? 1 : flex });
 const CARD = (opt, kids) => COL(Object.assign({ padding: 10, borderRadius: 13, backgroundColor: C.card }, opt), kids);
+// 行级居中：靠左右弹性 spacer（Egern 不认行级 justifyContent，这是可靠机制之一）
+const CENTER = (kids, opt) => ROW(Object.assign({ gap: 6 }, opt || {}), [SP(), ...kids, SP()]);
 const root = (opt, kids) => STACK('column', opt, kids);
 const bgGradient = () => ({
   type: 'linear', colors: [C.bg, C.bg2, C.bg3], stops: [0, 0.55, 1],
@@ -832,10 +834,10 @@ const WTEMP = (t) => (t === null || t === undefined ? C.sub
 /* 宜 / 忌 色块 —— 黄历核心信息，做成视觉主角 */
 function yiJiBlock(A, n, gap) {
   const line = (ch, words, tagCol, bgCol) => STACK('row', {
-    padding: [5, 9], borderRadius: 9, backgroundColor: bgCol, gap: 8, alignItems: 'center',
+    padding: [5, 12], borderRadius: 9, backgroundColor: bgCol, gap: 6, alignItems: 'center',
   }, [
     T(ch, { size: 13, weight: 'bold', textColor: tagCol, lineLimit: 1 }),
-    T(JOIN(words, n), { size: 13, textColor: C.ink, lineLimit: 2, minScale: 0.75, flex: 1 }),
+    T(JOIN(words, n), { size: 13, textColor: C.ink, lineLimit: 2, minScale: 0.7 }),
   ]);
   return COL({ gap: gap === undefined ? 6 : gap }, [line('宜', A.yi, C.yi, C.yiBg), line('忌', A.ji, C.zhu, C.jiBg)]);
 }
@@ -860,44 +862,40 @@ function nowW(W, size) {
 function buildSmall(A, W, env, o) {
   const kids = [];
   if (o.wantA) {
-    kids.push(ROW({ gap: 6, alignItems: 'center' }, [
+    kids.push(CENTER([
       T(A.lunarText, { size: 21, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
       T(`${A.yearGZ}年(${A.sx})`, { size: 10, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.75 }),
-      SP(),
-      ...titleChip(o),
     ]));
-    kids.push(solarLine(A, 10.5));
-    kids.push(SP(0.2));
-    kids.push(yiJiBlock(A, o.yiN, 5));
-    kids.push(SP(0.2));
+    kids.push(CENTER([solarLine(A, 10.5)]));
+    kids.push(SP(0.15));
+    kids.push(CENTER([yiJiBlock(A, o.yiN, 5)]));
+    kids.push(SP(0.15));
   }
   if (o.wantW && W) {
-    kids.push(ROW({ gap: 5, alignItems: 'center' }, [
+    kids.push(CENTER([ROW({ gap: 5, alignItems: 'center' }, [
       IMG(wxIcon(W), 17, C.gold),
-      T(`${W.temp}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.72 }),
-      SP(),
-      T(`${W.days[0] ? W.days[0].max + '°/' + W.days[0].min + '° · ' : ''}${W.desc}`, { size: 10.5, textColor: C.sub, lineLimit: 1, minScale: 0.68 }),
-    ]));
+      T(`${W.temp}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.75 }),
+      T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
+    ])]));
   } else if (o.wantW) {
-    kids.push(T('天气待更新', { size: 11, textColor: C.faint }));
+    kids.push(CENTER([T('天气待更新', { size: 11, textColor: C.faint })]));
   }
-  return root({ padding: 12, gap: 5, backgroundGradient: o.plain ? undefined : bgGradient() }, kids);
+  return root({ padding: 12, gap: 5, backgroundGradient: o.plain ? undefined : bgGradient() }, [COL({ gap: 5, flex: 1, alignItems: 'center' }, kids)]);
 }
 
+
 function buildMedium(A, W, env, o) {
-  const left = o.wantA ? COL({ gap: 5, flex: 2.3 }, [
-    ROW({ gap: 6, alignItems: 'center' }, [
+  const left = o.wantA ? COL({ gap: 5, flex: 2.4, alignItems: 'stretch' }, [
+    CENTER([
       T(A.lunarText, { size: 21, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
       T(`${A.yearGZ}年(${A.sx})`, { size: 10.5, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.72 }),
-      SP(),
-      ...titleChip(o),
     ]),
-    solarLine(A),
-    SP(0.15),
-    yiJiBlock(A, o.yiN),
-    SP(0.15),
-    metaLine(A),
-  ]) : COL({ gap: 5, flex: 2.3 }, []);
+    CENTER([solarLine(A)]),
+    SP(0.12),
+    CENTER([yiJiBlock(A, o.yiN)]),
+    SP(0.12),
+    CENTER([metaLine(A)]),
+  ]) : COL({ gap: 5, flex: 2.4 }, []);
   const right = (o.wantW && W) ? CARD({ flex: 1, gap: 2, alignItems: 'center', padding: [10, 6] }, [
     SP(0.25),
     IMG(wxIcon(W), 20, C.gold),
