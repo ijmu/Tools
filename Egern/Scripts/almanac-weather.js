@@ -496,22 +496,50 @@ async function resolvePlace(ctx, loc) {
   return place;
 }
 
-/* ---------------- 天气描述 → 统一图标 ---------------- */
+/* ---------------- 天气描述 → 图标 + 语义配色 ----------------
+ * 图标按天气类别分级：毛毛雨/小雨 ≠ 中雨 ≠ 大雨·暴雨，雨夹雪单独一档；
+ * 颜色按类别取（晴=暖金、晴夜=冷紫、多云/阴=蓝灰、雨=蓝且越大越深、雷=紫、
+ * 雪=冰蓝、雨夹雪=青蓝、雾霾=灰、沙尘=沙褐、台风=青灰）——
+ * **土色只留给真正带沙的天气**，天气图标不再套用黄历的金色。 */
 const DESC_ICON = [
-  [/龙卷|台风|飓风/, 'tornado'],
-  [/雷阵雨伴有冰雹|雷阵雨伴冰雹|雷暴/, 'cloud.bolt.rain.fill'],
-  [/雷阵雨|雷/, 'cloud.bolt.rain.fill'],
-  [/暴雨|大暴雨|特大暴雨|大雨/, 'cloud.heavyrain.fill'],
+  [/龙卷|台风|飓风|热带风暴|强风|大风/, 'tornado'],
+  [/雷阵雨伴有冰雹|雷阵雨伴冰雹|雷暴|雷阵雨|雷/, 'cloud.bolt.rain.fill'],
+  [/冰雹/, 'cloud.hail.fill'],
+  [/特大暴雨|大暴雨|暴雨|大雨/, 'cloud.heavyrain.fill'],
+  [/中雨/, 'cloud.rain.fill'],
   [/雨夹雪|冻雨|雨雪/, 'cloud.sleet.fill'],
-  [/中雨|小雨|阵雨|雨|降水/, 'cloud.rain.fill'],
-  [/毛毛雨|细雨/, 'cloud.drizzle.fill'],
+  [/毛毛雨|细雨|小雨|零星|阵雨/, 'cloud.drizzle.fill'],
+  [/雨|降水/, 'cloud.rain.fill'],
   [/暴雪|大雪|中雪|小雪|阵雪|雪/, 'cloud.snow.fill'],
-  [/雾|霾|浮尘|扬沙|沙尘|尘/, 'cloud.fog.fill'],
+  [/浮尘|扬沙|沙尘|尘/, 'sun.dust.fill'],
+  [/风/, 'wind'],
+  [/雾|霾/, 'cloud.fog.fill'],
   [/阴/, 'cloud.fill'],
   [/多云|少云|晴间多云/, 'cloud.sun.fill'],
   [/晴/, 'sun.max.fill'],
 ];
 const NIGHT_FIX = { 'sun.max.fill': 'moon.stars.fill', 'cloud.sun.fill': 'cloud.moon.fill' };
+
+/** 图标 → 配色（light/dark 成对，与黄历的金色无关） */
+const WX_TINT = {
+  'sun.max.fill': { light: '#E8A100', dark: '#FFCB45' },          // 晴 · 暖金
+  'moon.stars.fill': { light: '#5B6BA8', dark: '#A9B8E8' },       // 晴夜 · 冷紫蓝
+  'cloud.sun.fill': { light: '#7C8AA3', dark: '#AFC0D8' },        // 多云 · 灰蓝
+  'cloud.moon.fill': { light: '#6E7C9C', dark: '#A2B2D6' },
+  'cloud.fill': { light: '#6B7C93', dark: '#A8B8CC' },            // 阴 · 云灰
+  'cloud.drizzle.fill': { light: '#5B9BD5', dark: '#8CC3F0' },    // 小雨 · 浅蓝
+  'cloud.rain.fill': { light: '#3D82C4', dark: '#6FAEE8' },       // 中雨 · 蓝
+  'cloud.heavyrain.fill': { light: '#1F5FA8', dark: '#5C9BE0' },  // 大雨/暴雨 · 深蓝
+  'cloud.bolt.rain.fill': { light: '#7C5CD6', dark: '#A98BFF' },  // 雷 · 紫
+  'cloud.snow.fill': { light: '#7FA8CE', dark: '#BCDAF0' },       // 雪 · 冰蓝
+  'cloud.sleet.fill': { light: '#5C9FC7', dark: '#96C8E6' },      // 雨夹雪 · 青蓝
+  'cloud.hail.fill': { light: '#6FA8CE', dark: '#A0CBE8' },       // 冰雹 · 冷蓝
+  'cloud.fog.fill': { light: '#8A9299', dark: '#AEB6BD' },        // 雾/霾 · 灰
+  'sun.dust.fill': { light: '#B08A50', dark: '#D7B37A' },         // 沙尘 · 沙褐
+  'tornado': { light: '#4F8A8B', dark: '#7FB8B8' },               // 台风/龙卷 · 青灰
+  'wind': { light: '#5A8CA8', dark: '#8FBAD2' },                  // 风 · 青蓝
+  'snowflake': { light: '#7FA8CE', dark: '#BCDAF0' },
+};
 
 function descIcon(desc, isDay) {
   const d = String(desc || '').trim();
@@ -520,6 +548,9 @@ function descIcon(desc, isDay) {
   }
   return ['cloud.fill', d || '—'];
 }
+
+/** 天气图标配色：按图标语义取色，取不到按「阴」灰蓝兜底 */
+const wxTint = (w) => WX_TINT[(w && w.icon) || ''] || WX_TINT['cloud.fill'];
 
 /* ---------------- 各源适配器：统一输出 ---------------- */
 const outcome = (o) => Object.assign({
@@ -786,12 +817,15 @@ const bgGradient = () => ({
   type: 'linear', colors: [C.bg, C.bg2, C.bg3], stops: [0, 0.55, 1],
   startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
 });
+/** 温度 → 配色：冷蓝 → 青 → 舒适绿 → 暖琥珀 → 橙 → 酷热红（与天气图标色互不干扰） */
 const WTEMP = (t) => (t === null || t === undefined ? C.sub
-  : t <= 0 ? { light: '#2B6CB0', dark: '#6BB6FF' }
-    : t <= 10 ? { light: '#1F7A8C', dark: '#5AC8D8' }
-      : t <= 20 ? { light: '#1E7A4C', dark: '#4ED8A0' }
-        : t <= 28 ? { light: '#B06000', dark: '#FFA94D' }
-          : { light: '#B5382C', dark: '#FF6B5E' });
+  : t <= 0 ? { light: '#3452A8', dark: '#8CA8FF' }
+    : t <= 8 ? { light: '#2F6FB5', dark: '#7FB4EC' }
+      : t <= 16 ? { light: '#2E8B9E', dark: '#63C6D6' }
+        : t <= 23 ? { light: '#2F9E5E', dark: '#5FD69A' }
+          : t <= 29 ? { light: '#E08A00', dark: '#FFC559' }
+            : t <= 34 ? { light: '#E8590C', dark: '#FFA45C' }
+              : { light: '#D92D20', dark: '#FF7A6B' });
 
 /* 宜 / 忌 色块 —— 黄历核心信息，做成视觉主角 */
 function yiJiBlock(A, n, gap) {
@@ -829,7 +863,7 @@ function buildSmall(A, W, env, o) {
   }
   if (o.wantW && W) {
     kids.push(CENTER([ROW({ gap: 5, alignItems: 'center' }, [
-      IMG(wxIcon(W), 17, C.gold),
+      IMG(wxIcon(W), 17, wxTint(W)),
       T(`${W.temp}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.75 }),
       T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
     ])]));
@@ -854,7 +888,7 @@ function buildMedium(A, W, env, o) {
   ]) : COL({ gap: 4, flex: 2.2 }, []);
   const right = (o.wantW && W) ? COL({ flex: 1, gap: 2, alignItems: 'center', padding: [10, 6], borderRadius: 16, backgroundColor: C.card }, [
     SP(0.2),
-    IMG(wxIcon(W), 22, C.gold),
+    IMG(wxIcon(W), 22, wxTint(W)),
     T(`${W.temp}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65, textAlign: 'center' }),
     T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.72 }),
     T(`↑${W.days[0] ? W.days[0].max : '--'}° ↓${W.days[0] ? W.days[0].min : '--'}°`, { size: 11, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
@@ -865,7 +899,7 @@ function buildMedium(A, W, env, o) {
   if (o.wantW && W && (W.hourly || []).length >= 4) {
     const cells = W.hourly.slice(0, 4).map((h) => ROW({ gap: 3, flex: 1, alignItems: 'center' }, [
       T(h.t, { size: 9, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
-      IMG(h && h.icon ? h.icon : 'cloud.fill', 9, C.gold),
+      IMG(h && h.icon ? h.icon : 'cloud.fill', 9, wxTint(h)),
       T(`${h.temp}°`, { size: 10, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.6 }),
     ]));
     strip = ROW({ gap: 2, alignItems: 'center' }, cells);
@@ -882,7 +916,7 @@ function buildLarge(A, W, env, o) {
     const hours = all.slice(0, all.length > 6 ? 8 : 6);
     cards.push(CARD({ gap: 6 }, [
       ROW({ gap: 8, alignItems: 'center' }, [
-        IMG(wxIcon(W), 22, C.gold),
+        IMG(wxIcon(W), 22, wxTint(W)),
         T(`${W.temp}°`, { size: 34, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.7 }),
         SP(),
         COL({ gap: 1, flex: 1, alignItems: 'end' }, [
@@ -893,7 +927,7 @@ function buildLarge(A, W, env, o) {
       T(`${W.place} · ${W.desc} · 湿${W.hum}% 风${W.wind}km/h`, { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.68 }),
       hours.length ? ROW({ gap: 4, flex: 0.7 }, hours.map((h) => COL({ gap: 2, flex: 1, alignItems: 'center' }, [
         T(h.t, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
-        IMG(h && h.icon ? h.icon : 'cloud.fill', 11, C.gold),
+        IMG(h && h.icon ? h.icon : 'cloud.fill', 11, wxTint(h)),
         T(`${h.temp}°`, { size: 11, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.7 }),
       ]))) : SP(0),
       ROW({ gap: 6 }, W.days.slice(1, 4).map((d, i) => ROW({ gap: 6, flex: 1, alignItems: 'center' }, [
