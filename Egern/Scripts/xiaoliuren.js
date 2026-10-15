@@ -302,7 +302,7 @@ export default async function (ctx) {
     { alignItems: 'center', padding: [4, 11], gap: 0, borderRadius: 999 }));
 
   const children = [head];
-  const gap = isSmall ? 4 : 4;
+  const gap = isSmall ? 4 : 5;
   if (isSmall) {
     children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
   } else if (isLarge) {
@@ -324,8 +324,15 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    const heroRow = ROW([SP(), heroName, COL(heroSub, { alignItems: 'start', gap: 0 }), SP()], { gap: 7 });
-    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroRow, { type: 'spacer', length: 2 }, shortPill);
+    // 中尺寸节奏：球行 —(flex 0.9)— 英雄 —(flex 1.1)— 断语，底部不再留整段空白
+    children.push(
+      { type: 'spacer', flex: 0.9 },
+      discRow,
+      { type: 'spacer', flex: 1.0 },
+      heroBlock,
+      { type: 'spacer', flex: 1.2 },
+      shortPill,
+    );
   }
 
   const main = {
