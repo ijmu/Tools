@@ -282,7 +282,7 @@ export default async function (ctx) {
     ICON(dayIcon.name, dayIcon.color, 13),
     T('小六壬', 'subheadline', TXT.primary, 'bold'),
     { type: 'spacer' },
-    T(isSmall ? `${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}` : `${lunarStr} · ${clock}`, 'caption2', TXT.secondary, 'regular',
+    T(isSmall ? `${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}` : (isLarge ? `${lunarStr} · ${clock}` : `${lunarStr} · ${clock} · ${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}`), 'caption2', TXT.secondary, 'regular',
       { textAlign: 'right', minScale: 0.6 }),
   ]);
 
@@ -302,7 +302,7 @@ export default async function (ctx) {
     { alignItems: 'center', padding: [4, 11], gap: 0, borderRadius: 999 }));
 
   const children = [head];
-  const gap = isSmall ? 4 : 5;
+  const gap = isSmall ? 4 : 4;
   if (isSmall) {
     children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
   } else if (isLarge) {
@@ -311,7 +311,7 @@ export default async function (ctx) {
         { type: 'spacer' }, T('仅供玩味', 'caption2', TXT.tertiary, 'regular')], { gap: 5 }),
       T(hour.brief, 'footnote', TXT.primary, 'medium', { lineLimit: 2, minScale: 0.8 }),
     ];
-    if (SHOW_MEANING) panel.push(T(hour.ju, 'caption1', TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.8 }));
+    if (SHOW_MEANING) panel.push(T(hour.ju, 'caption1', TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.5 }));
     children.push(
       { type: 'spacer' },
       discRow,
@@ -324,15 +324,8 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    const heroRow = ROW([
-      heroName,
-      COL(heroSub, { alignItems: 'start', gap: 0, flex: 1 }),
-      T(`${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}`, 'caption2', TXT.tertiary, 'regular', { textAlign: 'right', minScale: 0.6 }),
-    ], { gap: 8 });
-    const pillBand = glass(
-      [T(hour.short, 'footnote', TXT.secondary, 'medium', { textAlign: 'center', lineLimit: 1, minScale: 0.7 })],
-      { alignItems: 'center', padding: [5, 12], gap: 0, borderRadius: 999 });
-    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroRow, pillBand);
+    const heroRow = ROW([SP(), heroName, COL(heroSub, { alignItems: 'start', gap: 0 }), SP()], { gap: 7 });
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroRow, { type: 'spacer', length: 2 }, shortPill);
   }
 
   const main = {
