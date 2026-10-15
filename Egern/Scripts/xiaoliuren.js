@@ -237,7 +237,7 @@ export default async function (ctx) {
   }
 
   // ---------- 六宫圆盘 ----------
-  const ballSize = isSmall ? 20 : isLarge ? 40 : 30;
+  const ballSize = isSmall ? 20 : isLarge ? 40 : 38;
   const ball = (p) => {
     const active = p.name === hour.name;
     const c = pcol(p);
@@ -324,12 +324,20 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
+    const heroRow = ROW([
+      heroName,
+      COL(heroSub, { alignItems: 'start', gap: 0, flex: 1 }),
+      T(`${ZHI[zhi]}时 ${SHICHEN_RANGE[zhi]}`, 'caption2', TXT.tertiary, 'regular', { textAlign: 'right', minScale: 0.6 }),
+    ], { gap: 8 });
+    const pillBand = glass(
+      [T(hour.short, 'footnote', TXT.secondary, 'medium', { textAlign: 'center', lineLimit: 1, minScale: 0.7 })],
+      { alignItems: 'center', padding: [5, 12], gap: 0, borderRadius: 999 });
+    children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroRow, pillBand);
   }
 
   const main = {
     type: 'widget',
-    padding: isSmall ? [12, 13, 12, 13] : [14, 16, 14, 16],
+    padding: isSmall ? [12, 13, 12, 13] : [13, 15, 13, 15],
     gap,
     refreshAfter: refreshTime,
     children,
