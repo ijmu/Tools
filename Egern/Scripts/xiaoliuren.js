@@ -80,6 +80,7 @@ const yearDays = (y) => {
 
 function solarToLunar(y, m, d) {
   let offset = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1900, 0, 31)) / 86400000);
+  if (offset < 0) offset = 0;   // 早于农历表起点（1900-01-31）时按起点钳制，避免负日号
   let ly = 1900;
   for (; ly < 2101 && offset >= yearDays(ly); ly++) offset -= yearDays(ly);
   const leap = leapMonth(ly);
@@ -120,7 +121,7 @@ function nextShichenTime(now) {
 }
 
 /* ============================================================
- * 主屏幕渲染（2026-10-14 视觉改版：借鉴 Hark 仪表盘小组件）
+ * 主屏幕渲染
  *  · backgroundGradient 渐变底 + 玻璃面板（与油价/彩票组件同一套观感）
  *  · 六宫圆盘：六个宫位圆标，落宫实心高亮（Hark 的 ball 语法：stack + width/height/borderRadius）
  *  · 三宫来路（月→日→时）压进落宫副栏，不额外占高；大尺寸另有步骤卡 + 断语玻璃面板
@@ -155,7 +156,7 @@ const ICON = (name, color, size = 12) => ({ type: 'image', src: `sf-symbol:${nam
 // 居中一律用「左右各一个 flex 空位」：Egern 不认 justifyContent，spacer 的 flex 才是可用机制
 const SP = () => ({ type: 'spacer', flex: 1 });
 const ROW = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'row', alignItems: 'center', gap: 4, children }, extra);
-const CENTER = (node, extra = {}) => ROW([SP(), node, SP()], extra);
+const CENTER = (node, extra = {}) => ROW([SP(), node, SP()], Object.assign({ gap: 0 }, extra));
 const COL = (children, extra = {}) => Object.assign({ type: 'stack', direction: 'column', alignItems: 'center', gap: 4, children }, extra);
 const glass = (children, extra = {}) =>
   Object.assign({ type: 'stack', direction: 'column', alignItems: 'start', gap: 4, padding: [7, 10], borderRadius: 14, backgroundColor: GLASS, children }, extra);
@@ -266,7 +267,7 @@ export default async function (ctx) {
     stepCell('日宫', day, false),
     T('›', 'caption1', TXT.tertiary, 'regular'),
     stepCell('时宫', hour, true),
-    SP(), SP(), SP(), SP(), SP(), SP(),
+    SP(),
   ], { gap: 3 });
 
   // ---------- 主屏装配 ----------
