@@ -228,19 +228,20 @@ export default async function (ctx) {
   }
 
   // ---------- 六宫圆盘 ----------
-  const ballSize = isSmall ? 20 : isLarge ? 40 : 38;
+  const ballSize = isSmall ? 20 : isLarge ? 36 : 30;
   const ball = (p) => {
     const active = p.name === hour.name;
     const c = pcol(p);
+    const d = active ? ballSize : ballSize - 4;   // 当前宫略大，其余退后：盘的视觉重量降下来，焦点只在落宫
     const extra = {
       alignItems: 'center', justifyContent: 'center', gap: 0,
-      width: ballSize, height: ballSize, borderRadius: ballSize / 2,
-      backgroundColor: active ? c : tint(p, isLarge ? '33' : '26'),
+      width: d, height: d, borderRadius: d / 2,
+      backgroundColor: active ? c : tint(p, isLarge ? '29' : '1F'),
     };
-    if (!active) { extra.borderWidth = 1; extra.borderColor = tint(p, '55'); }
+    if (!active) { extra.borderWidth = 1; extra.borderColor = tint(p, isLarge ? '4D' : '3D'); }
     return {
       type: 'stack', direction: 'row', ...extra,
-      children: [T(p.name, Math.round(ballSize * 0.36), active ? { light: '#FFFFFF', dark: '#0D0D10' } : c, 'semibold',
+      children: [T(p.name, Math.round(d * (active ? 0.4 : 0.42)), active ? { light: '#FFFFFF', dark: '#0D0D10' } : c, 'semibold',
         { textAlign: 'center', minScale: 0.55 })],
     };
   };
@@ -282,7 +283,7 @@ export default async function (ctx) {
       isSmall ? 'caption1' : 'footnote', TXT.secondary, 'medium', { minScale: 0.7 }),
   ];
   if (!isSmall) heroSub.push(T(path, 'caption2', TXT.tertiary, 'regular', { minScale: 0.65, lineLimit: 1 }));
-  const heroName = T(hour.name, isLarge ? 'largeTitle' : 'title', pcol(hour), 'heavy', { minScale: 0.6 });
+  const heroName = T(hour.name, isLarge ? 'largeTitle' : (isSmall ? 'title' : 34), pcol(hour), 'heavy', { minScale: 0.6 });
   // 小尺寸窄：名称与信息竖排，避免横向被裁
   const heroBlock = isSmall
     ? COL([CENTER(heroName), ...heroSub.map((n) => CENTER(n))], { gap: 2 })
@@ -290,10 +291,10 @@ export default async function (ctx) {
 
   const shortPill = CENTER(glass(
     [T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: isSmall ? 2 : 1, minScale: 0.72 })],
-    { alignItems: 'center', padding: [4, 11], gap: 0, borderRadius: 999 }));
+    { alignItems: 'center', padding: isSmall ? [4, 11] : [6, 15], gap: 0, borderRadius: 999 }));
 
   const children = [head];
-  const gap = isSmall ? 4 : 5;
+  const gap = isSmall ? 4 : (isLarge ? 5 : 4);
   if (isSmall) {
     children.push({ type: 'spacer' }, discRow, { type: 'spacer' }, heroBlock, shortPill);
   } else if (isLarge) {
@@ -315,13 +316,13 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    // 中尺寸节奏：球行 —(flex 1.0)— 英雄 —(flex 1.3)— 断语；头部独立，中轴自对齐
+    // 中尺寸节奏：顶部收紧、重点下移 —— 头 —(0.8)— 盘 —(1.0)— 结果 —(1.5)— 签文贴底
     children.push(
-      { type: 'spacer', flex: 1.0 },
+      { type: 'spacer', flex: 0.8 },
       discRow,
-      { type: 'spacer', flex: 1.1 },
+      { type: 'spacer', flex: 1.0 },
       heroBlock,
-      { type: 'spacer', flex: 1.3 },
+      { type: 'spacer', flex: 1.5 },
       shortPill,
     );
   }
