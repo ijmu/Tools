@@ -806,9 +806,6 @@ const STACK = (dir, opt, kids) => Object.assign({ type: 'stack', direction: dir,
 const COL = (opt, kids) => STACK('column', Object.assign({ alignItems: 'start' }, opt || {}), kids);
 const ROW = (opt, kids) => STACK('row', Object.assign({ alignItems: 'center' }, opt || {}), kids);
 const SP = (flex) => ({ type: 'spacer', flex: flex === undefined ? 1 : flex });
-const CARD = (opt, kids) => COL(Object.assign({ padding: 10, borderRadius: 13, backgroundColor: C.card }, opt), kids);
-// 行内容器：靠父 column 的 alignItems:"center" 实现水平居中（官方语义：column + center = 子元素水平居中）
-const CENTER = (kids, opt) => ROW(Object.assign({ gap: 6 }, opt || {}), kids);
 // 根节点必须是 widget（官方：垂直布局、对齐固定左上角、唯一支持 refreshAfter 的元素）
 const WIDGET_ONLY = ['children', 'gap', 'padding', 'backgroundColor', 'backgroundGradient', 'backgroundImage',
   'refreshAfter', 'url', 'flex', 'borderRadius', 'shadowColor', 'shadowRadius', 'shadowOffset'];
@@ -831,19 +828,6 @@ const WTEMP = (t) => (t === null || t === undefined ? C.sub
             : t <= 34 ? { light: '#E8590C', dark: '#FFA45C' }
               : { light: '#D92D20', dark: '#FF7A6B' });
 
-/* 宜 / 忌 色块 —— 黄历核心信息，做成视觉主角 */
-function yiJiBlock(A, n, gap) {
-  const line = (ch, words, tagCol, bgCol) => STACK('row', {
-    padding: [3.5, 10], borderRadius: 9, backgroundColor: bgCol, gap: 7, alignItems: 'center',
-  }, [
-    T(ch, { size: 13, weight: 'bold', textColor: tagCol, lineLimit: 1 }),
-    T(n === null ? (words || []).join(' ') : JOIN(words, n), { size: 12, textColor: C.ink, lineLimit: 1, minScale: 0.62 }),
-  ]);
-  return COL({ gap: gap === undefined ? 6 : gap }, [line('宜', A.yi, C.yi, C.yiBg), line('忌', A.ji, C.zhu, C.jiBg)]);
-}
-const titleChip = (o) => (o && o.title ? [T(o.title, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 })] : []);
-const solarLine = (A, size) => T(`${A.dayGZ}日 · ${A.zhiXing}日 · 周${WD[A.week]}`, { size: size || 10.5, textColor: C.sub, lineLimit: 1, minScale: 0.72 });
-const metaLine = (A, size) => T(`冲${A.chongSX}(${A.chongGZ}) 煞${A.sha} ${A.tianShen}·${A.tianShenType}`, { size: size || 9.5, textColor: C.faint, lineLimit: 1, minScale: 0.7 });
 function tmrLine(A, size) {
   const n = new Date(Date.UTC(A.y, A.m - 1, A.d) + 86400000);
   const B = almanac(n.getUTCFullYear(), n.getUTCMonth() + 1, n.getUTCDate());
@@ -853,133 +837,181 @@ function tmrLine(A, size) {
 const wxIcon = (W) => (W && W.icon ? W.icon : 'cloud.fill');
 const dayLabel = (iso, i) => (i === 0 ? '明天' : i === 1 ? '后天' : ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][new Date(iso + 'T12:00:00Z').getUTCDay()]);
 /* ===================== 各尺寸布局 ===================== */
+/* ===================== A 方案：满宽三段（无卡片，全程两端对齐） =====================
+   统一设计语言：
+     · 第一段「表头」——左天气概览 / 右黄历身份，两端对齐同一条左沿与右沿
+     · 第二段「细目」——冲煞 · 值神 · 星宿（一行结论）
+     · 第三段「宜忌」——满宽等宽两条，左色标签 + 满宽文字
+     · 尾段「脚注」——逐时（左） / 明日（右）
+   字号阶梯：主 / 次 / 正文 / 辅助
+*/
+const hm2m = (s) => { const a = String(s || '').split(':'); return a.length === 2 && a[0] !== '' ? (+a[0]) * 60 + (+a[1]) : -1; };
+/** 逐时图标：按该小时的天气描述取图标，并按该时刻是否在日出日落之间做昼夜修正
+    （修复：原版 hourly 项没有 icon 字段，逐时条恒显示同一朵灰云） */
+function hourIcon(W, h) {
+  const r = hm2m(W && W.sunrise), s = hm2m(W && W.sunset), m = hm2m(h && h.t);
+  const day = (r < 0 || s < 0 || m < 0) ? 1 : (m >= r && m < s ? 1 : 0);
+  const [ic] = descIcon((h && h.desc) || (W && W.desc) || '', day);
+  return ic;
+}
+/** 逐时一格：时间 / 图标 / 温度（竖排），大尺寸用 */
+function hourCell(W, h, ts, is) {
+  return COL({ gap: 2, flex: 1, alignItems: 'center' }, [
+    T(String(h && h.t || '').slice(0, 5), { size: ts, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
+    IMG(hourIcon(W, h), is, wxTint({ icon: hourIcon(W, h) })),
+    T(`${nv(h && h.temp)}°`, { size: is * 1.15, weight: 'semibold', textColor: WTEMP(h && h.temp), lineLimit: 1, minScale: 0.6 }),
+  ]);
+}
+/** 逐时一格：横排（时间 图标 温度），小/中尺寸用 */
+function hourChip(W, h, ts) {
+  const ic = hourIcon(W, h);
+  return ROW({ gap: 3, alignItems: 'center' }, [
+    T(String(h && h.t || '').slice(0, 2), { size: ts, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
+    IMG(ic, ts * 0.95, wxTint({ icon: ic })),
+    T(`${nv(h && h.temp)}°`, { size: ts * 1.15, weight: 'semibold', textColor: WTEMP(h && h.temp), lineLimit: 1, minScale: 0.6 }),
+  ]);
+}
+/** 天气概览块（图标 + 温度 + 描述/高低温两行）：小尺寸与中大尺寸共用 */
+function wxBrief(W, o, tSz, iSz, sSz) {
+  const d0 = (W.days || [])[0] || {};
+  return ROW({ gap: iSz * 0.34, alignItems: 'center' }, [
+    IMG(wxIcon(W), iSz, wxTint(W)),
+    T(`${nv(W.temp)}°`, { size: tSz, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.68 }),
+    COL({ gap: 1, alignItems: 'start' }, [
+      T(W.desc, { size: sSz, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
+      T(`↑${nv(d0.max)}° ↓${nv(d0.min)}°`, { size: sSz * 0.86, textColor: C.sub, lineLimit: 1, minScale: 0.72 }),
+    ]),
+  ]);
+}
+/** 宜忌条：满宽等宽，左色标签 + 满宽文字 */
+function yiJiBar(A, ch, words, n, tagCol, bgCol, sz, pad) {
+  return ROW({ padding: pad, borderRadius: 9, backgroundColor: bgCol, gap: 8, alignItems: 'center' }, [
+    T(ch, { size: sz + 1, weight: 'bold', textColor: tagCol, lineLimit: 1 }),
+    T(JOIN(words, n), { size: sz, textColor: C.ink, lineLimit: 1, minScale: 0.55 }),
+  ]);
+}
 function buildSmall(A, W, env, o) {
+  const hasW = o.wantW && W;
   const kids = [];
   if (o.wantA) {
-    kids.push(CENTER([
-      T(A.lunarText, { size: 21, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
-      T(`${A.yearGZ}年(${A.sx})`, { size: 10, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.75 }),
+    kids.push(ROW({ gap: 6, alignItems: 'end' }, [
+      T(A.lunarText, { size: 20, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.78 }),
+      SP(1),
+      T(`${A.yearGZ}年`, { size: 9.5, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.7 }),
     ]));
-    kids.push(CENTER([solarLine(A, 10.5)]));
-    kids.push(SP(0.15));
-    kids.push(CENTER([yiJiBlock(A, o.yiN, 5)]));
-    kids.push(SP(0.15));
+    kids.push(T(`${A.dayGZ}日 · ${A.zhiXing}日 · 周${WD[A.week]}`, { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.64 }));
   }
-  if (o.wantW && W) {
-    kids.push(CENTER([ROW({ gap: 5, alignItems: 'center' }, [
-      IMG(wxIcon(W), 17, wxTint(W)),
-      T(`${nv(W.temp)}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.75 }),
-      T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
-    ])]));
-  } else if (o.wantW) {
-    kids.push(CENTER([T('天气待更新', { size: 11, textColor: C.faint })]));
+  if (hasW) { kids.push(SP(0.3)); kids.push(wxBrief(W, o, 24, 20, 10.5)); }
+  else if (o.wantW) { kids.push(SP(0.3)); kids.push(T('天气待更新', { size: 11, textColor: C.faint })); }
+  if (o.wantA) {
+    kids.push(SP(0.3));
+    kids.push(COL({ gap: 4, alignItems: 'stretch' }, [
+      yiJiBar(A, '宜', A.yi, o.yiN, C.yi, C.yiBg, 11.5, [4, 9]),
+      yiJiBar(A, '忌', A.ji, o.yiN, C.zhu, C.jiBg, 11.5, [4, 9]),
+    ]));
   }
-  return root({ padding: 12, gap: 5, backgroundGradient: o.plain ? undefined : bgGradient() }, [COL({ gap: 5, flex: 1, alignItems: 'center' }, kids)]);
+  return root({ padding: 12, gap: 4, backgroundGradient: o.plain ? undefined : bgGradient() },
+    [COL({ gap: 4, flex: 1, alignItems: 'stretch' }, kids)]);
 }
 
 
 function buildMedium(A, W, env, o) {
-  const left = o.wantA ? COL({ gap: 3, flex: 2.2, alignItems: 'center' }, [
-    CENTER([
-      T(A.lunarText, { size: 20.5, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
-      T(`${A.yearGZ}年(${A.sx})`, { size: 10.5, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.72 }),
-    ]),
-    CENTER([solarLine(A)]),
-    SP(0.08),
-    CENTER([yiJiBlock(A, o.yiN, 4)]),
-    SP(0.08),
-    CENTER([metaLine(A, 9)]),
-  ]) : COL({ gap: 4, flex: 2.2 }, []);
-  const right = (o.wantW && W) ? COL({ flex: 1, gap: 2, alignItems: 'center', padding: [10, 6], borderRadius: 16, backgroundColor: C.card }, [
-    SP(0.2),
-    IMG(wxIcon(W), 22, wxTint(W)),
-    T(`${nv(W.temp)}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65, textAlign: 'center' }),
-    T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.72 }),
-    T(`↑${nv(W.days[0] ? W.days[0].max : null)}° ↓${nv(W.days[0] ? W.days[0].min : null)}°`, { size: 11, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
-    T(`湿${nv(W.hum)}% 风${nv(W.wind)}`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
-    SP(0.2),
-  ]) : COL({ flex: 1 }, []);
-  let strip = null;
-  if (o.wantW && W && (W.hourly || []).length >= 4) {
-    const cells = W.hourly.slice(0, 4).map((h) => ROW({ gap: 3, flex: 1, alignItems: 'center' }, [
-      T(h.t, { size: 9, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
-      IMG(h && h.icon ? h.icon : 'cloud.fill', 9, wxTint(h)),
-      T(`${nv(h.temp)}°`, { size: 10, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.6 }),
-    ]));
-    strip = ROW({ gap: 2, alignItems: 'center' }, cells);
+  const hasW = o.wantW && W;
+  const LV = T(A.lunarText, { size: 24, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 });
+  const GZ = T(`${A.yearGZ}年(${A.sx})`, { size: 11, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.72 });
+  const subLine = `${A.dayGZ}日 · ${A.zhiXing}日 · 周${WD[A.week]}`;
+  let head;
+  if (hasW && o.wantA) {
+    // 表头右侧只留农历大字（长农历如「闰冬月初五」会把年月干支挤出边界 → 后者下移到细目行）
+    head = ROW({ gap: 10, alignItems: 'center' }, [wxBrief(W, o, 34, 30, 13), SP(1), LV]);
+  } else if (hasW) {
+    head = wxBrief(W, o, 34, 30, 13);
+  } else if (o.wantA) {
+    head = ROW({ gap: 8, alignItems: 'end' }, [LV, GZ, SP(1), T(subLine, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.66 })]);
+  } else { head = SP(0); }
+  // 细目行分两段双色：左段「今天是什么日子」（次色），右段「冲煞·值神」（辅助色）
+  const meta = o.wantA ? ROW({ gap: 7, alignItems: 'center' }, [
+    T(`${A.yearGZ}年(${A.sx}) · ${subLine}`, { size: 10.5, textColor: C.sub, lineLimit: 1, minScale: 0.6 }),
+    T(`冲${A.chongSX}(${A.chongGZ}) 煞${A.sha} · ${A.tianShen}·${A.tianShenType}`, { size: 10.5, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
+    SP(1),
+  ]) : SP(0);
+  const yiJi = o.wantA ? COL({ gap: 5, alignItems: 'stretch' }, [
+    yiJiBar(A, '宜', A.yi, o.yiN, C.yi, C.yiBg, 12.5, [4.5, 11]),
+    yiJiBar(A, '忌', A.ji, o.yiN, C.zhu, C.jiBg, 12.5, [4.5, 11]),
+  ]) : SP(0);
+  const fx = [];
+  if (hasW && (W.hourly || []).length >= 4) {
+    fx.push(ROW({ gap: 8, flex: 1, alignItems: 'center' }, (W.hourly || []).slice(0, 4).map((h) => hourChip(W, h, 9, 1))));
+  } else { fx.push(SP(1)); }
+  if (hasW && (W.days || [])[1]) {
+    fx.push(T(`明日 ${nv(W.days[1].max)}°/${nv(W.days[1].min)}°`, { size: 10.5, textColor: C.gold, lineLimit: 1, minScale: 0.7 }));
   }
-  const kids = [ROW({ gap: 9, flex: 1, alignItems: 'center' }, [left, right])];
-  if (strip) kids.push(strip);
-  return root({ padding: [10, 13], gap: 5, backgroundGradient: o.plain ? undefined : bgGradient() }, kids);
+  return root({ padding: [10, 14], gap: 4, backgroundGradient: o.plain ? undefined : bgGradient() },
+    [COL({ gap: 4, flex: 1, alignItems: 'stretch' }, [head, meta, yiJi, SP(0.25), ROW({ gap: 4, alignItems: 'center' }, fx)])]);
 }
 
 function buildLarge(A, W, env, o) {
-  const cards = [];
-  if (o.wantW && W) {
-    const all = W.hourly || [];
-    const hours = all.slice(0, all.length > 6 ? 8 : 6);
-    cards.push(CARD({ gap: 6 }, [
-      ROW({ gap: 8, alignItems: 'center' }, [
-        IMG(wxIcon(W), 22, wxTint(W)),
-        T(`${nv(W.temp)}°`, { size: 34, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.7 }),
-        SP(),
-        COL({ gap: 1, flex: 1, alignItems: 'end' }, [
-          T(`↑${nv(W.days[0] ? W.days[0].max : null)}° ↓${nv(W.days[0] ? W.days[0].min : null)}°`, { size: 12, textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
-          T(`体感${nv(W.feel)}°`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.8 }),
-        ]),
-      ]),
-      T(`${W.place} · ${W.desc} · 湿${nv(W.hum)}% 风${nv(W.wind)}km/h`, { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.68 }),
-      hours.length ? ROW({ gap: 4, flex: 0.7 }, hours.map((h) => COL({ gap: 2, flex: 1, alignItems: 'center' }, [
-        T(h.t, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
-        IMG(h && h.icon ? h.icon : 'cloud.fill', 11, wxTint(h)),
-        T(`${nv(h.temp)}°`, { size: 11, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.7 }),
-      ]))) : SP(0),
-      ROW({ gap: 6 }, W.days.slice(1, 4).map((d, i) => ROW({ gap: 6, flex: 1, alignItems: 'center' }, [
-        T(dayLabel(d.date, i), { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
-        T(`${nv(d.max)}°/${nv(d.min)}°`, { size: 12, weight: 'semibold', textColor: C.ink, lineLimit: 1, minScale: 0.7 }),
-      ]))),
-    ]));
-
-  }
+  const hasW = o.wantW && W;
+  const kids = [];
+  // 表头不做左右对开（大尺寸字大，对开必溢出）：天气概览、黄历身份各自独立成行，全部左对齐
+  if (hasW) kids.push(wxBrief(W, o, 46, 40, 15));
   if (o.wantA) {
-    cards.push(CARD({ gap: 4, flex: 1, alignItems: 'center' }, [
-      ROW({ gap: 6, alignItems: 'center' }, [
-        T(A.lunarText, { size: 23, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
-        T(`${A.yearGZ}年(${A.sx})`, { size: 11, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.75 }),
-        SP(),
-        ...titleChip(o),
-      ]),
-      T(`${A.dayGZ}日 · ${A.zhiXing}日 · 周${WD[A.week]} · ${A.xiu}宿(${A.xiuLuck}) ${A.nayin}`, { size: 10.5, textColor: C.sub, lineLimit: 1, minScale: 0.62 }),
-      SP(0.12),
-      yiJiBlock(A, o.yiN, 6),
-      SP(0.12),
-      metaLine(A, 10),
-      T(`喜${A.xi} 财${A.cai} 福${A.fu} · 胎神${A.taiShen} · ${A.pengZu[0].slice(0, 4)} ${A.pengZu[1].slice(0, 4)}`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.58 }),
-      SP(0.12),
-      tmrLine(A, 11),
+    kids.push(ROW({ gap: 8, alignItems: 'end' }, [
+      T(A.lunarText, { size: 26, weight: 'bold', textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
+      T(`${A.yearGZ}年(${A.sx})`, { size: 12, weight: 'bold', textColor: C.gold, lineLimit: 1, minScale: 0.75 }),
+      SP(1),
     ]));
+    kids.push(T(`${A.dayGZ}日 · ${A.zhiXing}日 · 周${WD[A.week]} · 冲${A.chongSX}(${A.chongGZ}) 煞${A.sha}`,
+      { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.58 }));
   }
-  if (!cards.length) cards.push(CARD({ flex: 1 }, [T('无数据', { size: 12, textColor: C.sub })]));
-  return root({ padding: 13, gap: 8, backgroundGradient: o.plain ? undefined : bgGradient() }, cards);
+  if (hasW) kids.push(T(`${W.place || ''} · 湿${nv(W.hum)}% 风${nv(W.wind)}km/h · 体感${nv(W.feel)}° · 气压${nv(W.pressure)}hPa`,
+    { size: 10.5, textColor: C.faint, lineLimit: 1, minScale: 0.6 }));
+  if (o.wantA) kids.push(COL({ gap: 6, alignItems: 'stretch' }, [
+    yiJiBar(A, '宜', A.yi, o.yiN, C.yi, C.yiBg, 13.5, [5, 12]),
+    yiJiBar(A, '忌', A.ji, o.yiN, C.zhu, C.jiBg, 13.5, [5, 12]),
+  ]));
+  if (hasW && (W.hourly || []).length >= 4) {
+    kids.push(SP(0.1));
+    kids.push(ROW({ gap: 4, alignItems: 'center' }, (W.hourly || []).slice(0, 8).map((h) => hourCell(W, h, 11, 15))));
+  }
+  if (hasW && (W.days || []).length >= 2) {
+    kids.push(SP(0.1));
+    kids.push(ROW({ gap: 6, alignItems: 'center' }, (W.days || []).slice(0, 4).map((d, i) => {
+      const ic = descIcon(d.desc || '', 1)[0];
+      return COL({ gap: 2, flex: 1, alignItems: 'center' }, [
+        T(dayLabel(d.date, i), { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
+        IMG(ic, 13, wxTint({ icon: ic })),
+        T(`${nv(d.max)}°/${nv(d.min)}°`, { size: 11.5, weight: 'semibold', textColor: C.ink, lineLimit: 1, minScale: 0.7 }),
+      ]);
+    })));
+  }
+  if (o.wantA) kids.push(tmrLine(A, 11));
+  return root({ padding: 13, gap: 5, backgroundGradient: o.plain ? undefined : bgGradient() },
+    [COL({ gap: 5, flex: 1, alignItems: 'stretch' }, kids)]);
 }
 
 /* ===================== 锁屏（accessory） ===================== */
 function buildLockRect(A, W) {
-  return root({ padding: 3, gap: 1 }, [COL({ gap: 1, flex: 1 }, [
-    T(`${A.lunarText} 宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)}`, { size: 11, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
-    T(`${A.zhiXing}日 冲${A.chongSX}${W ? ' · ' + W.temp + '° ' + W.desc : ''}`, { size: 9, textColor: '#FFFFFFCC', lineLimit: 1, minScale: 0.6 }),
+  const hasW = W && W.temp !== null && W.temp !== undefined;
+  const l2 = hasW ? nv(W.temp) + '° ' + W.desc : '冲' + A.chongSX;
+  return root({ padding: 3, gap: 1 }, [COL({ gap: 1, flex: 1, alignItems: 'stretch' }, [
+    T(`${A.lunarText} ${A.dayGZ}日 ${A.zhiXing}日`, { size: 11.5, weight: 'semibold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
+    T(`宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)} · ${l2}`, { size: 9.5, textColor: '#FFFFFFCC', lineLimit: 1, minScale: 0.55 }),
   ])]);
 }
 function buildLockCirc(A, W) {
+  const hasW = W && W.temp !== null && W.temp !== undefined;
   return root({ padding: 2, gap: 0 }, [COL({ gap: 0, flex: 1, alignItems: 'center' }, [
-    W ? IMG(wxIcon(W), 18, '#FFFFFF') : T('历', { size: 14, weight: 'bold', textColor: '#FFFFFF' }),
-    W ? T(`${nv(W.temp)}°`, { size: 14, weight: 'bold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 })
-      : T(A.lunarText, { size: 11, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
+    hasW ? IMG(wxIcon(W), 17, '#FFFFFF') : T('历', { size: 14, weight: 'bold', textColor: '#FFFFFF' }),
+    hasW ? T(`${nv(W.temp)}°`, { size: 13, weight: 'bold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 })
+      : T(A.lunarText, { size: 10.5, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.55 }),
   ])]);
 }
 function buildLockInline(A, W) {
-  return root({ padding: 0, gap: 0 }, [COL({ gap: 0, flex: 1 }, [
-    T(`${A.lunarText} 宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)}${W ? ' ' + W.temp + '°' : ''}`, { size: 12, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
+  const hasW = W && W.temp !== null && W.temp !== undefined;
+  return root({ padding: 0, gap: 0 }, [COL({ gap: 0, flex: 1, alignItems: 'stretch' }, [
+    T(`${A.lunarText} 宜${JOIN(A.yi, 1)} 忌${JOIN(A.ji, 1)}${hasW ? ' ' + nv(W.temp) + '°' : ''}`,
+      { size: 12, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.55 }),
   ])]);
 }
 
