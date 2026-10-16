@@ -456,10 +456,6 @@ scriptings:
     name: 招商实时金价
     script_url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Gold_Widgets.JS
     update_interval: 3600
-- generic:
-    name: 每日黄历天气
-    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/almanac-weather.js
-    update_interval: 1800
 mitm:
   
 widgets:
@@ -484,13 +480,6 @@ widgets:
     TANK_L: '66'
 - name: 招商实时金价
   script_name: 招商实时金价
-- name: 每日黄历天气
-  script_name: 每日黄历天气
-  env:
-    CITY: 北京
-    PROVINCE: 北京
-    TEMP_UNIT: c
-    REFRESH: '30'
 modules:
 - url: https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.surge.sgmodule
   update_interval: 86400
