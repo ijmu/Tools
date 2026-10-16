@@ -324,7 +324,10 @@ function popularityMap(raw) {
 
 /** 纯计算：接口 JSON → 汇总结构（不碰网络）。lb = 平台模型排行榜（可选，Cookie 模式才有） */
 function computeSubsidy(json, now, lb, prevJson) {
-  const list = json.data || json.models || [];
+  // 防御：丢掉 null 条目，并给缺名字的模型补 id 作显示名 —— 否则卡片上会出现 undefined
+  const list = (json.data || json.models || [])
+    .filter((m) => m && (m.display_name || m.id))
+    .map((m) => (m.display_name ? m : Object.assign({}, m, { display_name: String(m.id) })));
   const rate = typeof json.rmb_rate === 'number' && json.rmb_rate > 0 ? json.rmb_rate : CNY_PER_POWER;
   const useMap = usageMap(lb, list);       // 原始今日用量
   const popMap = popularityMap(useMap);    // 对数归一 0-100（smart 模式用）
@@ -386,8 +389,17 @@ async function loadSubsidy(ctx, now, lb) {
       budget: 9000,
     });
     const json = res.json || JSON.parse(res.text);
+    const list = json.data || json.models || [];
     const prev = memo && memo.json;   // 上一轮名单：用于标出本次新上架的模型
-    cacheWrite({ t: Date.now(), tr: res.via, json });
+    // 官网给了空表（维护 / 接口改版）：不覆盖缓存、直接回放上次数据，别把空表写进去
+    if (!list.length && prev) {
+      const out = computeSubsidy(prev, now, lb);
+      out.fromCache = true;
+      out.staleAt = memo.t;
+      out.err = '官网模型表为空';
+      return out;
+    }
+    if (list.length) cacheWrite({ t: Date.now(), tr: res.via, json });
     return computeSubsidy(json, now, lb, prev);
   } catch (e) {
     if (memo && memo.json) {
@@ -572,6 +584,19 @@ async function renderWidget(ctx) {
   const onN = data.siteCount != null ? data.siteCount : data.activeRows.length; // 官网口径：时段内即计数（含耗尽档）
   const subN = data.subsidised.length;
   const deep = data.deepest;
+  if (!best) {
+    // 空模型表且没有历史缓存：给一张明确的「暂无数据」卡，别再往下解引用（原来会抛 TypeError 整块崩）
+    return {
+      type: 'widget', refreshAfter, padding: 14, gap: 4, backgroundColor: C.bg,
+      children: [
+        header('暂无数据'),
+        T('官网模型表是空的', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, lineLimit: 1 }),
+        T('可能正在维护或接口改版，10 分钟后自动重试', { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 2, minScale: 0.7 }),
+        { type: 'spacer' },
+        foot(['无缓存可回放', 'ai.ipix.ink']),
+      ],
+    };
+  }
   const cheapest = best.m.display_name;
   const priceTxt = `⚡${fmtPower(best.eff)}`;
   const win = windowLabel(best.m);

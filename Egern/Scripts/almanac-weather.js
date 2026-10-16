@@ -552,6 +552,10 @@ function descIcon(desc, isDay) {
 /** 天气图标配色：按图标语义取色，取不到按「阴」灰蓝兜底 */
 const wxTint = (w) => WX_TINT[(w && w.icon) || ''] || WX_TINT['cloud.fill'];
 
+/** 数值兜底：字段缺失/非数字 → null（渲染层 nv 显示占位符），卡片上不允许出现 NaN/undefined */
+const rd = (v) => { const t = Number(v); return Number.isFinite(t) ? Math.round(t) : null; };
+const nv = (v, fb) => (v === null || v === undefined || (typeof v === 'number' && !Number.isFinite(v)) ? (fb === undefined ? '--' : fb) : v);
+
 /* ---------------- 各源适配器：统一输出 ---------------- */
 const outcome = (o) => Object.assign({
   ts: Date.now(), src: '', place: '', lat: 0, lon: 0, unit: 'c',
@@ -593,7 +597,7 @@ async function srcOpenMeteo(ctx, place, unit) {
   const hourly = [];
   for (let i = start; i < Math.min(start + 8, (h.time || []).length); i++) {
     hourly.push({
-      t: (h.time[i] || '').slice(11, 16), temp: Math.round(h.temperature_2m[i]), pop: h.precipitation_probability ? h.precipitation_probability[i] : null,
+      t: (h.time[i] || '').slice(11, 16), temp: rd(h.temperature_2m[i]), pop: h.precipitation_probability ? h.precipitation_probability[i] : null,
       desc: wmoText(h.weather_code[i]),
     });
   }
@@ -611,8 +615,8 @@ async function srcOpenMeteo(ctx, place, unit) {
   const [icon, desc] = descIcon(wmoText(c.weather_code), isDay);
   return outcome({
     src: 'open-meteo', place: place.name, lat: place.lat, lon: place.lon, unit,
-    temp: Math.round(c.temperature_2m), feel: Math.round(c.apparent_temperature), hum: Math.round(c.relative_humidity_2m),
-    wind: Math.round(c.wind_speed_10m), windDir: dirName(c.wind_direction_10m), pressure: Math.round(c.surface_pressure),
+    temp: rd(c.temperature_2m), feel: rd(c.apparent_temperature), hum: rd(c.relative_humidity_2m),
+    wind: rd(c.wind_speed_10m), windDir: dirName(c.wind_direction_10m), pressure: rd(c.surface_pressure),
     precip: c.precipitation, isDay, desc, icon,
     sunrise: t0.sunrise || '', sunset: t0.sunset || '', hourly, days,
   });
@@ -643,7 +647,7 @@ async function srcNMC(ctx, place, unit) {
   if (!data || !data.real || !data.real.weather) throw new Error('nmc 返回异常');
   const r = data.real;
   const detail = (data.predict && data.predict.detail) || [];
-  const conv = (v) => (unit === 'f' ? Math.round((Number(v) * 9) / 5 + 32) : Math.round(Number(v)));
+  const conv = (v) => { const t = Number(v); return Number.isFinite(t) ? (unit === 'f' ? Math.round((t * 9) / 5 + 32) : Math.round(t)) : null; };
   const days = detail.slice(0, 4).map((d) => ({
     date: String(d.date || '').slice(0, 10), max: conv(d.day && d.day.weather && d.day.weather.temperature),
     min: conv(d.night && d.night.weather && d.night.weather.temperature),
@@ -657,7 +661,7 @@ async function srcNMC(ctx, place, unit) {
   return outcome({
     src: 'nmc', place: place.name, lat: place.lat, lon: place.lon, unit,
     temp: conv(r.weather.temperature), feel: r.weather.feelst ? conv(r.weather.feelst) : null,
-    hum: Math.round(r.weather.humidity), wind: Math.round((r.wind || {}).speed || 0), windDir: (r.wind || {}).direct || '',
+    hum: rd(r.weather.humidity), wind: rd((r.wind || {}).speed), windDir: (r.wind || {}).direct || '',
     pressure: r.weather.airpressure && r.weather.airpressure < 9000 ? Math.round(r.weather.airpressure) : null,
     precip: r.weather.rain, isDay, desc, icon, sunrise, sunset, hourly: [], days,
   });
@@ -673,7 +677,7 @@ async function srcApihz(ctx, place, unit) {
     (sheng ? '&sheng=' + encodeURIComponent(sheng) : '') + '&place=' + encodeURIComponent(city);
   const j = await httpJSON(ctx, url, {}, 12000);
   if (!j || j.code !== 200) throw new Error('apihz 无数据');
-  const conv = (v) => (unit === 'f' ? Math.round((Number(v) * 9) / 5 + 32) : Math.round(Number(v)));
+  const conv = (v) => { const t = Number(v); return Number.isFinite(t) ? (unit === 'f' ? Math.round((t * 9) / 5 + 32) : Math.round(t)) : null; };
   const n = j.nowinfo || {};
   const isDay = isDayNow('06:00', '18:00');
   const [icon, desc] = descIcon(j.weather1, isDay);
@@ -686,8 +690,8 @@ async function srcApihz(ctx, place, unit) {
   }
   return outcome({
     src: 'apihz', place: place.name, lat: Number(j.lat) || place.lat, lon: Number(j.lon) || place.lon, unit,
-    temp: conv(n.temperature), feel: n.feelst ? conv(n.feelst) : null, hum: Math.round(n.humidity),
-    wind: n.windSpeed !== undefined ? Math.round(Number(n.windSpeed) * 3.6) : null, windDir: n.windDirection || '',
+    temp: conv(n.temperature), feel: n.feelst ? conv(n.feelst) : null, hum: rd(n.humidity),
+    wind: n.windSpeed !== undefined ? rd(Number(n.windSpeed) * 3.6) : null, windDir: n.windDirection || '',
     pressure: n.pressure, precip: n.precipitation, isDay, desc, icon, hourly: [], days,
   });
 }
@@ -697,7 +701,7 @@ async function srcWttr(ctx, place, unit) {
   const url = 'https://wttr.in/' + encodeURIComponent(place.lat + ',' + place.lon) + '?format=j1&lang=zh';
   const j = await httpJSON(ctx, url, { 'User-Agent': 'curl/8' }, 15000);
   const c = (j.current_condition || [])[0] || {};
-  const conv = (v) => (unit === 'f' ? Math.round((Number(v) * 9) / 5 + 32) : Math.round(Number(v)));
+  const conv = (v) => { const t = Number(v); return Number.isFinite(t) ? (unit === 'f' ? Math.round((t * 9) / 5 + 32) : Math.round(t)) : null; };
   const days = (j.weather || []).slice(0, 4).map((d) => ({
     date: d.date, max: conv(d.maxtempC), min: conv(d.mintempC),
     desc: ((d.hourly || [])[4] || {}).lang_zh ? ((d.hourly || [])[4].lang_zh[0] || {}).value : (d.hourly || [])[4] && (d.hourly || [])[4].weatherDesc ? (d.hourly || [])[4].weatherDesc[0].value : '—',
@@ -708,8 +712,8 @@ async function srcWttr(ctx, place, unit) {
   const [icon, desc] = descIcon(zh, isDay);
   return outcome({
     src: 'wttr', place: place.name, lat: place.lat, lon: place.lon, unit,
-    temp: conv(c.temp_C), feel: conv(c.FeelsLikeC), hum: Number(c.humidity),
-    wind: Number(c.windspeedKmph), windDir: c.winddir16Point || '', pressure: Number(c.pressure), precip: Number(c.precipMM),
+    temp: conv(c.temp_C), feel: conv(c.FeelsLikeC), hum: rd(c.humidity),
+    wind: rd(c.windspeedKmph), windDir: c.winddir16Point || '', pressure: rd(c.pressure), precip: rd(c.precipMM),
     isDay, desc, icon, hourly: [], days,
   });
 }
@@ -864,7 +868,7 @@ function buildSmall(A, W, env, o) {
   if (o.wantW && W) {
     kids.push(CENTER([ROW({ gap: 5, alignItems: 'center' }, [
       IMG(wxIcon(W), 17, wxTint(W)),
-      T(`${W.temp}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.75 }),
+      T(`${nv(W.temp)}°`, { size: 19, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.75 }),
       T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
     ])]));
   } else if (o.wantW) {
@@ -889,10 +893,10 @@ function buildMedium(A, W, env, o) {
   const right = (o.wantW && W) ? COL({ flex: 1, gap: 2, alignItems: 'center', padding: [10, 6], borderRadius: 16, backgroundColor: C.card }, [
     SP(0.2),
     IMG(wxIcon(W), 22, wxTint(W)),
-    T(`${W.temp}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65, textAlign: 'center' }),
+    T(`${nv(W.temp)}°`, { size: 27, weight: 'semibold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.65, textAlign: 'center' }),
     T(W.desc, { size: 11, textColor: C.sub, lineLimit: 1, minScale: 0.72 }),
-    T(`↑${W.days[0] ? W.days[0].max : '--'}° ↓${W.days[0] ? W.days[0].min : '--'}°`, { size: 11, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
-    T(`湿${W.hum}% 风${W.wind}`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
+    T(`↑${nv(W.days[0] ? W.days[0].max : null)}° ↓${nv(W.days[0] ? W.days[0].min : null)}°`, { size: 11, textColor: C.ink, lineLimit: 1, minScale: 0.75 }),
+    T(`湿${nv(W.hum)}% 风${nv(W.wind)}`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
     SP(0.2),
   ]) : COL({ flex: 1 }, []);
   let strip = null;
@@ -900,7 +904,7 @@ function buildMedium(A, W, env, o) {
     const cells = W.hourly.slice(0, 4).map((h) => ROW({ gap: 3, flex: 1, alignItems: 'center' }, [
       T(h.t, { size: 9, textColor: C.faint, lineLimit: 1, minScale: 0.6 }),
       IMG(h && h.icon ? h.icon : 'cloud.fill', 9, wxTint(h)),
-      T(`${h.temp}°`, { size: 10, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.6 }),
+      T(`${nv(h.temp)}°`, { size: 10, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.6 }),
     ]));
     strip = ROW({ gap: 2, alignItems: 'center' }, cells);
   }
@@ -917,22 +921,22 @@ function buildLarge(A, W, env, o) {
     cards.push(CARD({ gap: 6 }, [
       ROW({ gap: 8, alignItems: 'center' }, [
         IMG(wxIcon(W), 22, wxTint(W)),
-        T(`${W.temp}°`, { size: 34, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.7 }),
+        T(`${nv(W.temp)}°`, { size: 34, weight: 'bold', textColor: WTEMP(W.temp), lineLimit: 1, minScale: 0.7 }),
         SP(),
         COL({ gap: 1, flex: 1, alignItems: 'end' }, [
-          T(`↑${W.days[0] ? W.days[0].max : '--'}° ↓${W.days[0] ? W.days[0].min : '--'}°`, { size: 12, textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
-          T(`体感${W.feel}°`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.8 }),
+          T(`↑${nv(W.days[0] ? W.days[0].max : null)}° ↓${nv(W.days[0] ? W.days[0].min : null)}°`, { size: 12, textColor: C.ink, lineLimit: 1, minScale: 0.8 }),
+          T(`体感${nv(W.feel)}°`, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.8 }),
         ]),
       ]),
-      T(`${W.place} · ${W.desc} · 湿${W.hum}% 风${W.wind}km/h`, { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.68 }),
+      T(`${W.place} · ${W.desc} · 湿${nv(W.hum)}% 风${nv(W.wind)}km/h`, { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.68 }),
       hours.length ? ROW({ gap: 4, flex: 0.7 }, hours.map((h) => COL({ gap: 2, flex: 1, alignItems: 'center' }, [
         T(h.t, { size: 10, textColor: C.faint, lineLimit: 1, minScale: 0.7 }),
         IMG(h && h.icon ? h.icon : 'cloud.fill', 11, wxTint(h)),
-        T(`${h.temp}°`, { size: 11, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.7 }),
+        T(`${nv(h.temp)}°`, { size: 11, weight: 'semibold', textColor: WTEMP(h.temp), lineLimit: 1, minScale: 0.7 }),
       ]))) : SP(0),
       ROW({ gap: 6 }, W.days.slice(1, 4).map((d, i) => ROW({ gap: 6, flex: 1, alignItems: 'center' }, [
         T(dayLabel(d.date, i), { size: 10, textColor: C.sub, lineLimit: 1, minScale: 0.7 }),
-        T(`${d.max}°/${d.min}°`, { size: 12, weight: 'semibold', textColor: C.ink, lineLimit: 1, minScale: 0.7 }),
+        T(`${nv(d.max)}°/${nv(d.min)}°`, { size: 12, weight: 'semibold', textColor: C.ink, lineLimit: 1, minScale: 0.7 }),
       ]))),
     ]));
 
@@ -969,7 +973,7 @@ function buildLockRect(A, W) {
 function buildLockCirc(A, W) {
   return root({ padding: 2, gap: 0 }, [COL({ gap: 0, flex: 1, alignItems: 'center' }, [
     W ? IMG(wxIcon(W), 18, '#FFFFFF') : T('历', { size: 14, weight: 'bold', textColor: '#FFFFFF' }),
-    W ? T(`${W.temp}°`, { size: 14, weight: 'bold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 })
+    W ? T(`${nv(W.temp)}°`, { size: 14, weight: 'bold', textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 })
       : T(A.lunarText, { size: 11, textColor: '#FFFFFF', lineLimit: 1, minScale: 0.6 }),
   ])]);
 }
