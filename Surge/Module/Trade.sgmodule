@@ -1,8 +1,0 @@
-#!name=Trade (金融交易) 分流
-#!desc=为金融交易、股票券商软件分流。请点击“编辑参数 (Edit Argument)”，将 Policy 的值修改为你想要绑定的策略组名称。
-#!system=ios
-# 定义参数 Policy，默认值为 Proxy
-#!arguments=Policy=Proxy
-
-[Rule]
-RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Finance/Finance.list,%Policy%
