@@ -484,7 +484,7 @@ function yijiBar(tag, words, n, tagCol, tagBg, size, pad, maxChars) {
   return {
     type: 'stack', direction: 'row', alignItems: 'center', gap: 7, borderRadius: 8,
     padding: pad || [2, 8, 2, 8],
-    backgroundColor: tagBg,
+    backgroundColor: tagBg, flex: 1,
     children: [
       { type: 'text', text: tag, font: { size: size + 1, weight: 'bold' }, textColor: tagCol, maxLines: 1 },
       { type: 'text', text: yijiWords(words, n, maxChars), font: { size: size }, textColor: C.primary, maxLines: 1, minScale: 0.55 },
@@ -598,9 +598,9 @@ const FIT = {
     pad: 13, gap: 5,
     title: 11, sub: 10.5,
     lDay: 17, lSub: 10.5, meta: 10, meta2: 9.5,
-    bar: 11, barPad: [2, 8, 2, 8], barMax: 22,
+    bar: 11, barPad: [2, 8, 2, 8], barMax: 26,
     list: { icon: 10, name: 11.5, day: 11 },
-    yiJi: [4, 4], festN: 5,
+    yiJi: [5, 5], festN: 5,
   },
   systemLarge: {
     pad: 15, gap: 6,
@@ -664,14 +664,19 @@ function almRows(A, o, mode) {
   ];
 }
 
-// 节日行（小/中：轻量行式）
+// 节日行（小/中：轻量行式）—— 图标按节日 tone（喜庆度）取色，沿用原版节日倒计时规则
+const TONE_ICON = {
+  red: 'sparkles', gold: 'sparkles', pink: 'heart.fill', violet: 'moon.stars.fill',
+  cyan: 'snowflake', green: 'leaf.fill', orange: 'flame.fill', blue: 'snowflake',
+  mute: 'calendar', season: 'leaf.fill',
+};
 function festLine(it, sec, s, season) {
-  const ic = s.icon || 10;
+  const ic = 12;
+  const toneCol = it.tone === 'season' ? SEASON[season] : (TONE[it.tone] ? (TONE[it.tone].dark) : TONE.red.dark);
   return STACK('row', { alignItems: 'center', gap: 0 }, [
     STACK('row', { alignItems: 'center', gap: 5, flex: 1 }, [
       { type: 'spacer', length: ic },   // 图标列：固定宽（各行同竖线对齐）
-      IMG(sec.key === 'jq' ? 'leaf.fill' : sec.key === 'cn' ? 'flag.fill' : 'globe', ic,
-          sec.key === 'jq' ? SEASON[season] : sec.accent),
+      IMG(TONE_ICON[it.tone] || 'sparkles', s.icon, toneCol),
       T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
     ]),
     T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
