@@ -317,13 +317,12 @@ export default async function (ctx) {
       { type: 'spacer' },
     );
   } else {
-    // 中尺寸节奏：顶部收紧、重点下移 —— 头 —(0.8)— 盘 —(1.0)— 结果 —(1.5)— 签文贴底
     children.push(
-      { type: 'spacer', flex: 0.8 },
+      { type: 'spacer', flex: 1.5 },
       discRow,
       { type: 'spacer', flex: 1.0 },
       heroBlock,
-      { type: 'spacer', flex: 1.5 },
+      { type: 'spacer', flex: 0.8 },
       shortPill,
     );
   }

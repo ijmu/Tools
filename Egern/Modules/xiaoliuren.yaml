@@ -25,7 +25,7 @@ env_schema:
 scriptings:
 - generic:
     name: 小六壬
-    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js?v=20261018
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js?v=20261018b
     timeout: 30
 widgets:
 - name: 小六壬

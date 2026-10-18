@@ -586,6 +586,9 @@ function footer(data, o, env) {
 /* ===================== 融合渲染（黄历 × 节日） ===================== */
 
 // 各尺寸档位（尺寸值规整；构造均为已验证集合）
+// 垂直留白分配：头 1.5 : 尾 1 —— 内容组下沉，底部不空（沿用 xlr 真机验证过的 flex spacer 机制）
+const vwrap = (kids) => [{ type: 'spacer', flex: 1.5 }, ...kids, { type: 'spacer', flex: 1 }];
+
 const FIT = {
   systemSmall: {
     pad: 12, gap: 4,
@@ -762,21 +765,21 @@ function buildMain(fam, data, A, secs, opts, yc) {
     } else {
       for (const { it, sec } of mixList(data, secs, 5)) kids.push(festLine(it, sec, o.fest, data.season));
     }
-    return { pad: o.pad, gap: o.gap, children: kids };
+    return { pad: o.pad, gap: o.gap, children: vwrap(kids) };
   }
   if (fam === 'systemMedium') {
     const n = opts.perRow > 0 ? Math.min(opts.perRow, 6) : o.festN;
     const kids = [header2(A, o, opts.title, opts.shichen)];
     const listKids = mixList(data, secs, n).map(({ it, sec }) => festLine(it, sec, o.list, data.season));
     if (opts.showAlm) {
-      kids.push(STACK('row', { alignItems: 'start', gap: 8, flex: 1 }, [
+      kids.push(STACK('row', { alignItems: 'start', gap: 8 }, [
         STACK('column', { gap: almGap, flex: 64 }, almRows(A, o, 'medium')),
         STACK('column', { gap: 3, flex: 36, alignItems: 'start' }, listKids),
       ]));
     } else {
       kids.push(STACK('column', { gap: 3, flex: 1, alignItems: 'start' }, listKids));
     }
-    return { pad: o.pad, gap: o.gap, children: kids };
+    return { pad: o.pad, gap: o.gap, children: vwrap(kids) };
   }
   // large / xlarge
   const kids = [header2(A, o, opts.title, opts.shichen)];
@@ -789,7 +792,7 @@ function buildMain(fam, data, A, secs, opts, yc) {
     const items = data.buckets[sec.key].slice(0, n);
     if (items.length) kids.push(festRow(sec, items, o, data.season));
   }
-  return { pad: o.pad, gap: o.gap, children: kids };
+  return { pad: o.pad, gap: o.gap, children: vwrap(kids) };
 }
 
 // ---- 锁屏 ----
