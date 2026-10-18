@@ -598,9 +598,9 @@ const FIT = {
     pad: 13, gap: 5,
     title: 11, sub: 10.5,
     lDay: 17, lSub: 10.5, meta: 10, meta2: 9.5,
-    bar: 11, barPad: [2, 8, 2, 8], barMax: 15,
+    bar: 11, barPad: [2, 8, 2, 8], barMax: 22,
     list: { icon: 10, name: 11.5, day: 11 },
-    yiJi: [3, 3], festN: 5,
+    yiJi: [4, 4], festN: 5,
   },
   systemLarge: {
     pad: 15, gap: 6,
@@ -669,9 +669,11 @@ function festLine(it, sec, s, season) {
   return STACK('row', { alignItems: 'center', gap: 5 }, [
     IMG(sec.key === 'jq' ? 'leaf.fill' : sec.key === 'cn' ? 'flag.fill' : 'globe', s.icon,
         sec.key === 'jq' ? SEASON[season] : sec.accent),
-    T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
-    SPACER,
-    T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
+    STACK('row', { alignItems: 'center', gap: 8, flex: 1 }, [
+      T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
+      T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
+    ]),
+    { type: 'spacer', length: 10 },
   ]);
 }
 
