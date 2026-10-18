@@ -484,7 +484,7 @@ function yijiBar(tag, words, n, tagCol, tagBg, size, pad, maxChars) {
   return {
     type: 'stack', direction: 'row', alignItems: 'center', gap: 7, borderRadius: 8,
     padding: pad || [2, 8, 2, 8],
-    backgroundColor: tagBg, flex: 1,
+    backgroundColor: tagBg,
     children: [
       { type: 'text', text: tag, font: { size: size + 1, weight: 'bold' }, textColor: tagCol, maxLines: 1 },
       { type: 'text', text: yijiWords(words, n, maxChars), font: { size: size }, textColor: C.primary, maxLines: 1, minScale: 0.55 },
@@ -598,9 +598,9 @@ const FIT = {
     pad: 13, gap: 5,
     title: 11, sub: 10.5,
     lDay: 17, lSub: 10.5, meta: 10, meta2: 9.5,
-    bar: 11, barPad: [2, 8, 2, 8], barMax: 26,
+    bar: 12, barPad: [1, 8, 1, 8], barMax: 9,
     list: { icon: 10, name: 11.5, day: 11 },
-    yiJi: [5, 5], festN: 5,
+    yiJi: [9, 9], festN: 5,
   },
   systemLarge: {
     pad: 15, gap: 6,
@@ -761,7 +761,10 @@ function buildMain(fam, data, A, secs, opts, yc) {
   }
   // large / xlarge
   const kids = [header2(A, o, opts.title, opts.shichen)];
-  if (opts.showAlm) kids.push(STACK('column', { gap: almGap, alignItems: 'start' }, almRows(A, o, 'large')));
+  if (opts.showAlm) kids.push(STACK('column', { gap: almGap }, almRows(A, o, 'large').concat([
+    T(`冲${A.chongSX}(${A.chongGZ}) 煞${A.sha} · 五行${A.wuXing || '--'} · 彭祖${A.pengZu && A.pengZu[0] ? A.pengZu.join('、') : '--'}`,
+      { font: { size: 11 }, textColor: C.secondary, maxLines: 1, minScale: 0.6 }),
+  ])));
   const n = opts.perRow > 0 ? Math.min(opts.perRow, 3) : o.festN;
   for (const sec of secs) {
     const items = data.buckets[sec.key].slice(0, n);
