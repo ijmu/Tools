@@ -600,7 +600,7 @@ const FIT = {
     lDay: 17, lSub: 10.5, meta: 10, meta2: 9.5,
     bar: 12, barPad: [1, 8, 1, 8], barMax: 14,
     list: { icon: 10, name: 11.5, day: 11 },
-    yiJi: [9, 9], festN: 5,
+    yiJi: [9, 9], festN: 6,
   },
   systemLarge: {
     pad: 15, gap: 6,
