@@ -598,7 +598,7 @@ const FIT = {
     pad: 13, gap: 5,
     title: 11, sub: 10.5,
     lDay: 17, lSub: 10.5, meta: 10, meta2: 9.5,
-    bar: 12, barPad: [1, 8, 1, 8], barMax: 9,
+    bar: 12, barPad: [1, 8, 1, 8], barMax: 14,
     list: { icon: 10, name: 11.5, day: 11 },
     yiJi: [9, 9], festN: 5,
   },
@@ -671,16 +671,16 @@ const TONE_ICON = {
   mute: 'calendar', season: 'leaf.fill',
 };
 function festLine(it, sec, s, season) {
-  const ic = 12;
   const toneCol = it.tone === 'season' ? SEASON[season] : (TONE[it.tone] ? (TONE[it.tone].dark) : TONE.red.dark);
-  return STACK('row', { alignItems: 'center', gap: 0 }, [
-    STACK('row', { alignItems: 'center', gap: 5, flex: 1 }, [
-      { type: 'spacer', length: ic },   // 图标列：固定宽（各行同竖线对齐）
-      IMG(TONE_ICON[it.tone] || 'sparkles', s.icon, toneCol),
+  // 三列定宽（图标 12 / 名称 54 / 天数 40，行宽恒 116）→ 每列左缘各自成一条竖线，不随名称长度漂移
+  return STACK('row', { alignItems: 'center', gap: 5 }, [
+    IMG(TONE_ICON[it.tone] || 'sparkles', s.icon, toneCol),
+    STACK('column', { width: 54, alignItems: 'start' }, [
       T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
     ]),
-    T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
-    { type: 'spacer', length: 10 },
+    STACK('column', { width: 40, alignItems: 'start' }, [
+      T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
+    ]),
   ]);
 }
 
@@ -751,8 +751,8 @@ function buildMain(fam, data, A, secs, opts, yc) {
     const listKids = mixList(data, secs, n).map(({ it, sec }) => festLine(it, sec, o.list, data.season));
     if (opts.showAlm) {
       kids.push(STACK('row', { alignItems: 'start', gap: 8, flex: 1 }, [
-        STACK('column', { gap: almGap, flex: 5 }, almRows(A, o, 'medium')),
-        STACK('column', { gap: 3, flex: 5 }, listKids),
+        STACK('column', { gap: almGap, flex: 64 }, almRows(A, o, 'medium')),
+        STACK('column', { gap: 3, flex: 36 }, listKids),
       ]));
     } else {
       kids.push(STACK('column', { gap: 3, flex: 1 }, listKids));
