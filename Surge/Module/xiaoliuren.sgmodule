@@ -1,0 +1,9 @@
+#!name=小六壬·马前课
+#!desc=按农历月、日、时推演小六壬三宫，并以 Surge 信息面板显示落宫、断语、五行方位与下次换宫时间。
+# iOS/macOS 通用默认配置；自定义参数请复制 [Script] 行到本地 profile 修改 argument。
+
+[Script]
+xiaoliuren-panel = type=generic,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/xiaoliuren-panel.js,script-update-interval=86400,timeout=10,argument="zi=1,ju=1,ic=1"
+
+[Panel]
+XiaoLiuRen = title="小六壬",content="打开策略选择界面后起课",style=info,script-name=xiaoliuren-panel,update-interval=60

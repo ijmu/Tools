@@ -1,0 +1,10 @@
+#!name=星云电力补贴
+#!desc=读取星云模型补贴、价格和可用额度，并在 Surge 信息面板中展示排序结果。
+# iOS/macOS 通用默认配置；不要把个人 Cookie 写入公开模块。
+# 如需自定义 sort/top/cookie，请复制 [Script] 行到本地 profile 修改 argument。
+
+[Script]
+nebula-power-panel = type=generic,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/nebula-power-panel.js,script-update-interval=86400,timeout=12,argument="sort=usage,top=6"
+
+[Panel]
+NebulaPower = title="星云电力补贴",content="打开策略选择界面后刷新",style=info,script-name=nebula-power-panel,update-interval=600
