@@ -2,6 +2,7 @@
 # URL:https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/Direct_Own.yaml
 
 domain_suffix_set:
+  - m.qiyoujiagw.com
   - rilipro.com
   - egernlicense.com
   - cdn.jsdelivr.net
