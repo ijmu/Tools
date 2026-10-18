@@ -54,7 +54,7 @@ env_schema:
 scriptings:
   - generic:
       name: 黄历与节日
-      script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/almanac-holiday.js?v=20261018b
+      script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/almanac-holiday.js?v=20261018c
       timeout: 60
 widgets:
   - name: 黄历与节日

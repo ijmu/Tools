@@ -666,14 +666,13 @@ function almRows(A, o, mode) {
 
 // 节日行（小/中：轻量行式）
 function festLine(it, sec, s, season) {
-  return STACK('row', { alignItems: 'center', gap: 5 }, [
+  return STACK('row', { alignItems: 'center', gap: 6, flex: 1 }, [
+    SPACER,
     IMG(sec.key === 'jq' ? 'leaf.fill' : sec.key === 'cn' ? 'flag.fill' : 'globe', s.icon,
         sec.key === 'jq' ? SEASON[season] : sec.accent),
-    STACK('row', { alignItems: 'center', gap: 8, flex: 1 }, [
-      T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
-      T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
-    ]),
-    { type: 'spacer', length: 10 },
+    T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
+    T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
+    { type: 'spacer', length: 12 },
   ]);
 }
 
