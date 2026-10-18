@@ -662,19 +662,38 @@ function almRows(A, o, mode) {
   ];
 }
 
-// 节日行（小/中：轻量行式）—— 图标按节日 tone（喜庆度）取色，沿用原版节日倒计时规则
-const TONE_ICON = {
-  red: 'sparkles', gold: 'sparkles', pink: 'heart.fill', violet: 'moon.stars.fill',
-  cyan: 'snowflake', green: 'leaf.fill', orange: 'flame.fill', blue: 'snowflake',
-  mute: 'calendar', season: 'leaf.fill',
+// 节日图标三层体系：专属官方图标（按名称匹配）→ 春夏秋冬（节气/无专属按季节）→ 色随喜庆度 tone（不变）
+const FEST_ICON = {
+  '春节': 'gift.fill', '除夕': 'gift.fill', '圣诞': 'gift.fill', '平安夜': 'gift.fill',
+  '情人节': 'heart.fill', '七夕': 'heart.fill', '母亲节': 'heart.fill', '父亲节': 'heart.fill', '妇女节': 'heart.fill',
+  '元旦': 'sparkles', '跨年': 'sparkles', '小年': 'sparkles',
+  '元宵': 'moon.stars.fill', '中秋': 'moon.stars.fill',
+  '清明': 'cloud.rain.fill', '端午': 'water.waves', '腊八': 'cup.and.saucer.fill',
+  '劳动': 'hammer.fill', '五一': 'hammer.fill', '青年': 'flame.fill', '儿童': 'balloon.fill',
+  '教师': 'graduationcap.fill', '国庆': 'flag.fill', '建党': 'flag.fill', '建军': 'flag.fill',
+  '植树': 'leaf.fill', '环境': 'leaf.fill', '地球': 'globe',
+  '水日': 'drop.fill', '水周': 'drop.fill', '节水': 'drop.fill',
+  '红十字': 'cross.fill', '护士': 'cross.case.fill', '读书': 'book.fill',
+  '愚人': 'face.smiling', '万圣': 'theatermasks.fill', '感恩': 'fork.knife', '复活': 'hare.fill',
 };
+const SEASON_ICON = { spring: 'leaf.fill', summer: 'sun.max.fill', autumn: 'leaf.fill', winter: 'snowflake' };
+// 节日自身所在季节：节气/季节型 tone 直接用 tone；普通节日按日期月份分季
+function festSeasonOf(it) {
+  if (SEASON_ICON[it.tone]) return it.tone;
+  const m = new Date(it.serial).getUTCMonth() + 1;
+  return (m >= 3 && m <= 5) ? 'spring' : (m >= 6 && m <= 8) ? 'summer' : (m >= 9 && m <= 11) ? 'autumn' : 'winter';
+}
+function festIcon(it) {
+  for (const k in FEST_ICON) { if (it.name.indexOf(k) >= 0) return FEST_ICON[k]; }
+  return SEASON_ICON[festSeasonOf(it)] || 'sparkles';
+}
 function festLine(it, sec, s, season) {
-  const toneCol = it.tone === 'season' ? SEASON[season] : (TONE[it.tone] ? (TONE[it.tone].dark) : TONE.red.dark);
-  // 三列定宽（图标 12 / 名称 54 / 天数 40，行宽恒 116）→ 每列左缘各自成一条竖线，不随名称长度漂移
+  const toneCol = SEASON[it.tone] ? SEASON[it.tone].dark
+    : (TONE[it.tone] ? TONE[it.tone].dark : SEASON[festSeasonOf(it)].dark);
   // 名称补白到 4 字宽（全角空格）→ 文本等宽；同时用定宽容器 —— 双保险，列线不随名称长度漂移
   const nm = it.name + '\u3000\u3000\u3000\u3000'.slice(0, Math.max(0, 4 - it.name.length));
   return STACK('row', { alignItems: 'center', gap: 5 }, [
-    IMG(TONE_ICON[it.tone] || 'sparkles', s.icon, toneCol),
+    IMG(festIcon(it), s.icon, toneCol),
     STACK('column', { width: 54, alignItems: 'start' }, [
       T(nm, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
     ]),
