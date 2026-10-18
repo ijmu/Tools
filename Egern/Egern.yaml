@@ -141,36 +141,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
     hidden: false
 - select:
-    name: GitHub
-    policies:
-    - Manual
-    - DIRECT
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/github(1).png
-    hidden: false
-- select:
-    name: Microsoft
-    policies:
-    - DIRECT
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/microsoft.png
-    hidden: false
-- select:
-    name: Media
-    policies:
-    - Manual
-    - HK
-    - US
-    - TW
-    - JP
-    - SG
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
-    hidden: false
-- select:
     name: Spotify
     policies:
     - DIRECT
@@ -183,15 +153,6 @@ policy_groups:
     - Subscription
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
-    hidden: false
-- select:
-    name: Telegram
-    policies:
-    - Manual
-    - HK
-    - SG
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/telegram(1).png
     hidden: false
 - select:
     name: TikTok
@@ -410,32 +371,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
-    policy: GitHub
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Microsoft.yaml
-    policy: Microsoft
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
     policy: Spotify
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
-    policy: Telegram
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -453,13 +394,13 @@ modules:
 - url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
   compat_arguments:
     weatherCity: 莆田
-  update_interval: 86400
+  update_interval: 3600
   enabled: true
 - url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/almanac-holiday.yaml
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
-  update_interval: 86400
+  update_interval: 3600
   enabled: true
 - name: 网络诊断
   url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/network-radar-hark.yaml
