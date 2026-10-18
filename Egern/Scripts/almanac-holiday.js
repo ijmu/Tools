@@ -666,13 +666,16 @@ function almRows(A, o, mode) {
 
 // 节日行（小/中：轻量行式）
 function festLine(it, sec, s, season) {
-  return STACK('row', { alignItems: 'center', gap: 6, flex: 1 }, [
-    SPACER,
-    IMG(sec.key === 'jq' ? 'leaf.fill' : sec.key === 'cn' ? 'flag.fill' : 'globe', s.icon,
-        sec.key === 'jq' ? SEASON[season] : sec.accent),
-    T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
+  const ic = s.icon || 10;
+  return STACK('row', { alignItems: 'center', gap: 0 }, [
+    STACK('row', { alignItems: 'center', gap: 5, flex: 1 }, [
+      { type: 'spacer', length: ic },   // 图标列：固定宽（各行同竖线对齐）
+      IMG(sec.key === 'jq' ? 'leaf.fill' : sec.key === 'cn' ? 'flag.fill' : 'globe', ic,
+          sec.key === 'jq' ? SEASON[season] : sec.accent),
+      T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
+    ]),
     T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
-    { type: 'spacer', length: 12 },
+    { type: 'spacer', length: 10 },
   ]);
 }
 
@@ -742,8 +745,8 @@ function buildMain(fam, data, A, secs, opts, yc) {
     const kids = [header2(A, o, opts.title, opts.shichen)];
     const listKids = mixList(data, secs, n).map(({ it, sec }) => festLine(it, sec, o.list, data.season));
     if (opts.showAlm) {
-      kids.push(STACK('row', { alignItems: 'start', gap: 10, flex: 1 }, [
-        STACK('column', { gap: almGap, flex: 4 }, almRows(A, o, 'medium')),
+      kids.push(STACK('row', { alignItems: 'start', gap: 8, flex: 1 }, [
+        STACK('column', { gap: almGap, flex: 5 }, almRows(A, o, 'medium')),
         STACK('column', { gap: 3, flex: 5 }, listKids),
       ]));
     } else {
