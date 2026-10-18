@@ -1,0 +1,61 @@
+name: 黄历与节日
+description: 每日黄历（农历 · 干支 · 建除值神 · 冲煞 · 宜忌）与节日倒计时（国内 / 节气 / 国际）。纯本地计算，无网络依赖；时间基准 UTC+8，日界自动刷新。
+env_schema:
+  SHOW_ALMANAC:
+    name: SHOW_ALMANAC
+    description: 是否显示黄历信息（关闭后仅显示节日）
+    default_value: "1"
+    options: ["1", "0"]
+  YI_COUNT:
+    name: YI_COUNT
+    description: 宜忌各显示条数（0 为按尺寸自动；小 4 / 中 6 / 大 9）
+    default_value: ""
+    options: ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  QINGMING:
+    name: QINGMING
+    description: 清明节归属（cn=国内栏 / jq=节气栏）
+    default_value: "cn"
+    options: ["cn", "jq"]
+  SHOW_CN:
+    name: SHOW_CN
+    description: 是否显示国内节日栏
+    default_value: "1"
+    options: ["1", "0"]
+  SHOW_JIEQI:
+    name: SHOW_JIEQI
+    description: 是否显示节气栏
+    default_value: "1"
+    options: ["1", "0"]
+  SHOW_INTL:
+    name: SHOW_INTL
+    description: 是否显示国际节日栏
+    default_value: "1"
+    options: ["1", "0"]
+  PER_ROW:
+    name: PER_ROW
+    description: 每栏显示节日条数（0 为按尺寸自动；小/中 3 / 大 3）
+    default_value: ""
+    options: ["", "1", "2", "3", "4", "5", "6"]
+  TITLE:
+    name: TITLE
+    description: 组件标题（默认「黄历与节日」）
+    default_value: ""
+    options: []
+  URL:
+    name: URL
+    description: 点击组件跳转的地址（默认打开日历）
+    default_value: ""
+    options: []
+  PLAINBG:
+    name: PLAINBG
+    description: 纯色背景（1=关闭渐变）
+    default_value: "0"
+    options: ["1", "0"]
+scriptings:
+  - generic:
+      name: 黄历与节日
+      script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/almanac-holiday.js?v=20261018
+      timeout: 60
+widgets:
+  - name: 黄历与节日
+    script_name: 黄历与节日
