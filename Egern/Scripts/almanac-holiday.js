@@ -619,12 +619,10 @@ const SPACER = { type: 'spacer' };
 const WEEK_TEXT = '日一二三四五六';
 
 // 农历大字行（右侧挂一条小字）
-function almTitleRow(A, o, right) {
-  return STACK('row', { alignItems: 'center', gap: 6 }, [
-    T(A.lunarText, { font: { size: o.lDay, weight: 'heavy' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
-    SPACER,
-    right,
-  ]);
+function almTitleRow(A, o, right, tight) {
+  const kids = [T(A.lunarText, { font: { size: o.lDay, weight: 'heavy' }, textColor: C.primary, maxLines: 1, minScale: 0.6 })];
+  if (tight) kids.push(right); else kids.push(SPACER, right);
+  return STACK('row', { alignItems: 'center', gap: tight ? 9 : 6 }, kids);
 }
 
 // 黄历细目行（农历以外的干支/建除/值神/宿/节气）
@@ -648,7 +646,7 @@ function almRows(A, o, mode) {
   }
   if (mode === 'medium') {
     return [
-      almTitleRow(A, o, T(`${A.dayGZ}日`, { font: { size: o.lSub, weight: 'semibold' }, textColor: ALC, maxLines: 1, minScale: 0.7 })),
+      almTitleRow(A, o, T(`${A.dayGZ}日`, { font: { size: o.lSub, weight: 'semibold' }, textColor: ALC, maxLines: 1, minScale: 0.7 }), true),
       T(`${A.lunarYearGZ}${A.sx}年 · ${A.zhiXing}日 · ${A.tianShen}`, { font: { size: o.meta }, textColor: ALC, maxLines: 1, minScale: 0.65 }),
       T(`冲${A.chongSX}煞${A.sha}`, { font: { size: o.meta2 }, textColor: C.secondary, maxLines: 1, minScale: 0.7 }),
       yijiBar('宜', A.yi, o.yiJi[0], YI_C, YI_BG, o.bar, o.barPad, o.barMax),
@@ -656,7 +654,7 @@ function almRows(A, o, mode) {
     ];
   }
   return [ // large
-    almTitleRow(A, o, T(`${A.lunarYearGZ}年 · 肖${A.sx}`, { font: { size: o.lSub, weight: 'semibold' }, textColor: ALC, maxLines: 1, minScale: 0.7 })),
+    almTitleRow(A, o, T(`${A.lunarYearGZ}年 · 肖${A.sx}`, { font: { size: o.lSub, weight: 'semibold' }, textColor: ALC, maxLines: 1, minScale: 0.7 }), true),
     almMeta2(A, o.meta, true),
     T(`冲${A.chongSX}（${A.chongGZ}）煞${A.sha} · ${A.nayin}`, { font: { size: o.meta2 }, textColor: C.secondary, maxLines: 1, minScale: 0.7 }),
     yijiBar('宜', A.yi, o.yiJi[0], YI_C, YI_BG, o.bar, o.barPad, o.barMax),
@@ -673,10 +671,12 @@ const TONE_ICON = {
 function festLine(it, sec, s, season) {
   const toneCol = it.tone === 'season' ? SEASON[season] : (TONE[it.tone] ? (TONE[it.tone].dark) : TONE.red.dark);
   // 三列定宽（图标 12 / 名称 54 / 天数 40，行宽恒 116）→ 每列左缘各自成一条竖线，不随名称长度漂移
+  // 名称补白到 4 字宽（全角空格）→ 文本等宽；同时用定宽容器 —— 双保险，列线不随名称长度漂移
+  const nm = it.name + '\u3000\u3000\u3000\u3000'.slice(0, Math.max(0, 4 - it.name.length));
   return STACK('row', { alignItems: 'center', gap: 5 }, [
     IMG(TONE_ICON[it.tone] || 'sparkles', s.icon, toneCol),
     STACK('column', { width: 54, alignItems: 'start' }, [
-      T(it.name, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
+      T(nm, { font: { size: s.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 }),
     ]),
     STACK('column', { width: 40, alignItems: 'start' }, [
       T(daysText(it.days), { font: { size: s.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone), maxLines: 1, minScale: 0.7 }),
@@ -752,10 +752,10 @@ function buildMain(fam, data, A, secs, opts, yc) {
     if (opts.showAlm) {
       kids.push(STACK('row', { alignItems: 'start', gap: 8, flex: 1 }, [
         STACK('column', { gap: almGap, flex: 64 }, almRows(A, o, 'medium')),
-        STACK('column', { gap: 3, flex: 36 }, listKids),
+        STACK('column', { gap: 3, flex: 36, alignItems: 'start' }, listKids),
       ]));
     } else {
-      kids.push(STACK('column', { gap: 3, flex: 1 }, listKids));
+      kids.push(STACK('column', { gap: 3, flex: 1, alignItems: 'start' }, listKids));
     }
     return { pad: o.pad, gap: o.gap, children: kids };
   }
