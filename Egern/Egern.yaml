@@ -391,15 +391,18 @@ rules:
 mitm:
   
 modules:
-- url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
+- name: 每日天气
+  url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
   compat_arguments:
     weatherCity: 莆田
   update_interval: 3600
   enabled: true
-- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/almanac-holiday.yaml
+- name: 黄历与节日
+  url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/almanac-holiday.yaml
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
+- name: 小六壬
+  url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
   update_interval: 3600
   enabled: true
 - name: 网络诊断
@@ -426,12 +429,15 @@ modules:
   url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Spotify-hark.yaml
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
+- name: YouTube去广告
+  url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
+- name: 去广告规则集
+  url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
+- name: 启动页去广告
+  url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
   update_interval: 86400
   enabled: true
