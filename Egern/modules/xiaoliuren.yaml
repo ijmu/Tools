@@ -1,0 +1,32 @@
+name: 小六壬
+description: 农历月/日/时辰起课的马前课占测 —— 六宫圆盘 + 落宫断语 + 三宫来路，支持主屏四尺寸与锁屏三态
+env_schema:
+  ZI_ROLLOVER:
+    name: 子时换日
+    description: 23:00 起按次日日辰起课（1=开 / 0=关）
+    default_value: '0'
+    options:
+      - '1'
+      - '0'
+  SHOW_MEANING:
+    name: 断语全诗
+    description: 大尺寸是否显示四句断语全诗（1=显示 / 0=隐藏）
+    default_value: '1'
+    options:
+      - '1'
+      - '0'
+  PLAINBG:
+    name: 纯色底
+    description: 渐变背景异常（白屏）时的保险开关（1=纯色 / 0=渐变）
+    default_value: '0'
+    options:
+      - '1'
+      - '0'
+scriptings:
+- generic:
+    name: 小六壬
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/xiaoliuren.js?v=20261018
+    timeout: 30
+widgets:
+- name: 小六壬
+  script_name: 小六壬

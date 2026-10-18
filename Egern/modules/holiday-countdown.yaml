@@ -1,0 +1,65 @@
+name: 节日倒计时
+description: 国内节日 / 24 节气 / 国际节日 三栏倒数日 —— 农历与节气精确计算，支持主屏四尺寸与锁屏三态
+env_schema:
+  SHOW_CN:
+    name: 国内节日
+    description: 显示国内节日栏（1=显示 / 0=隐藏）
+    default_value: '1'
+    options:
+      - '1'
+      - '0'
+  SHOW_JIEQI:
+    name: 二十四节气
+    description: 显示节气栏（1=显示 / 0=隐藏）
+    default_value: '1'
+    options:
+      - '1'
+      - '0'
+  SHOW_INTL:
+    name: 国际节日
+    description: 显示国际节日栏（1=显示 / 0=隐藏）
+    default_value: '1'
+    options:
+      - '1'
+      - '0'
+  PER_ROW:
+    name: 每栏条数
+    description: 每栏取最近几条，1-6；留空按尺寸默认（小 1 / 中 3 / 大 3 / 加大 4）
+    default_value: ''
+  LUNAR:
+    name: 头部农历
+    description: 头部显示农历（1=显示 / 0=隐藏）
+    default_value: '1'
+    options:
+      - '1'
+      - '0'
+  QINGMING:
+    name: 清明归属
+    description: cn=列入国内节日（默认）；jq=按纯节气列入节气栏
+    default_value: 'cn'
+    options:
+      - 'cn'
+      - 'jq'
+  TITLE:
+    name: 标题
+    description: 自定义标题，留空显示「节日倒计时」（小尺寸为「倒计时」）
+    default_value: ''
+  URL:
+    name: 点击跳转
+    description: 点按组件打开的 URL，留空使用系统日历 calshow://
+    default_value: ''
+  PLAINBG:
+    name: 纯色底
+    description: 渐变背景异常（白屏）时的保险开关（1=纯色 / 0=渐变）
+    default_value: '0'
+    options:
+      - '1'
+      - '0'
+scriptings:
+- generic:
+    name: 节日倒计时
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js?v=20261018
+    timeout: 30
+widgets:
+- name: 节日倒计时
+  script_name: 节日倒计时
