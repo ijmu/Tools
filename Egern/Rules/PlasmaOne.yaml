@@ -1,0 +1,12 @@
+# Plasma One
+# URL:https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/PlasmaOne.yaml
+
+domain_suffix_set:
+  # 官网 / 文档 / 控制台（覆盖全部子域）
+  - plasma.org
+  # App 入口 / Web App / API / RPC / 测试网（覆盖全部子域）
+  - plasma.to
+  # 区块浏览器（含测试网）
+  - plasmascan.to
+  # App 下载深链
+  - plasmaone.onelink.me
