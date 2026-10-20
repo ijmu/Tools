@@ -7,10 +7,10 @@ block_quic: true
 close_connections_on_policy_change: true
 hijack_dns:
 - '*:53'
-geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: http://1.1.1.1/generate_204
-direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
+geoip_db_url: https://github.com/xream/geoip/releases/latest/download/ipinfo.country.mmdb
+asn_db_url: https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb
+proxy_latency_test_url: https://connectivitycheck.gstatic.com/generate_204
+direct_latency_test_url: https://www.qq.com
 udp_latency_test_url: google.com@8.8.8.8
 compat_route: true
 include_all_networks: false
@@ -35,44 +35,10 @@ dns:
   - https://doh.pub/dns-query
   - https://dns.google/dns-query
   - https://dns.alidns.com/dns-query
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
 real_ip_domains:
 - '*.lan'
 - '*.local'
 - '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
 policy_groups:
 - external:
     name: Subscription
@@ -139,6 +105,17 @@ policy_groups:
     - Subscription
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+    hidden: false
+- select:
+    name: PayPal
+    policies:
+    - DIRECT
+    - HK
+    - US
+    - UK
+    - DE
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
     hidden: false
 - select:
     name: Spotify
@@ -311,6 +288,11 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
+    policy: PayPal
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Neverless.list
     policy: US
     update_interval: 86400
@@ -425,8 +407,11 @@ modules:
     彩票类型: 大乐透
     分析期数: '100'
   enabled: true
-- name: Spotify 去广告
-  url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Spotify-hark.yaml
+- name: Spotify去广告
+  url: https://raw.githubusercontent.com/Reukix/ukix/refs/heads/main/Script/Spotify.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/7452323/QuantumultX/main/surge/Soul.sgmodule
   update_interval: 86400
   enabled: true
 - name: YouTube去广告
