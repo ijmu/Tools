@@ -47,7 +47,7 @@ policy_groups:
     - 订阅地址1
     - 订阅地址2
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
-    update_interval: 3600
+    update_interval: 21600
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
 - smart:
@@ -97,16 +97,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
     hidden: false
 - select:
-    name: Google
-    policies:
-    - Manual
-    - HK
-    - US
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
-    hidden: false
-- select:
     name: PayPal
     policies:
     - DIRECT
@@ -116,20 +106,6 @@ policy_groups:
     - DE
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
-    hidden: false
-- select:
-    name: Spotify
-    policies:
-    - DIRECT
-    - Manual
-    - HK
-    - US
-    - TW
-    - PH
-    - NG
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
     hidden: false
 - select:
     name: TikTok
@@ -233,17 +209,17 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: http://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: http://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -313,11 +289,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Kraken.list
-    policy: UK
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/N26.list
     policy: DE
     update_interval: 86400
@@ -348,16 +319,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-    policy: Google
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Spotify.yaml
-    policy: Spotify
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: DIRECT
     update_interval: 86400
@@ -373,6 +334,30 @@ rules:
 mitm:
   
 modules:
+- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-weather.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-maps.sgmodule
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
+  update_interval: 86400
+  enabled: false
 - name: 每日天气
   url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
   compat_arguments:
@@ -407,22 +392,13 @@ modules:
     彩票类型: 大乐透
     分析期数: '100'
   enabled: true
-- name: Spotify去广告
-  url: https://raw.githubusercontent.com/Reukix/ukix/refs/heads/main/Script/Spotify.sgmodule
+- url: https://raw.githubusercontent.com/ZLam/VPN/refs/heads/main/egern/widget/douban_ranking/douban-ranking.yaml
   update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/7452323/QuantumultX/main/surge/Soul.sgmodule
-  update_interval: 86400
-  enabled: true
+  enabled: false
 - name: YouTube去广告
   url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
-  enabled: true
-- name: 去广告规则集
-  url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
+  enabled: false
+- url: https://raw.githubusercontent.com/7452323/QuantumultX/main/surge/Soul.sgmodule
   update_interval: 86400
-  enabled: true
-- name: 启动页去广告
-  url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
-  update_interval: 86400
-  enabled: true
+  enabled: false
