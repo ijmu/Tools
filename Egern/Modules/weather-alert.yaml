@@ -1,0 +1,67 @@
+name: 天气·晴雨（预警增强）
+description: 蓝灰 UI · 官方气象预警横幅 + 台风卡片（中央气象台）+ 农历节气 / 逐时 / 五日 / 湿度 · 数据源中国天气网与中央气象台气象网，全部免 Key
+author: 预警增强改造（原模块：小龙女她爸 · SIJULY/egern-radar）
+icon: cloud.bolt.rain.fill
+compat_arguments:
+  weatherCity: ''
+compat_arguments_schema:
+  weatherCity:
+    name: 城市
+    description: 要查询的城市，例如 合肥、北京、莆田；留空或填“自动”则按 IP 自动定位（模块自带直连规则）
+    default_value: ''
+env_schema:
+  weatherCity:
+    name: 城市
+    description: 城市名 / 9 位中国天气网城市编码 / “纬度,经度” / 留空=按 IP 自动定位
+    default_value: ''
+  ALERT_LEVEL:
+    name: 预警级别
+    description: 只显示该级别及以上；「关闭」= 完整回退原版布局，且不请求预警与台风接口（最省电）
+    default_value: 全部
+    options:
+      - 全部
+      - 黄色
+      - 橙色
+      - 红色
+      - 关闭
+  ALERT_RADIUS:
+    name: 附近预警半径
+    description: 单位 km，只收录半径内「橙色及以上」的邻市预警；0 = 只显示本市与同市各区县
+    default_value: '100'
+  TYPHOON:
+    name: 台风卡片
+    description: 有活跃台风时显示中央气象台官方路径与预报摘要
+    default_value: 'true'
+    options:
+      - 'true'
+      - 'false'
+dns: {}
+rules:
+  - domain_suffix:
+      match: "weather.com.cn"
+      policy: DIRECT
+  - domain_suffix:
+      match: "nmc.cn"
+      policy: DIRECT
+  - domain_suffix:
+      match: "bilibili.com"
+      policy: DIRECT
+  - domain_suffix:
+      match: "useragentinfo.com"
+      policy: DIRECT
+  - domain_suffix:
+      match: "ipapi.co"
+      policy: DIRECT
+  - domain_suffix:
+      match: "freeipapi.com"
+      policy: DIRECT
+scriptings:
+- generic:
+    name: weathercn
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/weather-alert.js?v=20261024
+    timeout: 20
+    env:
+      CITY: '{{{weatherCity}}}'
+widgets:
+- name: 天气·晴雨
+  script_name: weathercn
