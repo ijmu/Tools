@@ -47,14 +47,17 @@ policy_groups:
     - 订阅地址1
     - 订阅地址2
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
-    update_interval: 21600
+    update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
-- smart:
+- auto_test:
     name: Automatic
     policies:
     - Subscription
     flatten: true
+    interval: 300
+    tolerance: 50
+    timeout: 5
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
     hidden: false
 - select:
@@ -209,12 +212,22 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -289,11 +302,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/N26.list
-    policy: DE
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Maya.list
     policy: PH
     update_interval: 86400
@@ -319,7 +327,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -334,7 +342,7 @@ rules:
 mitm:
   
 modules:
-- url: https://github.com/chavyleung/scripts/raw/master/box/rewrite/boxjs.rewrite.surge.sgmodule
+- url: https://loon.103516.xyz/Plugin/GitHub.lpx
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
