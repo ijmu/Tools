@@ -1,9 +1,0 @@
-#!name=天气·黄历宜忌
-#!desc=读取中国天气网天气与七日预报，并在 Surge 信息面板显示农历、干支、建除、值神、二十八宿和每日宜忌。
-# iOS/macOS 通用默认配置；自定义参数请复制 [Script] 行到本地 profile 修改 argument。
-
-[Script]
-weather-yiji-panel = type=generic,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/weather-yiji-panel.js,script-update-interval=86400,timeout=15,argument="CITY=海口,SHOW_YIJI=1,YI_COUNT=6,JI_COUNT=5"
-
-[Panel]
-WeatherYiji = title="天气·黄历宜忌",content="打开策略选择界面后刷新",style=info,script-name=weather-yiji-panel,update-interval=1800

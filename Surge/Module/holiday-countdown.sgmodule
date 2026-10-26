@@ -1,9 +1,0 @@
-#!name=节日倒计时
-#!desc=把 Egern 节日倒计时组件的农历、节气和节日计算迁移到 Surge 信息面板；Surge 版本为纯文本面板，不是主屏或锁屏 Widget。
-# iOS/macOS 通用默认配置；自定义参数请复制 [Script] 行到本地 profile 修改 argument。
-
-[Script]
-holiday-countdown-panel = type=generic,script-path=https://raw.githubusercontent.com/ijmu/Tools/main/Surge/Scripts/holiday-countdown-panel.js,script-update-interval=86400,timeout=10,argument="SHOW_CN=1,SHOW_JIEQI=1,SHOW_INTL=1,PER_ROW=3,LUNAR=1,TITLE=节日倒计时,QINGMING=cn"
-
-[Panel]
-HolidayCountdown = title="节日倒计时",content="打开策略选择界面后刷新",style=info,script-name=holiday-countdown-panel,update-interval=600
