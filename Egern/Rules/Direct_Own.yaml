@@ -2,14 +2,15 @@
 # URL:https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/Direct_Own.yaml
 
 domain_suffix_set:
-  - www.surge-activation.com
+  - egernlicense.com
+  - surge-activation.com
   - m.qiyoujiage.com
   - rilipro.com
-  - egernlicense.com
-  - liangxin.xyz
-  - m1.tohno-0.top
   - ipix.ink
   - ai.ipix.ink
   - duolingo.com
   - skk.moe
+  - cdn.jsdelivr.net
+  - liangxin.xyz
+  - m1.tohno-0.top
   - oics.net
