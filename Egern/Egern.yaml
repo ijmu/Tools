@@ -7,11 +7,10 @@ block_quic: true
 close_connections_on_policy_change: true
 hijack_dns:
 - '*:53'
-geoip_db_url: https://github.com/xream/geoip/releases/latest/download/ipinfo.country.mmdb
-asn_db_url: https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb
-proxy_latency_test_url: https://connectivitycheck.gstatic.com/generate_204
-direct_latency_test_url: https://www.qq.com
-udp_latency_test_url: google.com@8.8.8.8
+geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
+asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+proxy_latency_test_url: http://1.1.1.1/generate_204
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: true
 include_all_networks: false
 include_apns: false
@@ -50,14 +49,11 @@ policy_groups:
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
-- auto_test:
+- smart:
     name: Automatic
     policies:
     - Subscription
     flatten: true
-    interval: 300
-    tolerance: 50
-    timeout: 5
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
     hidden: false
 - select:
@@ -82,12 +78,13 @@ policy_groups:
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
     hidden: false
-- smart:
+- select:
     name: AIGC
     policies:
-    - Subscription
-    flatten: true
-    filter: (?=.*(🇺🇸|美国|United States|USA|\bUS\b|洛杉矶|硅谷|西雅图|芝加哥|纽约|旧金山|(?i)States))(?!.*(流媒体|专线|IEPL|IPLC|家宽|游戏|解锁))
+    - US
+    - JP
+    - SG
+    flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
     hidden: false
 - select:
@@ -98,6 +95,41 @@ policy_groups:
     - SG
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
+    hidden: false
+- select:
+    name: GitHub
+    policies:
+    - Manual
+    - HK
+    - US
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/github(1).png
+    hidden: false
+- select:
+    name: Google
+    policies:
+    - Manual
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Subscription
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
+    hidden: false
+- select:
+    name: Media
+    policies:
+    - Manual
+    - HK
+    - US
+    - TW
+    - JP
+    - SG
+    - Subscription
+    flatten: false
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
     hidden: false
 - select:
     name: PayPal
@@ -212,22 +244,12 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -262,18 +284,33 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Binancenew.list
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/crypto.yaml
     policy: Crypto
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Bybit.list
-    policy: Crypto
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+    policy: GitHub
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Pionex.list
-    policy: Crypto
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
+    policy: Google
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -283,11 +320,6 @@ rules:
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Neverless.list
-    policy: US
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/IBKR.list
     policy: US
     update_interval: 86400
     disabled: false
@@ -307,27 +339,7 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/HongKong.list
-    policy: HK
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/UK.list
-    policy: UK
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Turkey.list
-    policy: TR
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Nigeria.list
-    policy: NG
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
+    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -341,17 +353,18 @@ rules:
     policy: Manual
 mitm:
   
+  hostnames:
+    excludes:
+    - raw.githubusercontent.com
+    - github.com
 modules:
-- url: https://loon.103516.xyz/Plugin/GitHub.lpx
+- url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
   update_interval: 86400
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
   update_interval: 86400
   enabled: true
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
@@ -401,12 +414,5 @@ modules:
     分析期数: '100'
   enabled: true
 - url: https://raw.githubusercontent.com/ZLam/VPN/refs/heads/main/egern/widget/douban_ranking/douban-ranking.yaml
-  update_interval: 86400
-  enabled: false
-- name: YouTube去广告
-  url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/7452323/QuantumultX/main/surge/Soul.sgmodule
   update_interval: 86400
   enabled: false
