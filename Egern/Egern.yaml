@@ -18,33 +18,68 @@ include_cellular_services: false
 include_local_networks: false
 dns:
   upstreams:
-    iBL3ND-DNS:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-    - https://1.1.1.1/dns-query
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
+    Secure-DNS:
+    - https://223.5.5.5/dns-query
+    - https://120.53.53.53/dns-query
   forward:
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Hot.yaml
+      value: reject
+      update_interval: 3600
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
+      value: reject
+      update_interval: 86400
   - domain_wildcard:
       match: '*'
-      value: iBL3ND-DNS
-      disabled: false
+      value: Secure-DNS
   proxy_nameservers:
-  - https://1.1.1.1/dns-query
-  - https://doh.pub/dns-query
-  - https://dns.google/dns-query
-  - https://dns.alidns.com/dns-query
+  - https://223.5.5.5/dns-query
+  - https://120.53.53.53/dns-query
+bypass_tunnel_proxy:
+- '*.ts.net'
+- tailscale.com
+- '*.tailscale.com'
+- tailscale.net
+- '*.tailscale.net'
+- 100.64.0.0/10
+- fd7a:115c:a1e0::/48
+- '*.local'
+- '*.lan'
+- 192.168.0.0/16
+- 10.0.0.0/8
+- 172.16.0.0/12
 real_ip_domains:
 - '*.lan'
 - '*.local'
 - '*.push.apple.com'
+- lancache.steamcontent.com
+- '*.msftconnecttest.com'
+- '*.msftncsi.com'
+- msftncsi.com
+- msftconnecttest.com
+- '*.srv.nintendo.net'
+- '*.stun.playstation.net'
+- xbox.*.microsoft.com
+- '*.xboxlive.com'
+- stun.l.google.com
+- '*.prod.cloud.netflix.com'
+- appboot.netflix.com
+- '*.battle.net'
+- '*.blzstatic.cn'
+- '*.battlenet.com'
+- '*.battlenet.com.cn'
+- '*.ts.net'
+- tailscale.com
+- '*.tailscale.com'
+- tailscale.net
+- '*.tailscale.net'
 policy_groups:
 - external:
     name: Subscription
     type: select
     urls:
     - 订阅地址1
-    - 订阅地址2
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
@@ -85,7 +120,7 @@ policy_groups:
     - JP
     - SG
     flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/grok.png
     hidden: false
 - select:
     name: Crypto
@@ -244,12 +279,27 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Tailscale-Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+    policy: DIRECT
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -289,27 +339,17 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/gits.yaml
     policy: GitHub
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/YouTube.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
     policy: Google
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
-    policy: Google
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
     policy: Media
     update_interval: 86400
     disabled: false
@@ -339,14 +379,14 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
 - geoip:
     match: CN
     policy: DIRECT
-    no_resolve: true
+    no_resolve: false
     disabled: false
 - default:
     name: Final
@@ -358,15 +398,27 @@ mitm:
     - raw.githubusercontent.com
     - github.com
 modules:
-- url: https://raw.githubusercontent.com/gholts/surge/refs/heads/main/modules/youtube-enhance.sgmodule
+- url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Egern-YouTube.yaml
+  compat_arguments:
+    blockUpload: 'true'
+    blockShorts: 'true'
+    autoHd: 'true'
+    blockGames: 'true'
+    blockVerticalLive: 'true'
+    jumpAhead: 'true'
+    blockStore: 'true'
+    nativeDownload: 'true'
+  update_interval: 86400
+  enabled: true
+- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
   update_interval: 86400
   enabled: false
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
   update_interval: 86400
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
   update_interval: 86400
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
   update_interval: 86400
   enabled: false
