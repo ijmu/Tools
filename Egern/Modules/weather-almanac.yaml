@@ -1,5 +1,5 @@
 name: 天气·黄历
-description: 中国天气网免 Key · 含农历/干支/黄道黑道/宜忌 · 无节日倒计时 · 蓝灰 UI
+description: 中国天气网免 Key · Hark 玻璃卡风格 · 农历/干支/黄道黑道 · 宜忌 · 无节日倒计时
 author: Minis
 icon: https://raw.githubusercontent.com/SIJULY/egern-radar/main/weather-icon.png
 compat_arguments:
@@ -33,6 +33,7 @@ scriptings:
     timeout: 15
     env:
       CITY: '{{{weatherCity}}}'
+      ALM_STYLE: hark
       SHOW_ALM: '1'
       SHOW_FESTIVAL: '0'
 widgets:
