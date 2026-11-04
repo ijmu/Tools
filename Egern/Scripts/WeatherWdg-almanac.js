@@ -4688,6 +4688,8 @@ const HC = {
   red: () => dynColor('#D93A2F', '#FF453A'),
   blue: () => dynColor('#2578D8', '#64A8FF'),
   sky: () => dynColor('#1B87AE', '#64D2FF'),
+  orange: () => dynColor('#C97200', '#FF9F0A'),
+  yellow: () => dynColor('#B88900', '#FFD60A'),
   hi: () => dynColor('#E0564A', '#FF8E80'),
   lo: () => dynColor('#3E7BD6', '#83B8ED'),
   track: () => dynColor('#00000012', '#FFFFFF22'),
@@ -4821,15 +4823,30 @@ function hSpread(items) {
   return out
 }
 
-function hForecastCol(day, label, first, size) {
-  return hCol([
+// AQI 语义色
+function hAqiColor(label) {
+  const l = String(label || '')
+  if (/优/.test(l)) return HC.green()
+  if (/良/.test(l)) return HC.yellow()
+  if (/轻度|中度/.test(l)) return HC.orange()
+  if (/重度|严重/.test(l)) return HC.red()
+  return HC.dim()
+}
+
+function hForecastCol(day, label, first, size, compact) {
+  const temps = hRow([
+    hT(temp(day && day.tempMax), size.temp, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
+    hT(temp(day && day.tempMin), size.temp, HC.lo(), 'regular', { mono: true, minScale: 1 }),
+  ], { gap: 3 })
+  const col = hCol([
     hT(label, size.name, first ? HC.text() : HC.dim(), first ? 'semibold' : 'regular', { minScale: 1 }),
-    hE(weatherEmoji(day && day.iconDay, false), size.icon),
-    hRow([
-      hT(temp(day && day.tempMax), size.temp, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
-      hT(temp(day && day.tempMin), size.temp, HC.lo(), 'regular', { mono: true, minScale: 1 }),
-    ], { gap: 3 }),
-  ], { gap: 2, alignItems: 'center' })
+    compact
+      ? hRow([hE(weatherEmoji(day && day.iconDay, false), size.icon), hSp(3), temps], { gap: 0 })
+      : hE(weatherEmoji(day && day.iconDay, false), size.icon),
+  ], { gap: 2, alignItems: 'center', flex: 1 })
+  if (compact) return col
+  col.children.push(temps)
+  return col
 }
 
 // ── 小尺寸 ──
@@ -4872,32 +4889,52 @@ function harkSmall(data, A) {
 function harkMedium(data, A) {
   const cond = clean(data.now.text) || '—'
   const now = data.now || {}
-  const wind = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '级' : ''].filter(Boolean).join(' ') || '风力 —'
+  const day = getToday(data)
   const humRaw = numeric(now.humidity)
   const hum = humRaw == null ? null : Math.max(0, Math.min(100, humRaw))
   const aqi = data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '—'
+  const windScale = clean(now.windScale) ? clean(now.windScale) + '级' : '—'
   const days = getForecast(data).slice(0, 5)
   const luckCol = A.luck === '凶' ? HC.red() : HC.green()
-  const yiTxt = pickWords(A.yi, almCount('YI_COUNT', 4, 4), 10)
-  const jiTxt = pickWords(A.ji, almCount('JI_COUNT', 3, 4), 8)
+  const yiTxt = pickWords(A.yi, almCount('YI_COUNT', 4, 4), 11)
+  const jiTxt = pickWords(A.ji, almCount('JI_COUNT', 3, 4), 9)
 
   const wxCard = hGlass([
-    hNowRow(data, { temp: 28, cond: 10, hl: 8.6, icon: 17 }),
-  ], { flex: 1.12, gap: 3 })
+    hRow([
+      hT(temp(now.temp), 27, HC.text(), 'bold', { mono: true, minScale: 0.8 }),
+      hSp(),
+      hE(weatherEmoji(now.icon, isNight(data)), 17),
+    ]),
+    hRow([
+      hT(cond, 9.5, HC.text(), 'medium', { minScale: 0.9 }),
+      hSp(3),
+      hT('高 ' + temp(day && day.tempMax), 8.6, HC.hi(), 'semibold', { mono: true }),
+      hSp(3),
+      hT('低 ' + temp(day && day.tempMin), 8.6, HC.lo(), 'regular', { mono: true }),
+    ]),
+  ], { flex: 0.86, gap: 3, padding: [6, 10] })
 
   const almCard = hGlass([
     hRow([
       hDot(HC.gold()),
-      hT(A.lunarText, 13.5, HC.gold(), 'bold', { minScale: 0.8 }),
+      hT(A.lunarText, 14, HC.gold(), 'bold', { minScale: 0.8 }),
       hSp(4),
       hT(A.dayGZ, 9.5, HC.dim(), 'medium', { minScale: 0.8 }),
       hSp(),
       hDot(luckCol),
       hT(A.dao || '平', 9, luckCol, 'semibold', { minScale: 1 }),
     ], { gap: 3 }),
+    hT(A.tianShen + ' · ' + A.zhiXing + '日 · ' + A.xiu + '宿' + A.xiuLuck, 9, HC.dim(), 'regular', { minScale: 0.6 }),
     hRow([hT('宜', 9.5, HC.green(), 'bold'), hSp(5), hT(yiTxt, 9.5, HC.text(), 'medium', { minScale: 0.5 })]),
     hRow([hT('忌', 9.5, HC.red(), 'bold'), hSp(5), hT(jiTxt, 9.5, HC.text(), 'medium', { minScale: 0.5 })]),
-  ], { flex: 1, gap: 3 })
+  ], { flex: 1.14, gap: 3, padding: [6, 10] })
+
+  const stats = hRow([
+    hI('thermometer.medium', HC.dim(), 9), hSp(3), hT(temp(now.feelsLike), 9.5, HC.text(), 'semibold', { mono: true }),
+    hSp(), hI('wind', HC.dim(), 9), hSp(3), hT(windScale, 9.5, HC.text(), 'semibold'),
+    hSp(), hT('AQI', 9, HC.dim(), 'regular'), hSp(3), hT(aqi, 9.5, hAqiColor(data.aqi && data.aqi.label), 'semibold', { minScale: 0.8 }),
+    hSp(), hI('drop.fill', HC.dim(), 9), hSp(3), hT(hum == null ? '—' : Math.round(hum) + '%', 9.5, HC.text(), 'semibold', { mono: true }),
+  ], { gap: 0 })
 
   return {
     type: 'widget', padding: [8, 12], gap: 2,
@@ -4913,39 +4950,28 @@ function harkMedium(data, A) {
       ]),
       hSp(),
       hRow([wxCard, almCard], { gap: 8 }),
-      hRow([
-        hT('体感 ' + temp(now.feelsLike), 9, HC.dim(), 'regular', { minScale: 0.9 }),
-        hT('·', 9, HC.dim(), 'regular'),
-        hT(wind, 9, HC.dim(), 'regular', { minScale: 0.9 }),
-        hT('·', 9, HC.dim(), 'regular'),
-        hT('AQI ' + aqi, 9, HC.dim(), 'regular', { minScale: 0.9 }),
-        hT('·', 9, HC.dim(), 'regular'),
-        hT(hum == null ? '湿度 —' : '湿度 ' + Math.round(hum) + '%', 9, HC.dim(), 'regular', { minScale: 0.9 }),
-        hSp(),
-        hBar(46, 4, hum != null ? hum / 100 : 0, HC.track(), HC.sky()),
-      ], { gap: 4 }),
       hSp(),
       hGlass([
-        hRow(hSpread(days.map(({ date, day }, i) => hForecastCol(day, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.5, icon: 11, temp: 8.6 }))), { gap: 2 }),
-      ], { gap: 3, padding: [5, 10], borderRadius: 12 }),
+        stats,
+        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.5, icon: 12, temp: 9 }, true))),
+      ], { gap: 4, padding: [5, 10], borderRadius: 12 }),
     ],
   }
 }
-
 
 // 逐时行（大尺寸，嵌在实况卡里）
 function hHoursRow(data) {
   const hours = (data.hourly || []).slice(0, 6)
   if (!hours.length) return null
-  return hRow(hSpread(hours.map((h) => {
+  return hRow(hours.map((h) => {
     const hStr = h.hourText ? String(h.hourText).slice(0, 2) : String(h.fxTime).slice(11, 13)
     const hr = Number(hStr)
     return hCol([
       hT(hStr + '时', 8.5, HC.dim(), 'regular', { minScale: 1 }),
       hE(weatherEmoji(h.icon, /^n/i.test(String(h.icon || '')) || hr < 6 || hr >= 18), 12),
       hT(temp(h.temp), 9, HC.text(), 'semibold', { mono: true, minScale: 1 }),
-    ], { gap: 1, alignItems: 'center' })
-  })), { gap: 2 })
+    ], { gap: 1, alignItems: 'center', flex: 1 })
+  }))
 }
 
 // ── 大尺寸 ──
@@ -5013,7 +5039,7 @@ function harkLarge(data, A) {
       ], { gap: 5, padding: [8, 12] }),
       hSp(),
       hGlass([
-        hRow(hSpread(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.6, icon: 13, temp: 9.5 }))), { gap: 2 }),
+        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.6, icon: 13, temp: 9.5 }))),
       ], { gap: 4, padding: [8, 12] }),
     ],
   }
