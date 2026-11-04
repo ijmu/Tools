@@ -4846,7 +4846,7 @@ function hForecastCol(day, label, first, size, compact) {
   const col = hCol([
     hT(label, size.name, first ? HC.text() : HC.dim(), first ? 'semibold' : 'regular', { minScale: 1 }),
     compact
-      ? hRow([hE(weatherEmoji(day && day.iconDay, false), size.icon), hSp(3), temps], { gap: 0 })
+      ? hRow([hE(weatherEmoji(day && day.iconDay, false), size.icon), hSp(2), temps], { gap: 0 })
       : hE(weatherEmoji(day && day.iconDay, false), size.icon),
   ], { gap: 2, alignItems: 'center', flex: 1 })
   if (compact) return col
@@ -4931,7 +4931,7 @@ function harkMedium(data, A) {
     hCenter([hT(A.godText, 9, HC.dim(), 'regular', { minScale: 0.5 })]),
     hCenter([hT('宜', 10, HC.green(), 'bold'), hSp(6), hT(yiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
     hCenter([hT('忌', 10, HC.red(), 'bold'), hSp(6), hT(jiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
-  ], { flex: 1.14, gap: 3, padding: [6, 10] })
+  ], { flex: 1.14, gap: 2, padding: [6, 10] })
 
   const statCell = (label, value, color, mono) => hCol([
     hRow([
@@ -4942,12 +4942,14 @@ function harkMedium(data, A) {
   ], { flex: 1, alignItems: 'center' })
   const stats = hRow([
     statCell('AQI', aqi, hAqiColor(data.aqi && data.aqi.label)),
+    { type: 'spacer' },
     statCell('湿度', hum == null ? '—' : Math.round(hum) + '%', null, true),
+    { type: 'spacer' },
     statCell('能见度', unit(now.vis, 'km')),
-  ], { gap: 6 })
+  ])
 
   return {
-    type: 'widget', padding: [7, 12], gap: 2,
+    type: 'widget', padding: [6, 12], gap: 2,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
@@ -4963,8 +4965,8 @@ function harkMedium(data, A) {
       hSp(),
       hGlass([
         stats,
-        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.5, icon: 12, temp: 9 }, true))),
-      ], { gap: 3, padding: [5, 10], borderRadius: 12 }),
+        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 9, icon: 12.5, temp: 9.2 }, true))),
+      ], { gap: 4, padding: [5, 10], borderRadius: 14 }),
     ],
   }
 }
@@ -5048,7 +5050,7 @@ function harkLarge(data, A) {
       ], { gap: 5, padding: [8, 12] }),
       hSp(),
       hGlass([
-        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 8.6, icon: 13, temp: 9.5 }))),
+        hRow(days.map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '明天' : dayLabel(date), i === 0, { name: 9, icon: 14, temp: 10 }))),
       ], { gap: 4, padding: [8, 12] }),
     ],
   }
