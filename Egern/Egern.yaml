@@ -18,21 +18,13 @@ include_cellular_services: false
 include_local_networks: false
 dns:
   upstreams:
-    Secure-DNS:
+    Encrypted-DNS:
     - https://223.5.5.5/dns-query
     - https://120.53.53.53/dns-query
   forward:
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Hot.yaml
-      value: reject
-      update_interval: 3600
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Reject-Merged.yaml
-      value: reject
-      update_interval: 86400
   - domain_wildcard:
       match: '*'
-      value: Secure-DNS
+      value: Encrypted-DNS
   proxy_nameservers:
   - https://223.5.5.5/dns-query
   - https://120.53.53.53/dns-query
@@ -80,6 +72,7 @@ policy_groups:
     type: select
     urls:
     - 订阅地址1
+    - 订阅地址2
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
@@ -279,11 +272,6 @@ rules:
     policy: DIRECT
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Tailscale-Direct.yaml
-    policy: DIRECT
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
     policy: DIRECT
     update_interval: 86400
@@ -309,7 +297,8 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
+    name: Douyin
+    match: https://raw.githubusercontent.com/bluee1111/egern-douyin/main/douyin-cn-direct.list
     policy: DIRECT
     update_interval: 86400
     disabled: false
@@ -392,7 +381,8 @@ rules:
     name: Final
     policy: Manual
 mitm:
-  
+  ca_p12: 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
+  ca_passphrase: egern
   hostnames:
     excludes:
     - raw.githubusercontent.com
@@ -410,27 +400,15 @@ modules:
     nativeDownload: 'true'
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
+- url: https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin.yaml
   update_interval: 86400
-  enabled: false
+  enabled: true
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
   update_interval: 86400
-  enabled: false
+  enabled: true
 - url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
   update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-weather.sgmodule
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-maps.sgmodule
-  update_interval: 86400
-  enabled: false
-- url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
-  update_interval: 86400
-  enabled: false
+  enabled: true
 - name: 每日天气
   url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
   compat_arguments:
@@ -457,14 +435,14 @@ modules:
     CITY: 莆田
     MY_FUEL: '95'
     TANK_L: '66'
-  enabled: true
+  enabled: false
 - name: 彩票开奖
   url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.yaml
   update_interval: 86400
   env:
     彩票类型: 大乐透
     分析期数: '100'
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/ZLam/VPN/refs/heads/main/egern/widget/douban_ranking/douban-ranking.yaml
   update_interval: 86400
   enabled: false
