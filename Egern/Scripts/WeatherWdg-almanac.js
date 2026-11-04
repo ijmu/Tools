@@ -4778,6 +4778,11 @@ function hBar(width, height, ratio, track, fill) {
   }
 }
 
+// 左右各一个 spacer → 行内内容水平居中（玻璃卡内的行会撑满卡片宽度）
+function hCenter(kids, extra) {
+  return hRow([{ type: 'spacer' }].concat((kids || []).filter(Boolean), [{ type: 'spacer' }]), extra)
+}
+
 // 实况行：大温度 + 天气图标（+ 右侧 天气/高低温；可选上下两行形态）
 function hNowRow(data, o) {
   const now = data.now || {}
@@ -4871,14 +4876,14 @@ function harkSmall(data, A) {
       hNowRow(data, { temp: 27, cond: 9.8, hl: 9, icon: 18, stacked: true }),
       hSp(),
       hGlass([
-        hRow([
-          hT(A.lunarText, 12, HC.gold(), 'bold', { minScale: 0.8 }),
-          hSp(),
+        hCenter([
+          hT(A.lunarText, 12.5, HC.gold(), 'bold', { minScale: 0.8 }),
+          hSp(6),
           hDot(luckCol),
           hT(A.dao || '平', 9, luckCol, 'semibold', { minScale: 1 }),
-        ], { gap: 4 }),
-        hRow([hT('宜', 10, HC.green(), 'bold'), hSp(6), hT(yiTxt, 10.5, HC.text(), 'medium', { minScale: 0.5 })]),
-        hRow([hT('忌', 10, HC.red(), 'bold'), hSp(6), hT(jiTxt, 10.5, HC.text(), 'medium', { minScale: 0.5 })]),
+        ]),
+        hCenter([hT('宜', 10, HC.green(), 'bold'), hSp(6), hT(yiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
+        hCenter([hT('忌', 10, HC.red(), 'bold'), hSp(6), hT(jiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
       ], { gap: 4, padding: [6, 10] }),
     ],
   }
@@ -4915,17 +4920,17 @@ function harkMedium(data, A) {
   ], { flex: 0.86, gap: 3, padding: [6, 10] })
 
   const almCard = hGlass([
-    hRow([
+    hCenter([
       hT(A.lunarText, 14, HC.gold(), 'bold', { minScale: 0.8 }),
-      hSp(4),
+      hSp(6),
       hT(A.dayGZ, 9.5, HC.dim(), 'medium', { minScale: 0.8 }),
-      hSp(),
+      hSp(6),
       hDot(luckCol),
       hT(A.dao || '平', 9, luckCol, 'semibold', { minScale: 1 }),
-    ], { gap: 3 }),
-    hT(A.tianShen + ' · ' + A.zhiXing + '日 · ' + A.xiu + '宿' + A.xiuLuck, 9, HC.dim(), 'regular', { minScale: 0.6 }),
-    hRow([hT('宜', 10, HC.green(), 'bold'), hSp(6), hT(yiTxt, 10.5, HC.text(), 'medium', { minScale: 0.5 })]),
-    hRow([hT('忌', 10, HC.red(), 'bold'), hSp(6), hT(jiTxt, 10.5, HC.text(), 'medium', { minScale: 0.5 })]),
+    ]),
+    hCenter([hT(A.godText, 9, HC.dim(), 'regular', { minScale: 0.5 })]),
+    hCenter([hT('宜', 10, HC.green(), 'bold'), hSp(6), hT(yiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
+    hCenter([hT('忌', 10, HC.red(), 'bold'), hSp(6), hT(jiTxt, 10.5, HC.text(), 'medium', { minScale: 0.45 })]),
   ], { flex: 1.14, gap: 3, padding: [6, 10] })
 
   const statCell = (label, value, color, mono) => hCol([
@@ -5028,16 +5033,18 @@ function harkLarge(data, A) {
       ], { gap: 6, padding: [8, 12] }),
       hSp(),
       hGlass([
-        hRow([
+        hCenter([
           hT(A.lunarText, 15, HC.gold(), 'bold', { minScale: 0.8 }),
-          hSp(),
+          hSp(7),
+          hT(A.dayGZ, 11, HC.dim(), 'medium', { minScale: 0.8 }),
+          hSp(7),
           hDot(luckCol),
           hT((A.dao || '平') + '日', 10, luckCol, 'semibold', { minScale: 1 }),
         ]),
-        hT(A.yearGZ + A.monthGZ + A.dayGZ + ' · ' + A.godText, 9.5, HC.dim(), 'regular', { minScale: 0.55 }),
-        hRow([hT('宜', 11, HC.green(), 'bold'), hSp(7), hT(yiTxt, 11.5, HC.text(), 'medium', { minScale: 0.5 })]),
-        hRow([hT('忌', 11, HC.red(), 'bold'), hSp(7), hT(jiTxt, 11.5, HC.text(), 'medium', { minScale: 0.5 })]),
-        hT(A.footerText + (A.jieQi ? ' · 今日' + A.jieQi : ''), 9, HC.dim(), 'regular', { minScale: 0.55 }),
+        hCenter([hT(A.godText, 9.5, HC.dim(), 'regular', { minScale: 0.5 })]),
+        hCenter([hT('宜', 11, HC.green(), 'bold'), hSp(7), hT(yiTxt, 11.5, HC.text(), 'medium', { minScale: 0.45 })]),
+        hCenter([hT('忌', 11, HC.red(), 'bold'), hSp(7), hT(jiTxt, 11.5, HC.text(), 'medium', { minScale: 0.45 })]),
+        hCenter([hT(A.yearGZ + A.monthGZ + ' · ' + A.footerText + (A.jieQi ? ' · 今日' + A.jieQi : ''), 9, HC.dim(), 'regular', { minScale: 0.45 })]),
       ], { gap: 5, padding: [8, 12] }),
       hSp(),
       hGlass([
