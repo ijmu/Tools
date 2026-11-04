@@ -4788,8 +4788,8 @@ function hYiJiBlock(A, o) {
   const yiTxt = pickWords(A.yi, o.yiN, o.yiChars)
   const jiTxt = pickWords(A.ji, o.jiN, o.jiChars)
   const col = hCol([
-    hRow([hT('宜', o.size, HC.green(), 'bold', { minScale: 0.8 }), hSp(o.gap), hT(yiTxt, o.text, HC.text(), 'medium', { minScale: o.scale || 0.45 })], { gap: 0 }),
-    hRow([hT('忌', o.size, HC.red(), 'bold', { minScale: 0.8 }), hSp(o.gap), hT(jiTxt, o.text, HC.text(), 'medium', { minScale: o.scale || 0.45 })], { gap: 0 }),
+    hRow([hT('宜', o.size, HC.green(), 'medium', { minScale: 0.8 }), hSp(o.gap), hT(yiTxt, o.size, HC.text(), 'medium', { minScale: o.scale || 0.45 })], { gap: 0 }),
+    hRow([hT('忌', o.size, HC.red(), 'medium', { minScale: 0.8 }), hSp(o.gap), hT(jiTxt, o.size, HC.text(), 'medium', { minScale: o.scale || 0.45 })], { gap: 0 }),
   ], { gap: o.rowGap || 4, alignItems: 'start' })
   return col
 }
@@ -4893,7 +4893,7 @@ function harkSmall(data, A) {
           hDot(luckCol),
           hT(A.dao || '平', 9, luckCol, 'semibold', { minScale: 1 }),
         ]),
-        hCenter([hYiJiBlock(A, { size: 10, text: 10.5, gap: 6, rowGap: 4, yiN: almCount('YI_COUNT', 4, 4), jiN: almCount('JI_COUNT', 3, 3), yiChars: 11, jiChars: 9 })]),
+        hCenter([hYiJiBlock(A, { size: 10.5, gap: 6, rowGap: 4, yiN: almCount('YI_COUNT', 4, 4), jiN: almCount('JI_COUNT', 3, 3), yiChars: 11, jiChars: 9 })]),
       ], { gap: 5, padding: [6, 10] }),
     ],
   }
@@ -4939,7 +4939,7 @@ function harkMedium(data, A) {
       hT(A.dao || '平', 9, luckCol, 'semibold', { minScale: 1 }),
     ]),
     hCenter([hT(A.tianShen + ' · ' + A.zhiXing + '日 · ' + A.xiu + '宿' + A.xiuLuck, 9, HC.dim(), 'regular', { minScale: 0.55 })]),
-    hCenter([hYiJiBlock(A, { size: 10, text: 10.5, gap: 6, rowGap: 3, yiN: almCount('YI_COUNT', 4, 4), jiN: almCount('JI_COUNT', 3, 4), yiChars: 10, jiChars: 8 })]),
+    hCenter([hYiJiBlock(A, { size: 10.5, gap: 6, rowGap: 4, yiN: almCount('YI_COUNT', 4, 4), jiN: almCount('JI_COUNT', 3, 4), yiChars: 10, jiChars: 8 })]),
   ], { flex: 1.14, gap: 3, padding: [7, 10] })
 
   const statCell = (label, value, color, mono) => hCol([
@@ -5053,7 +5053,7 @@ function harkLarge(data, A) {
           hT((A.dao || '平') + '日', 10, luckCol, 'semibold', { minScale: 1 }),
         ]),
         hCenter([hT(A.tianShen + ' · ' + A.zhiXing + '日 · ' + A.xiu + '宿' + A.xiuLuck, 9.5, HC.dim(), 'regular', { minScale: 0.55 })]),
-        hCenter([hYiJiBlock(A, { size: 11, text: 11.5, gap: 7, rowGap: 5, yiN: almCount('YI_COUNT', 9, 9), jiN: almCount('JI_COUNT', 9, 6), yiChars: 30, jiChars: 24 })]),
+        hCenter([hYiJiBlock(A, { size: 11.5, gap: 7, rowGap: 5, yiN: almCount('YI_COUNT', 9, 9), jiN: almCount('JI_COUNT', 9, 6), yiChars: 30, jiChars: 24 })]),
         hCenter([hT(A.yearGZ + A.monthGZ + ' · ' + A.footerText + (A.jieQi ? ' · 今日' + A.jieQi : ''), 9, HC.dim(), 'regular', { minScale: 0.45 })]),
       ], { gap: 5, padding: [8, 12] }),
       hSp(),
