@@ -458,10 +458,16 @@ const COL = {
   large: { chips: 46, name: 66, code: 36, date: 42, price: 54, pct: 58, cost: 56, pnl: 64, chg: 88 },
 };
 
-function chipsCol(it, size) {
+// tag 紧贴名称左侧，整组右对齐：名称右边缘固定 → 代码/日期列对齐
+function nameGroup(it, size, nameSize) {
   const c = COL[size] || COL.medium;
-  if (!c.chips) return null;
-  return S(tagChips(it.tags).children, { gap: 2, align: 'center', w: c.chips });
+  return S(
+    [
+      tagChips(it.tags),
+      T(it.name, { size: nameSize, weight: 'semibold', color: C.ink, min: 0.8, w: c.name, align: 'right' }),
+    ],
+    { gap: 4, align: 'center', justify: 'flex-end', w: c.chips + c.name + 4 }
+  );
 }
 
 function metaNodes(it, size, withNotice, col) {
@@ -516,8 +522,7 @@ function stockEntry(it, size, dual) {
     [
       S(
         [
-          chipsCol(it, size),
-          T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+          nameGroup(it, size, 11.5),
           T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
           dateBadge(it, 8, c),
           SP(),
@@ -560,8 +565,7 @@ function stockRow(it, compact) {
   }
   return S(
     [
-      chipsCol(it, 'medium'),
-      T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+      nameGroup(it, 'medium', 11.5),
       T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
       dateBadge(it, 8, c),
       SP(),
@@ -576,8 +580,7 @@ function stockCard(it, three) {
   const color = pctColor(it.pct);
   const main = S(
     [
-      chipsCol(it, 'large'),
-      T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+      nameGroup(it, 'large', 15),
       T(it.code, { size: 9.5, color: C.dim, mono: true, w: c.code }),
       SP(),
       T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
