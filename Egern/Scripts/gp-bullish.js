@@ -459,14 +459,16 @@ const COL = {
 };
 
 // tag 紧贴名称左侧，整组右对齐：名称右边缘固定 → 代码/日期列对齐
+// tag 占固定列（不足 3 个用固定 spacer 补齐），名称从固定位置左对齐开始
 function nameGroup(it, size, nameSize) {
   const c = COL[size] || COL.medium;
+  const n = (it.tags.quality ? 1 : 0) + (it.tags.strong ? 1 : 0) + (it.tags.heavy ? 1 : 0);
+  const used = n * 14 + Math.max(0, n - 1) * 2; // 单个 chip ≈ 14pt，间隙 2
+  const kids = tagChips(it.tags).children.slice();
+  if (n < 3) kids.push(T(' ', { size: 1, w: c.chips - used - 2 })); // 固定宽占位，保证 tag 列宽恒定
   return S(
-    [
-      tagChips(it.tags),
-      T(it.name, { size: nameSize, weight: 'semibold', color: C.ink, min: 0.8, w: c.name, align: 'right' }),
-    ],
-    { gap: 4, align: 'center', justify: 'flex-end', w: c.chips + c.name + 4 }
+    [S(kids, { gap: 2, align: 'center' }), T(it.name, { size: nameSize, weight: 'semibold', color: C.ink, min: 0.8, w: c.name })],
+    { gap: 4, align: 'center' }
   );
 }
 
@@ -531,10 +533,10 @@ function stockEntry(it, size, dual) {
         { gap: 4, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct })].concat(
+        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
           metaNodes(it, 9, true, c)
         ),
-        { gap: 6, align: 'center' }
+        { gap: 5, align: 'center' }
       ),
     ],
     { dir: 'column', gap: 1 }
@@ -592,8 +594,8 @@ function stockCard(it, three) {
     const right = [];
     if (it.notice) right.push(dateBadge(it, 9.5, null));
     if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
-    const meta = metaNodes(it, 9.5, true, c).concat(right);
-    return S([main, S(meta, { gap: 5, align: 'center' })], {
+    const meta = metaNodes(it, 9.5, true, c).concat([SP()], right);
+    return S([main, S([SP()].concat(meta), { gap: 5, align: 'center' })], {
       dir: 'column',
       gap: 5,
       pad: [10, 12, 10, 12],
