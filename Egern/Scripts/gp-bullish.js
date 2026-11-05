@@ -606,7 +606,7 @@ function header(list, data, cfg) {
 function widgetRoot(children, bottomPad) {
   return {
     type: 'widget',
-    padding: [12, 12, bottomPad, 12], // 有图例时贴住下沿，无图例（小尺寸）留出呼吸
+    padding: [4, 12, 4, 12], // 上下留白一致：图例贴底、头部也贴顶
     gap: 3,
     backgroundGradient: bg(),
     refreshAfter: refreshAfter(),
@@ -641,7 +641,7 @@ function buildWidget(data, size, cfg) {
   // 头部 → 标的列表 → （弹性留白）→ 图例，图例固定左下角
   const children = [header(list, data, cfg), body, SP()];
   if (hasLegend) children.push(legend(size));
-  return widgetRoot(children, hasLegend ? 4 : 10);
+  return widgetRoot(children, 4);
 }
 
 function buildMessage(title, msg, hint) {
