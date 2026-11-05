@@ -332,6 +332,9 @@ function buildList(items, quotes, cfg) {
       price,
       pct,
       pnl: Number(it.CURRENT_PNL_RATIO),
+      cost: Number(it.REPORT_PRICE),
+      chgRatio: it.CHANGE_RATIO_VAL == null || it.CHANGE_RATIO_VAL === '' ? null : Number(it.CHANGE_RATIO_VAL),
+      chgType: String(it.CHANGE_TYPE || '').trim(),
       industry: String(it.INDUSTRY || '').trim(),
       notice,
       tags,
@@ -437,6 +440,84 @@ function tagChips(tags, size) {
   return S(arr, { gap: 2, align: 'center' });
 }
 
+function fmtCost(v) {
+  return v > 0 ? v.toFixed(2) : '—';
+}
+
+function fmtChg(it) {
+  if (it.chgRatio == null || isNaN(it.chgRatio)) return it.chgType || '—';
+  const n = it.chgRatio;
+  return (it.chgType ? it.chgType + ' ' : '') + (n > 0 ? '+' : '') + n.toFixed(2) + '%';
+}
+
+// 副行：成本价 / 收益率 / 调仓变动（各自按涨跌着色）
+function metaNodes(it, size, withNotice) {
+  const out = [];
+  if (it.cost > 0) out.push(T('成本 ' + fmtCost(it.cost), { size: size, color: C.dim, mono: true }));
+  if (!isNaN(it.pnl)) out.push(T('收益 ' + fmtPnl(it.pnl), { size: size, weight: 'semibold', color: pctColor(it.pnl) }));
+  const chg = fmtChg(it);
+  if (chg !== '—') {
+    // 幅度站点未下发（普通账号 CHANGE_RATIO_VAL 全为 null），按方向着色：增持/新进=红，减持=绿
+    const chgColor =
+      it.chgRatio != null && !isNaN(it.chgRatio)
+        ? pctColor(it.chgRatio)
+        : it.chgType === '减持'
+        ? C.green
+        : it.chgType
+        ? C.red
+        : C.dim;
+    out.push(T('调仓 ' + chg, { size: size, weight: 'semibold', color: chgColor, min: 0.75 }));
+  }
+  return out;
+}
+
+// 单只条目：dual = 主行 + 副行（推荐日期/行业/累计收益率），用于标的很少时把版面撑起来
+function stockEntry(it, size, dual) {
+  const color = pctColor(it.pct);
+  if (size === 'small') {
+    if (!dual) return stockRow(it, true);
+    return S(
+      [
+        S(
+          [
+            T(it.name, { size: 10.5, weight: 'semibold', color: C.ink, min: 0.7 }),
+            T(it.code, { size: 7.5, color: C.dim, mono: true }),
+            SP(),
+            T(fmtPrice(it.price), { size: 10, weight: 'semibold', color: C.ink, mono: true, w: 34, align: 'right' }),
+          ],
+          { gap: 3, align: 'center' }
+        ),
+        S([T(fmtPct(it.pct), { size: 10, weight: 'semibold', color: color, mono: true, w: 36, align: 'right' }), SP()].concat(
+          metaNodes(it, 7.5, false)
+        ), { gap: 3, align: 'center' }),
+      ],
+      { dir: 'column', gap: 2 }
+    );
+  }
+  if (!dual) return stockRow(it, false);
+  return S(
+    [
+      S(
+        [
+          tagChips(it.tags),
+          T(it.name, { size: 12, weight: 'semibold', color: C.ink, min: 0.8 }),
+          T(it.code, { size: 8.5, color: C.dim, mono: true }),
+          SP(),
+          T(fmtPrice(it.price), { size: 12, weight: 'semibold', color: C.ink, mono: true, w: 44, align: 'right' }),
+        ],
+        { gap: 3, align: 'center' }
+      ),
+      S(
+        [T(fmtPct(it.pct), { size: 11, weight: 'semibold', color: color, mono: true, w: 46, align: 'right' }), SP()].concat(
+          metaNodes(it, 9.5, true)
+        ),
+        { gap: 5, align: 'center' }
+      ),
+    ],
+    { dir: 'column', gap: 2 }
+  );
+}
+
 function stockRow(it, compact) {
   const color = pctColor(it.pct);
   if (compact) {
@@ -467,11 +548,10 @@ function stockRow(it, compact) {
 // 大尺寸专用：每只一张玻璃卡，两行（主行 + 推荐日期/行业/累计收益率）
 function stockCard(it) {
   const color = pctColor(it.pct);
-  const meta = [];
-  if (it.notice) meta.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
-  if (it.industry) meta.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
-  meta.push(SP());
-  meta.push(T('累计 ' + fmtPnl(it.pnl), { size: 9.5, weight: 'semibold', color: pctColor(it.pnl) }));
+  const right = [];
+  if (it.notice) right.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
+  if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
+  const meta = metaNodes(it, 9.5, true).concat([SP()], right);
   return S(
     [
       S(
@@ -535,28 +615,31 @@ function widgetRoot(children) {
 }
 
 // 行数少时把行距撑开，避免大片留白；行数多时保持紧凑
-function rowGapFor(size, n) {
+function rowGapFor(size, n, rowH, hasLegend) {
   const H = size === 'large' ? 382 : 170;
-  const fixed = 24 + 16.5 + 12 + 12.6; // padding + 头部 + widget 间隙 + 图例
-  const rowH = 14.5;
+  const fixed = 24 + 16.5 + 12 + (hasLegend ? 12.6 : 0); // padding + 头部 + widget 间隙 + 图例
   if (n <= 1) return 3;
   const g = Math.floor((H - fixed - n * rowH) / (n - 1));
-  return Math.max(3, Math.min(13, g));
+  return Math.max(2, Math.min(16, g));
 }
 
 function buildWidget(data, size, cfg) {
   const limit = cfg.max > 0 ? cfg.max : ROWS[size] || ROWS.medium;
   const list = data.list.slice(0, limit);
-  const compact = size === 'small';
-  const rows = list.map((it) => stockRow(it, compact));
+  const hasLegend = size !== 'small';
   const useCards = size === 'large' && list.length <= 5;
-  const rowGap = size === 'small' ? 2 : Math.min(rowGapFor(size, list.length), useCards ? 8 : 13);
-  const body = useCards ? S(list.map(stockCard), { dir: 'column', gap: 10 }) : S(rows, { dir: 'column', gap: rowGap });
-  const children = [header(list, data, cfg), SP(1), body];
-  if (size !== 'small') {
-    children.push(SP(1));
-    children.push(legend(size));
+  const dual = (size === 'small' || size === 'medium') && list.length <= 3;
+  let body;
+  if (useCards) {
+    body = S(list.map(stockCard), { dir: 'column', gap: 10 });
+  } else {
+    const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
+    const gap = rowGapFor(size, list.length, rowH, hasLegend);
+    body = S(list.map((it) => stockEntry(it, size, dual)), { dir: 'column', gap: gap });
   }
+  // 头部与内容紧贴（顶部对齐），图例用弹性 spacer 钉在底部
+  const children = [header(list, data, cfg), body, SP()];
+  if (hasLegend) children.push(legend(size));
   return widgetRoot(children);
 }
 
