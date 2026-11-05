@@ -603,10 +603,10 @@ function header(list, data, cfg) {
   );
 }
 
-function widgetRoot(children) {
+function widgetRoot(children, bottomPad) {
   return {
     type: 'widget',
-    padding: 12,
+    padding: [12, 12, bottomPad, 12], // 有图例时贴住下沿，无图例（小尺寸）留出呼吸
     gap: 3,
     backgroundGradient: bg(),
     refreshAfter: refreshAfter(),
@@ -630,17 +630,25 @@ function buildWidget(data, size, cfg) {
   const useCards = size === 'large' && list.length <= 5;
   const dual = (size === 'small' || size === 'medium') && list.length <= 3;
   let body;
+  // 条目之间用弹性 spacer 均分剩余高度：标的少时自然铺开，多了自动压回最小间距
+  const spaced = [];
+  const push = (node, i) => {
+    if (i > 0) spaced.push(SP());
+    spaced.push(node);
+  };
   if (useCards) {
-    body = S(list.map(stockCard), { dir: 'column', gap: 10 });
+    list.forEach((it, i) => push(stockCard(it), i));
+    body = S(spaced, { dir: 'column', gap: 3, flex: 1 });
   } else {
     const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
-    const gap = rowGapFor(size, list.length, rowH, hasLegend);
-    body = S(list.map((it) => stockEntry(it, size, dual)), { dir: 'column', gap: gap });
+    const baseGap = rowGapFor(size, list.length, rowH, hasLegend);
+    list.forEach((it, i) => push(stockEntry(it, size, dual), i));
+    body = S(spaced, { dir: 'column', gap: Math.max(2, Math.min(4, baseGap)), flex: 1 });
   }
-  // 头部与内容紧贴（顶部对齐），图例用弹性 spacer 钉在底部
-  const children = [header(list, data, cfg), body, SP()];
-  if (hasLegend) children.push(legend(size));
-  return widgetRoot(children);
+  // 头部紧贴内容；body 用 flex 吃掉全部剩余高度（内部弹性间距均分），图例因而钉在最底部
+  const children = [header(list, data, cfg), body];
+  if (hasLegend) children.push(S([SP(), legend(size), SP()], { align: 'center' }));
+  return widgetRoot(children, hasLegend ? 4 : 10);
 }
 
 function buildMessage(title, msg, hint) {
@@ -659,7 +667,7 @@ function buildMessage(title, msg, hint) {
     children.push(SP(2));
     children.push(T(hint, { size: 8.5, color: C.dim, lines: 3 }));
   }
-  return widgetRoot(children);
+  return widgetRoot(children, 12);
 }
 
 // ─── 入口 ───
