@@ -376,7 +376,8 @@ async function loadData(ctx, cfg) {
   }
   const list = buildList(items, quotes, cfg);
   if (!list.length) throw new Error(cfg.days > 0 ? '近 ' + cfg.days + ' 天没有新推荐的标的' : '三个标签当前都没有标的');
-  storeSet(ctx, 'cache:' + cfg.site, JSON.stringify({ at: Date.now(), total: list.length, list: list.slice(0, 60) }));
+  const ck = 'cache:' + cfg.site + ':' + cfg.days;
+  storeSet(ctx, ck, JSON.stringify({ at: Date.now(), total: list.length, list: list.slice(0, 60) }));
   return { list, total: list.length, at: Date.now(), stale: false };
 }
 
@@ -384,7 +385,7 @@ async function loadData(ctx, cfg) {
 const CACHE_TTL = 3 * 60 * 60 * 1000;
 
 function cachedData(ctx, cfg) {
-  const raw = storeGet(ctx, 'cache:' + cfg.site) || storeGet(ctx, 'cache');
+  const raw = storeGet(ctx, 'cache:' + cfg.site + ':' + cfg.days);
   if (!raw) return null;
   try {
     const d = JSON.parse(raw);
