@@ -460,24 +460,29 @@ const COL = {
 
 // tag 紧贴名称左侧，整组右对齐：名称右边缘固定 → 代码/日期列对齐
 // tag 占固定列（不足 3 个用固定 spacer 补齐），名称从固定位置左对齐开始
+// 固定宽度列：Egern 的 text 不支持 width，只能用 column stack + alignItems 锁列宽与对齐
+function col(node, w, align) {
+  if (!w) return node;
+  if (node == null) return S([], { dir: 'column', w: w });
+  return S([node], { dir: 'column', w: w, align: align || 'start' });
+}
+
+// tag 占固定列（左对齐），名称从固定 x 左对齐开始
 function nameGroup(it, size, nameSize) {
   const c = COL[size] || COL.medium;
-  const n = (it.tags.quality ? 1 : 0) + (it.tags.strong ? 1 : 0) + (it.tags.heavy ? 1 : 0);
-  const used = n * 14 + Math.max(0, n - 1) * 2; // 单个 chip ≈ 14pt，间隙 2
-  const kids = tagChips(it.tags).children.slice();
-  if (n < 3) kids.push(T(' ', { size: 1, w: c.chips - used - 2 })); // 固定宽占位，保证 tag 列宽恒定
   return S(
-    [S(kids, { gap: 2, align: 'center' }), T(it.name, { size: nameSize, weight: 'semibold', color: C.ink, min: 0.8, w: c.name })],
+    [
+      col(S(tagChips(it.tags).children, { gap: 2, align: 'center' }), c.chips, 'start'),
+      col(T(it.name, { size: nameSize, weight: 'semibold', color: C.ink, min: 0.8 }), c.name, 'start'),
+    ],
     { gap: 4, align: 'center' }
   );
 }
-
-function metaNodes(it, size, withNotice, col) {
+function metaNodes(it, size, withNotice, c) {
   const out = [];
-  const w = (k) => (col && col[k] ? col[k] : undefined);
-  if (it.cost > 0) out.push(T('成本 ' + fmtCost(it.cost), { size: size, color: C.dim, mono: true, w: w('cost') }));
+  if (it.cost > 0) out.push(col(T('成本 ' + fmtCost(it.cost), { size: size, color: C.dim, mono: true }), c && c.cost, 'start'));
   if (!isNaN(it.pnl))
-    out.push(T('收益 ' + fmtPnl(it.pnl), { size: size, weight: 'semibold', color: pctColor(it.pnl), w: w('pnl') }));
+    out.push(col(T('收益 ' + fmtPnl(it.pnl), { size: size, weight: 'semibold', color: pctColor(it.pnl) }), c && c.pnl, 'start'));
   const chg = fmtChg(it);
   if (chg !== '—') {
     // 幅度站点未下发（普通账号 CHANGE_RATIO_VAL 全为 null），按方向着色：增持/新进=红，减持=绿
@@ -489,7 +494,7 @@ function metaNodes(it, size, withNotice, col) {
         : it.chgType
         ? C.red
         : C.dim;
-    out.push(T('调仓 ' + chg, { size: size, weight: 'semibold', color: chgColor, min: 0.75, w: w('chg') }));
+    out.push(col(T('调仓 ' + chg, { size: size, weight: 'semibold', color: chgColor, min: 0.75 }), c && c.chg, 'start'));
   }
   return out;
 }
@@ -502,17 +507,17 @@ function stockEntry(it, size, dual) {
       [
         S(
           [
-            T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7, w: c.name }),
-            T(it.code, { size: 7, color: C.dim, mono: true, w: c.code }),
+            col(T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7 }), c.name, 'start'),
+            col(T(it.code, { size: 7, color: C.dim, mono: true }), c.code, 'start'),
             SP(),
-            T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+            col(T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
           ],
           { gap: 3, align: 'center' }
         ),
         S(
-          [T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
-            metaNodes(it, 7.5, false, null)
-          ),
+          [
+            col(T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true }), c.pct, 'start'),
+          ].concat(metaNodes(it, 7.5, false, null)),
           { gap: 3, align: 'center' }
         ),
       ],
@@ -525,29 +530,32 @@ function stockEntry(it, size, dual) {
       S(
         [
           nameGroup(it, size, 11.5),
-          T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
+          col(T(it.code, { size: 8, color: C.dim, mono: true }), c.code, 'start'),
           dateBadge(it, 8, c),
           SP(),
-          T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+          col(T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
         ],
         { gap: 4, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
+        [col(T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true }), c.pct, 'start')].concat(
           metaNodes(it, 9, true, c)
         ),
-        { gap: 5, align: 'center' }
+        { gap: 6, align: 'center' }
       ),
     ],
     { dir: 'column', gap: 1 }
   );
 }
-function dateBadge(it, size, col) {
-  const w = col && col.date ? col.date : undefined;
-  if (!it.notice) return w ? S([], { w: w }) : null;
-  return S(
-    [symbol('calendar', size, C.dim), T(it.notice.slice(5), { size: size, color: C.dim, mono: true })],
-    { gap: 2, align: 'center', w: w }
+function dateBadge(it, size, c) {
+  if (!it.notice) return col(null, c && c.date);
+  return col(
+    S([symbol('calendar', size, C.dim), T(it.notice.slice(5), { size: size, color: C.dim, mono: true })], {
+      gap: 2,
+      align: 'center',
+    }),
+    c && c.date,
+    'start'
   );
 }
 function stockRow(it, compact) {
@@ -556,11 +564,11 @@ function stockRow(it, compact) {
   if (compact) {
     return S(
       [
-        T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7, w: c.name }),
-        T(it.code, { size: 7.5, color: C.dim, mono: true, w: c.code }),
+        col(T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7 }), c.name, 'start'),
+        col(T(it.code, { size: 7.5, color: C.dim, mono: true }), c.code, 'start'),
         SP(),
-        T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
-        T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
+        col(T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
+        col(T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true }), c.pct, 'end'),
       ],
       { gap: 3, align: 'center' }
     );
@@ -568,11 +576,11 @@ function stockRow(it, compact) {
   return S(
     [
       nameGroup(it, 'medium', 11.5),
-      T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
+      col(T(it.code, { size: 8, color: C.dim, mono: true }), c.code, 'start'),
       dateBadge(it, 8, c),
       SP(),
-      T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
-      T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
+      col(T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
+      col(T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true }), c.pct, 'end'),
     ],
     { gap: 4, align: 'center' }
   );
@@ -583,10 +591,10 @@ function stockCard(it, three) {
   const main = S(
     [
       nameGroup(it, 'large', 15),
-      T(it.code, { size: 9.5, color: C.dim, mono: true, w: c.code }),
+      col(T(it.code, { size: 9.5, color: C.dim, mono: true }), c.code, 'start'),
       SP(),
-      T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
-      T(fmtPct(it.pct), { size: 14, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
+      col(T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
+      col(T(fmtPct(it.pct), { size: 14, weight: 'semibold', color: color, mono: true }), c.pct, 'end'),
     ],
     { gap: 5, align: 'center' }
   );
