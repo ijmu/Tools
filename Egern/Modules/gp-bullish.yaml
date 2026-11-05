@@ -1,0 +1,32 @@
+name: 看多标的
+description: 极力推荐 / 强烈看多 / 重仓绩优 —— 股票名称 · 代码 · 现价 · 当日涨幅（数据源 gp.xsian.top）
+author: Minis
+
+# 模块设置页的三个输入框（对应脚本里的 ctx.env.GP_SITE / GP_USER / GP_PASS）
+env_schema:
+  GP_SITE:
+    name: 网站
+    description: 平台地址；站点换域名时只改这里
+    default_value: https://gp.xsian.top
+  GP_USER:
+    name: 账号
+    description: 登录用户名
+  GP_PASS:
+    name: 密码
+    description: 登录密码（填错会在小组件上直接提示，不会静默）
+
+# 站点与行情接口直连，不走代理（避免登录 IP 漂移）
+rules:
+  - domain_suffix:
+      match: "xsian.top"
+      policy: DIRECT
+
+scriptings:
+  - generic:
+      name: gp-bullish
+      script_url: "https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/gp-bullish.js?v=20261105"
+      timeout: 30
+
+widgets:
+  - name: 看多标的
+    script_name: gp-bullish
