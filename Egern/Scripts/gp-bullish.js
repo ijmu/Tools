@@ -496,12 +496,22 @@ function widgetRoot(children) {
   };
 }
 
+// 行数少时把行距撑开，避免大片留白；行数多时保持紧凑
+function rowGapFor(size, n) {
+  const H = size === 'large' ? 382 : 170;
+  const fixed = 24 + 16.5 + 12 + 12.6; // padding + 头部 + widget 间隙 + 图例
+  const rowH = 14.5;
+  if (n <= 1) return 3;
+  const g = Math.floor((H - fixed - n * rowH) / (n - 1));
+  return Math.max(3, Math.min(13, g));
+}
+
 function buildWidget(data, size, cfg) {
   const limit = cfg.max > 0 ? cfg.max : ROWS[size] || ROWS.medium;
   const list = data.list.slice(0, limit);
   const compact = size === 'small';
   const rows = list.map((it) => stockRow(it, compact));
-  const rowGap = size === 'small' ? 2 : 3;
+  const rowGap = size === 'small' ? 2 : rowGapFor(size, list.length);
   const children = [header(list, data, cfg), SP(1), S(rows, { dir: 'column', gap: rowGap })];
   if (size !== 'small') {
     children.push(SP(1));
