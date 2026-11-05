@@ -40,8 +40,8 @@ const C = {
 function bg() {
   return {
     type: 'linear',
-    colors: [dyn('#F8FBFF', '#101A2C'), dyn('#EFF4FC', '#16233A'), dyn('#E9F1FA', '#0B1220')],
-    stops: [0, 0.55, 1],
+    colors: [dyn('#FFFFFF', '#0F1A2E'), dyn('#F1F5FB', '#0B1425'), dyn('#E6EDF7', '#07101D')],
+    stops: [0, 0.52, 1],
     startPoint: { x: 0, y: 0 },
     endPoint: { x: 1, y: 1 },
   };
@@ -500,21 +500,21 @@ function stockEntry(it, size, dual) {
       S(
         [
           tagChips(it.tags),
-          T(it.name, { size: 12, weight: 'semibold', color: C.ink, min: 0.8 }),
-          T(it.code, { size: 8.5, color: C.dim, mono: true }),
+          T(it.name, { size: 10.5, weight: 'semibold', color: C.ink, min: 0.8 }),
+          T(it.code, { size: 7.5, color: C.dim, mono: true }),
           SP(),
-          T(fmtPrice(it.price), { size: 12, weight: 'semibold', color: C.ink, mono: true, w: 44, align: 'right' }),
+          T(fmtPrice(it.price), { size: 10.5, weight: 'semibold', color: C.ink, mono: true, w: 40, align: 'right' }),
         ],
         { gap: 3, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 11, weight: 'semibold', color: color, mono: true, w: 46, align: 'right' }), SP()].concat(
-          metaNodes(it, 9.5, true)
+        [T(fmtPct(it.pct), { size: 10, weight: 'semibold', color: color, mono: true, w: 42, align: 'right' }), SP()].concat(
+          metaNodes(it, 8, true)
         ),
-        { gap: 5, align: 'center' }
+        { gap: 4, align: 'center' }
       ),
     ],
-    { dir: 'column', gap: 2 }
+    { dir: 'column', gap: 1 }
   );
 }
 
@@ -536,6 +536,7 @@ function stockRow(it, compact) {
     [
       tagChips(it.tags),
       T(it.name, { size: 11, weight: 'semibold', color: C.ink, min: 0.8 }),
+      SP(2),
       T(it.code, { size: 8, color: C.dim, mono: true }),
       SP(),
       T(fmtPrice(it.price), { size: 10.5, weight: 'semibold', color: C.ink, mono: true, w: 42, align: 'right' }),
@@ -546,43 +547,52 @@ function stockRow(it, compact) {
 }
 
 // 大尺寸专用：每只一张玻璃卡，两行（主行 + 推荐日期/行业/累计收益率）
-function stockCard(it) {
+function stockCard(it, three) {
   const color = pctColor(it.pct);
-  const right = [];
-  if (it.notice) right.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
-  if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
-  const meta = metaNodes(it, 9.5, true).concat([SP()], right);
-  return S(
+  const main = S(
     [
-      S(
-        [
-          tagChips(it.tags),
-          T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8 }),
-          T(it.code, { size: 9.5, color: C.dim, mono: true }),
-          SP(),
-          T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }),
-        ],
-        { gap: 4, align: 'center' }
-      ),
-      S([T(fmtPct(it.pct), { size: 13, weight: 'semibold', color: color, mono: true }), SP()].concat(meta), {
-        gap: 4,
-        align: 'center',
-      }),
+      tagChips(it.tags),
+      T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8 }),
+      T(it.code, { size: 9.5, color: C.dim, mono: true }),
+      SP(),
+      T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }),
+      T(fmtPct(it.pct), { size: 13, weight: 'semibold', color: color, mono: true }),
     ],
-    { dir: 'column', gap: 4, pad: [9, 11, 9, 11], bg: C.glass, radius: 10 }
+    { gap: 5, align: 'center' }
+  );
+  if (!three) {
+    const right = [];
+    if (it.notice) right.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
+    if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
+    const meta = metaNodes(it, 9.5, true).concat([SP()], right);
+    return S([main, S([SP()].concat(meta), { gap: 5, align: 'center' })], {
+      dir: 'column',
+      gap: 5,
+      pad: [10, 12, 10, 12],
+      bg: C.glass,
+      radius: 12,
+    });
+  }
+  // 三行卡：主行 / 成本·收益·调仓 / 推荐日期·行业
+  const foot = [];
+  if (it.notice) foot.push(T('推荐 ' + it.notice.slice(5), { size: 9, color: C.dim }));
+  if (it.industry) foot.push(T('· ' + it.industry, { size: 9, color: C.dim, min: 0.7 }));
+  return S(
+    [main, S(metaNodes(it, 10, true), { gap: 10, align: 'center' }), S(foot, { gap: 3, align: 'center' })],
+    { dir: 'column', gap: 5, pad: [10, 12, 10, 12], bg: C.glass, radius: 12 }
   );
 }
 
 function legend(size) {
-  const sz = size === 'medium' ? 7.5 : 8;
+  const sz = 8;
   const item = (label, name, fg, bgc) =>
     S([chip(label, fg, bgc), T(name, { size: sz, color: C.dim })], { gap: 2, align: 'center' });
   return S(
     [
       item('荐', '极力推荐', C.gold, C.goldBg),
-      SP(6),
+      SP(10),
       item('多', '强烈看多', C.red, C.redBg),
-      SP(6),
+      SP(10),
       item('绩', '重仓绩优', C.purple, C.purpleBg),
     ],
     { align: 'center', gap: 0 }
@@ -591,15 +601,17 @@ function legend(size) {
 
 function header(list, data, cfg) {
   const n = data.total || list.length;
-  const when = data.stale ? '缓存 ' + clockOf(data.at) : clockOf(data.at);
+  const count = (cfg.days > 0 ? '近' + cfg.days + '天 ' : '') + n + ' 只' + (data.stale ? ' · 缓存' : '');
   return S(
     [
-      symbol('chart.line.uptrend.xyaxis', 11, C.gold),
-      T('看多标的', { size: 12.5, weight: 'semibold', color: C.ink }),
+      symbol('chart.line.uptrend.xyaxis', 12, C.gold),
+      T('看多标的', { size: 13.5, weight: 'bold', color: C.ink }),
       SP(),
-      T((cfg.days > 0 ? '近' + cfg.days + '天 ' : '') + n + ' 只 · ' + when, { size: 8.5, color: C.dim, min: 0.8 }),
+      T(count, { size: 9, color: data.stale ? C.gold : C.sub, min: 0.8 }),
+      SP(5),
+      T(data.stale ? clockOf(data.at) : clockOf(data.at), { size: 9, color: C.dim, mono: true }),
     ],
-    { gap: 4, align: 'center' }
+    { gap: 5, align: 'center' }
   );
 }
 
@@ -617,10 +629,10 @@ function widgetRoot(children, bottomPad) {
 // 行数少时把行距撑开，避免大片留白；行数多时保持紧凑
 function rowGapFor(size, n, rowH, hasLegend) {
   const H = size === 'large' ? 382 : 170;
-  const fixed = 24 + 16.5 + 12 + (hasLegend ? 12.6 : 0); // padding + 头部 + widget 间隙 + 图例
+  const fixed = 8 + 16.5 + 12 + (hasLegend ? 12.6 : 0); // padding + 头部 + widget 间隙 + 图例
   if (n <= 1) return 3;
   const g = Math.floor((H - fixed - n * rowH) / (n - 1));
-  return Math.max(2, Math.min(11, g));
+  return Math.max(3, Math.min(8, g));
 }
 
 function buildWidget(data, size, cfg) {
@@ -632,7 +644,8 @@ function buildWidget(data, size, cfg) {
   let body;
 // 标的按正常间距紧凑排列，位置不被拉伸
   if (useCards) {
-    body = S(list.map(stockCard), { dir: 'column', gap: 8 });
+    const three = list.length <= 4;
+    body = S(list.map((it) => stockCard(it, three)), { dir: 'column', gap: 10 });
   } else {
     const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
     const gap = rowGapFor(size, list.length, rowH, hasLegend);
