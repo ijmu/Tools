@@ -498,51 +498,50 @@ function metaNodes(it, size, withNotice, col) {
   }
   return out;
 }
-function stockEntry(it, size, dual) {
+// mode: 'tri' = 三行（富途式：名称/价格 主行，代码·日期/涨幅 次行，持仓细节沉底）
+//       'dual' = 两行（主行全字段 + 持仓细节沉底）
+//       'single' = 单行紧凑
+function stockEntry(it, size, mode) {
   const c = COL[size] || COL.medium;
   const color = pctColor(it.pct);
-  if (size === 'small') {
-    if (!dual) return stockRow(it, true);
+  if (mode === 'single') return stockRow(it, size === 'small');
+  const meta = S([col(null, c.chips + 4)].concat(metaNodes(it, mode === 'tri' ? 8.5 : 8, true, c)), {
+    gap: 6,
+    align: 'center',
+  });
+  if (mode === 'tri') {
     return S(
       [
+        S([nameGroup(it, size, 13), SP(), col(T(fmtPrice(it.price), { size: 14, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end')], { gap: 4, align: 'center' }),
         S(
           [
-            T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7, w: c.name }),
-            T(it.code, { size: 7, color: C.dim, mono: true, w: c.code }),
+            col(null, c.chips + 4),
+            col(T(it.code, { size: 9, color: C.dim, mono: true }), c.code, 'start'),
+            dateBadge(it, 9, c),
             SP(),
-            T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+            col(T(fmtPct(it.pct), { size: 12.5, weight: 'semibold', color: color, mono: true }), c.pct, 'end'),
           ],
-          { gap: 3, align: 'center' }
+          { gap: 4, align: 'center' }
         ),
-        S(
-          [T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
-            metaNodes(it, 7.5, false, null)
-          ),
-          { gap: 3, align: 'center' }
-        ),
+        meta,
       ],
       { dir: 'column', gap: 2 }
     );
   }
-  if (!dual) return stockRow(it, false);
   return S(
     [
       S(
         [
-          nameGroup(it, size, 11.5),
-          T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
+          nameGroup(it, size, 11),
+          col(T(it.code, { size: 8, color: C.dim, mono: true }), c.code, 'start'),
           dateBadge(it, 8, c),
           SP(),
-          T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+          col(T(fmtPrice(it.price), { size: 11, weight: 'semibold', color: C.ink, mono: true }), c.price, 'end'),
+          col(T(fmtPct(it.pct), { size: 11, weight: 'semibold', color: color, mono: true }), c.pct, 'end'),
         ],
         { gap: 4, align: 'center' }
       ),
-      S(
-        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
-          metaNodes(it, 9, true, c)
-        ),
-        { gap: 5, align: 'center' }
-      ),
+      meta,
     ],
     { dir: 'column', gap: 1 }
   );
@@ -674,20 +673,21 @@ function buildWidget(data, size, cfg) {
   const list = data.list.slice(0, limit);
   const hasLegend = size !== 'small';
   const useCards = size === 'large' && list.length <= 5;
-  const dual = (size === 'small' || size === 'medium') && list.length <= 3;
+  const tri = size === 'medium' && list.length <= 2;
+  const dual = (size === 'small' && list.length <= 3) || (size === 'medium' && list.length <= 4 && !tri);
   let body;
 // 标的按正常间距紧凑排列，位置不被拉伸
   if (useCards) {
     const three = list.length <= 4;
     body = S(list.map((it) => stockCard(it, three)), { dir: 'column', gap: 10 });
   } else {
-    const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
+    const rowH = tri ? 50 : dual ? (size === 'small' ? 29 : 27) : 14.5;
     const gap = Math.max(2, Math.floor(rowGapFor(size, list.length, rowH, hasLegend) / 2));
     // 行间加 1pt 分隔线，列表更表格化
     const kids = [];
     list.forEach((it, i) => {
       if (i > 0) kids.push(S([], { h: 1, bg: C.line }));
-      kids.push(stockEntry(it, size, dual));
+      kids.push(stockEntry(it, size, tri ? 'tri' : dual ? 'dual' : 'single'));
     });
     body = S(kids, { dir: 'column', gap: gap });
   }
