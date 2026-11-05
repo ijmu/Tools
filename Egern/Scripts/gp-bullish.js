@@ -117,6 +117,10 @@ function readEnv(ctx) {
     pass: pick('GP_PASS', 'PASSWORD', 'PASS', 'gp_pass'),
     sort: (pick('GP_SORT') || 'pct').toLowerCase(),
     max: parseInt(pick('GP_MAX'), 10),
+    days: (() => {
+      const v = parseInt(pick('GP_DAYS'), 10);
+      return isNaN(v) ? 7 : v; // 0 = 不过滤
+    })(),
   };
 }
 
@@ -288,6 +292,19 @@ function padCode(c) {
   return String(c == null ? '' : c).padStart(6, '0');
 }
 
+// 本地时区的「N 天前」日期串（YYYY-MM-DD）
+function cutoffDate(days) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - days);
+  const p = (n) => (n < 10 ? '0' + n : '' + n);
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
+function todayStr() {
+  return cutoffDate(0);
+}
+
 function dateValue(s) {
   const t = Date.parse(String(s || '').slice(0, 10) + 'T00:00:00Z');
   return Number.isFinite(t) ? t : 0;
@@ -295,11 +312,16 @@ function dateValue(s) {
 
 function buildList(items, quotes, cfg) {
   const map = new Map();
+  const cut = cfg.days > 0 ? cutoffDate(cfg.days) : '';
+
   for (const it of items) {
     const code = padCode(it.SECURITY_CODE);
     const tags = tagsOf(it);
     if (!tags.quality && !tags.strong && !tags.heavy) continue;
     if (map.has(code)) continue;
+    const notice = String(it.NOTICE_DATE || '').slice(0, 10);
+    // 只留新鲜推荐的：日期早于截止日的直接丢；日期异常的（未来/空）保留并标 —
+    if (cut && /^\d{4}-\d{2}-\d{2}$/.test(notice) && notice < cut) continue;
     const q = quotes[code] || {};
     const price = Number(q.price) > 0 ? Number(q.price) : Number(it.CURRENT_PRICE) || 0;
     const pct = q.change_pct == null || isNaN(Number(q.change_pct)) ? null : Number(q.change_pct);
@@ -309,7 +331,7 @@ function buildList(items, quotes, cfg) {
       price,
       pct,
       pnl: Number(it.CURRENT_PNL_RATIO),
-      notice: String(it.NOTICE_DATE || '').slice(0, 10),
+      notice,
       tags,
     });
   }
@@ -351,17 +373,21 @@ async function loadData(ctx, cfg) {
     }
   }
   const list = buildList(items, quotes, cfg);
-  if (!list.length) throw new Error('三个标签当前都没有标的');
-  storeSet(ctx, 'cache', JSON.stringify({ at: Date.now(), total: list.length, list: list.slice(0, 60) }));
+  if (!list.length) throw new Error(cfg.days > 0 ? '近 ' + cfg.days + ' 天没有新推荐的标的' : '三个标签当前都没有标的');
+  storeSet(ctx, 'cache:' + cfg.site, JSON.stringify({ at: Date.now(), total: list.length, list: list.slice(0, 60) }));
   return { list, total: list.length, at: Date.now(), stale: false };
 }
 
-function cachedData(ctx) {
-  const raw = storeGet(ctx, 'cache');
+// 缓存只在拉取失败时兜底：按站点隔离（换网址不串数据），且超过 3 小时视为过期不用
+const CACHE_TTL = 3 * 60 * 60 * 1000;
+
+function cachedData(ctx, cfg) {
+  const raw = storeGet(ctx, 'cache:' + cfg.site) || storeGet(ctx, 'cache');
   if (!raw) return null;
   try {
     const d = JSON.parse(raw);
     if (!d || !Array.isArray(d.list) || !d.list.length) return null;
+    if (Date.now() - (d.at || 0) > CACHE_TTL) return null;
     return { list: d.list, total: d.total || d.list.length, at: d.at || 0, stale: true };
   } catch (e) {
     return null;
@@ -445,7 +471,7 @@ function legend(size) {
   );
 }
 
-function header(list, data) {
+function header(list, data, cfg) {
   const n = data.total || list.length;
   const when = data.stale ? '缓存 ' + clockOf(data.at) : clockOf(data.at);
   return S(
@@ -453,7 +479,7 @@ function header(list, data) {
       symbol('chart.line.uptrend.xyaxis', 11, C.gold),
       T('看多标的', { size: 12.5, weight: 'semibold', color: C.ink }),
       SP(),
-      T(n + ' 只 · ' + when, { size: 8.5, color: C.dim, min: 0.8 }),
+      T((cfg.days > 0 ? '近' + cfg.days + '天 ' : '') + n + ' 只 · ' + when, { size: 8.5, color: C.dim, min: 0.8 }),
     ],
     { gap: 4, align: 'center' }
   );
@@ -476,7 +502,7 @@ function buildWidget(data, size, cfg) {
   const compact = size === 'small';
   const rows = list.map((it) => stockRow(it, compact));
   const rowGap = size === 'small' ? 2 : 3;
-  const children = [header(list, data), SP(1), S(rows, { dir: 'column', gap: rowGap })];
+  const children = [header(list, data, cfg), SP(1), S(rows, { dir: 'column', gap: rowGap })];
   if (size !== 'small') {
     children.push(SP(1));
     children.push(legend(size));
@@ -515,7 +541,7 @@ export default async function (ctx) {
     const data = await loadData(ctx, cfg);
     return buildWidget(data, size, cfg);
   } catch (e) {
-    const cached = cachedData(ctx);
+    const cached = cachedData(ctx, cfg);
     if (cached) return buildWidget(cached, size, cfg);
     return buildMessage('拿不到数据', (e && (e.message || String(e))) || '网络异常', '模块设置：' + cfg.site + ' · 账号 ' + (cfg.user || '未填'));
   }
