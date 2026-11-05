@@ -148,18 +148,28 @@ function headers(cfg, extra) {
   );
 }
 
+function toForm(obj) {
+  const parts = [];
+  for (const k of Object.keys(obj)) {
+    parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(obj[k] == null ? '' : obj[k]));
+  }
+  return parts.join('&');
+}
+
+// mode: 'json' = 预序列化字符串 | 'obj' = 直接把对象交给宿主序列化 | 'form' = 表单编码
 async function httpJson(ctx, cfg, path, opts) {
   opts = opts || {};
   const url = cfg.site + path;
   const h = headers(cfg, opts.headers);
+  const mode = opts.mode || 'json';
   let resp;
   if (opts.body != null) {
-    h['Content-Type'] = 'application/json';
-    resp = await ctx.http.post(url, {
-      body: typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body),
-      headers: h,
-      timeout: opts.timeout || 20000,
-    });
+    h['Content-Type'] = mode === 'form' ? 'application/x-www-form-urlencoded' : 'application/json';
+    const req = { headers: h, timeout: opts.timeout || 20000 };
+    if (mode === 'obj') req.body = opts.body;
+    else if (mode === 'form') req.body = toForm(opts.body);
+    else req.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
+    resp = await ctx.http.post(url, req);
   } else {
     resp = await ctx.http.get(url, { headers: h, timeout: opts.timeout || 20000 });
   }
@@ -172,23 +182,41 @@ async function httpJson(ctx, cfg, path, opts) {
   try {
     json = JSON.parse(text);
   } catch (e) {}
-  const err = new Error((json && (json.message || json.msg)) || 'HTTP ' + status);
+  const msg = (json && (json.message || json.msg)) || String(text || '').trim().slice(0, 70);
+  const err = new Error((status ? 'HTTP ' + status + ' @ ' + path : '@ ' + path) + (msg ? ' · ' + msg : ''));
   err.status = status;
   err.authDead = status === 401 || status === 403;
+  err.format = status === 400;
   if (!resp || !status || status >= 400) throw err;
-  if (!json) throw new Error('接口未返回 JSON（' + String(text).slice(0, 80) + '）');
+  if (!json) throw new Error(path + ' 未返回 JSON · ' + String(text).slice(0, 70));
   return json;
 }
 
 // 登录：成功拿 token；若服务端要求「原设备确认」则轮询
+// 宿主把 POST body 丢掉时会拿到 400「无效的请求格式」，所以换三种 body 形态各试一次
 async function login(ctx, cfg) {
   if (!cfg.user || !cfg.pass) throw new Error('模块设置里缺少账号或密码');
-  const j = await httpJson(ctx, cfg, '/api/login', {
-    body: { username: cfg.user, password: cfg.pass, public_ip: storeGet(ctx, 'ip') || '' },
-  });
+  const payload = { username: cfg.user, password: cfg.pass, public_ip: storeGet(ctx, 'ip') || '' };
+  const modes = ['json', 'obj', 'form'];
+  let lastErr = null;
+  for (let i = 0; i < modes.length; i++) {
+    const mode = modes[i];
+    try {
+      const j = await httpJson(ctx, cfg, '/api/login', { body: payload, mode });
+      return await adoptLogin(ctx, cfg, j, mode);
+    } catch (e) {
+      if (e.status !== 400) throw e;
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('登录失败');
+}
+
+async function adoptLogin(ctx, cfg, j, mode) {
   if (j.success && j.token) {
     storeSet(ctx, 'token', j.token);
     storeSet(ctx, 'token_at', String(Date.now()));
+    storeSet(ctx, 'login_mode', mode);
     return j.token;
   }
   if (j.pending && j.req_id) {
@@ -202,7 +230,7 @@ async function login(ctx, cfg) {
         return s.token;
       }
     }
-    throw new Error('需要在网页端点「允许」新设备登录');
+    throw new Error('需在网页端点「允许」新设备登录');
   }
   throw new Error(j.message || '账号或密码错误');
 }
