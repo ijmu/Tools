@@ -34,6 +34,7 @@ const C = {
   green: dyn('#12885A', '#5CD69B'),
   purple: dyn('#6B4FC0', '#B49BFF'),
   purpleBg: dyn('#EDE7FF', '#2C2350'),
+  glass: dyn('#FFFFFFB8', '#FFFFFF14'),
 };
 
 function bg() {
@@ -331,6 +332,7 @@ function buildList(items, quotes, cfg) {
       price,
       pct,
       pnl: Number(it.CURRENT_PNL_RATIO),
+      industry: String(it.INDUSTRY || '').trim(),
       notice,
       tags,
     });
@@ -414,6 +416,12 @@ function fmtPct(v) {
   return (n > 0 ? '+' : '') + n.toFixed(2) + '%';
 }
 
+function fmtPnl(v) {
+  if (v == null || isNaN(v)) return '—';
+  const n = Number(v);
+  return (n > 0 ? '+' : '') + n.toFixed(2) + '%';
+}
+
 function pctColor(v) {
   if (v == null || isNaN(v) || Math.abs(Number(v)) < 0.005) return C.dim;
   return Number(v) > 0 ? C.red : C.green;
@@ -452,6 +460,35 @@ function stockRow(it, compact) {
       T(fmtPct(it.pct), { size: 10.5, weight: 'semibold', color: color, mono: true, w: 46, align: 'right' }),
     ],
     { gap: 3, align: 'center' }
+  );
+}
+
+// 大尺寸专用：每只一张玻璃卡，两行（主行 + 推荐日期/行业/累计收益率）
+function stockCard(it) {
+  const color = pctColor(it.pct);
+  const meta = [];
+  if (it.notice) meta.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
+  if (it.industry) meta.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
+  meta.push(SP());
+  meta.push(T('累计 ' + fmtPnl(it.pnl), { size: 9.5, weight: 'semibold', color: pctColor(it.pnl) }));
+  return S(
+    [
+      S(
+        [
+          tagChips(it.tags),
+          T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8 }),
+          T(it.code, { size: 9.5, color: C.dim, mono: true }),
+          SP(),
+          T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }),
+        ],
+        { gap: 4, align: 'center' }
+      ),
+      S([T(fmtPct(it.pct), { size: 13, weight: 'semibold', color: color, mono: true }), SP()].concat(meta), {
+        gap: 4,
+        align: 'center',
+      }),
+    ],
+    { dir: 'column', gap: 4, pad: [9, 11, 9, 11], bg: C.glass, radius: 10 }
   );
 }
 
@@ -511,8 +548,10 @@ function buildWidget(data, size, cfg) {
   const list = data.list.slice(0, limit);
   const compact = size === 'small';
   const rows = list.map((it) => stockRow(it, compact));
-  const rowGap = size === 'small' ? 2 : rowGapFor(size, list.length);
-  const children = [header(list, data, cfg), SP(1), S(rows, { dir: 'column', gap: rowGap })];
+  const useCards = size === 'large' && list.length <= 5;
+  const rowGap = size === 'small' ? 2 : Math.min(rowGapFor(size, list.length), useCards ? 8 : 13);
+  const body = useCards ? S(list.map(stockCard), { dir: 'column', gap: 10 }) : S(rows, { dir: 'column', gap: rowGap });
+  const children = [header(list, data, cfg), SP(1), body];
   if (size !== 'small') {
     children.push(SP(1));
     children.push(legend(size));
