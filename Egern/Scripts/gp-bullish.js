@@ -480,14 +480,14 @@ function stockEntry(it, size, dual) {
       [
         S(
           [
-            T(it.name, { size: 10.5, weight: 'semibold', color: C.ink, min: 0.7 }),
-            T(it.code, { size: 7.5, color: C.dim, mono: true }),
+            T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7 }),
+            T(it.code, { size: 7, color: C.dim, mono: true }),
             SP(),
-            T(fmtPrice(it.price), { size: 10, weight: 'semibold', color: C.ink, mono: true, w: 34, align: 'right' }),
+            T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: 34, align: 'right' }),
           ],
           { gap: 3, align: 'center' }
         ),
-        S([T(fmtPct(it.pct), { size: 10, weight: 'semibold', color: color, mono: true, w: 36, align: 'right' }), SP()].concat(
+        S([T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: 40, align: 'right' }), SP()].concat(
           metaNodes(it, 7.5, false)
         ), { gap: 3, align: 'center' }),
       ],
@@ -500,16 +500,16 @@ function stockEntry(it, size, dual) {
       S(
         [
           tagChips(it.tags),
-          T(it.name, { size: 10.5, weight: 'semibold', color: C.ink, min: 0.8 }),
-          T(it.code, { size: 7.5, color: C.dim, mono: true }),
+          T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
+          T(it.code, { size: 8, color: C.dim, mono: true }),
           SP(),
-          T(fmtPrice(it.price), { size: 10.5, weight: 'semibold', color: C.ink, mono: true, w: 40, align: 'right' }),
+          T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
         ],
         { gap: 3, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 10, weight: 'semibold', color: color, mono: true, w: 42, align: 'right' }), SP()].concat(
-          metaNodes(it, 8, true)
+        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: 50, align: 'right' }), SP()].concat(
+          metaNodes(it, 9, true)
         ),
         { gap: 4, align: 'center' }
       ),
@@ -535,12 +535,12 @@ function stockRow(it, compact) {
   return S(
     [
       tagChips(it.tags),
-      T(it.name, { size: 11, weight: 'semibold', color: C.ink, min: 0.8 }),
+      T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
       SP(2),
       T(it.code, { size: 8, color: C.dim, mono: true }),
       SP(),
-      T(fmtPrice(it.price), { size: 10.5, weight: 'semibold', color: C.ink, mono: true, w: 42, align: 'right' }),
-      T(fmtPct(it.pct), { size: 10.5, weight: 'semibold', color: color, mono: true, w: 46, align: 'right' }),
+      T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
+      T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: 50, align: 'right' }),
     ],
     { gap: 3, align: 'center' }
   );
@@ -556,7 +556,7 @@ function stockCard(it, three) {
       T(it.code, { size: 9.5, color: C.dim, mono: true }),
       SP(),
       T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }),
-      T(fmtPct(it.pct), { size: 13, weight: 'semibold', color: color, mono: true }),
+      T(fmtPct(it.pct), { size: 14, weight: 'semibold', color: color, mono: true }),
     ],
     { gap: 5, align: 'center' }
   );
