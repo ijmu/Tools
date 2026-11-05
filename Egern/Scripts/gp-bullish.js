@@ -451,10 +451,25 @@ function fmtChg(it) {
 }
 
 // 副行：成本价 / 收益率 / 调仓变动（各自按涨跌着色）
-function metaNodes(it, size, withNotice) {
+// 列宽表：代码/日期/成本/收益/调仓各自成列，不随 chip 数量与名称长度推移
+const COL = {
+  small: { chips: 0, name: 36, code: 25, date: 0, price: 34, pct: 39 },
+  medium: { chips: 46, name: 48, code: 30, date: 38, price: 46, pct: 50, cost: 50, pnl: 58, chg: 78 },
+  large: { chips: 46, name: 66, code: 36, date: 42, price: 54, pct: 58, cost: 56, pnl: 64, chg: 88 },
+};
+
+function chipsCol(it, size) {
+  const c = COL[size] || COL.medium;
+  if (!c.chips) return null;
+  return S(tagChips(it.tags).children, { gap: 2, align: 'center', w: c.chips });
+}
+
+function metaNodes(it, size, withNotice, col) {
   const out = [];
-  if (it.cost > 0) out.push(T('成本 ' + fmtCost(it.cost), { size: size, color: C.dim, mono: true }));
-  if (!isNaN(it.pnl)) out.push(T('收益 ' + fmtPnl(it.pnl), { size: size, weight: 'semibold', color: pctColor(it.pnl) }));
+  const w = (k) => (col && col[k] ? col[k] : undefined);
+  if (it.cost > 0) out.push(T('成本 ' + fmtCost(it.cost), { size: size, color: C.dim, mono: true, w: w('cost') }));
+  if (!isNaN(it.pnl))
+    out.push(T('收益 ' + fmtPnl(it.pnl), { size: size, weight: 'semibold', color: pctColor(it.pnl), w: w('pnl') }));
   const chg = fmtChg(it);
   if (chg !== '—') {
     // 幅度站点未下发（普通账号 CHANGE_RATIO_VAL 全为 null），按方向着色：增持/新进=红，减持=绿
@@ -466,13 +481,12 @@ function metaNodes(it, size, withNotice) {
         : it.chgType
         ? C.red
         : C.dim;
-    out.push(T('调仓 ' + chg, { size: size, weight: 'semibold', color: chgColor, min: 0.75 }));
+    out.push(T('调仓 ' + chg, { size: size, weight: 'semibold', color: chgColor, min: 0.75, w: w('chg') }));
   }
   return out;
 }
-
-// 单只条目：dual = 主行 + 副行（推荐日期/行业/累计收益率），用于标的很少时把版面撑起来
 function stockEntry(it, size, dual) {
+  const c = COL[size] || COL.medium;
   const color = pctColor(it.pct);
   if (size === 'small') {
     if (!dual) return stockRow(it, true);
@@ -480,16 +494,19 @@ function stockEntry(it, size, dual) {
       [
         S(
           [
-            T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7 }),
-            T(it.code, { size: 7, color: C.dim, mono: true }),
+            T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7, w: c.name }),
+            T(it.code, { size: 7, color: C.dim, mono: true, w: c.code }),
             SP(),
-            T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: 34, align: 'right' }),
+            T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
           ],
           { gap: 3, align: 'center' }
         ),
-        S([T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: 40, align: 'right' }), SP()].concat(
-          metaNodes(it, 7.5, false)
-        ), { gap: 3, align: 'center' }),
+        S(
+          [T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
+            metaNodes(it, 7.5, false, null)
+          ),
+          { gap: 3, align: 'center' }
+        ),
       ],
       { dir: 'column', gap: 2 }
     );
@@ -499,85 +516,80 @@ function stockEntry(it, size, dual) {
     [
       S(
         [
-          tagChips(it.tags),
-          T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
-          T(it.code, { size: 8, color: C.dim, mono: true }),
-          SP(6),
-          dateBadge(it, 8),
+          chipsCol(it, size),
+          T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+          T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
+          dateBadge(it, 8, c),
           SP(),
-          T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
+          T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
         ],
-        { gap: 3, align: 'center' }
+        { gap: 4, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: 50, align: 'right' }), SP()].concat(
-          metaNodes(it, 9, true)
+        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
+          metaNodes(it, 9, true, c)
         ),
-        { gap: 4, align: 'center' }
+        { gap: 5, align: 'center' }
       ),
     ],
     { dir: 'column', gap: 1 }
   );
 }
-
-// 推荐日期：日历图标 + MM-DD，作为辅助信息轴
-function dateBadge(it, size) {
-  if (!it.notice) return null;
+function dateBadge(it, size, col) {
+  const w = col && col.date ? col.date : undefined;
+  if (!it.notice) return w ? S([], { w: w }) : null;
   return S(
     [symbol('calendar', size, C.dim), T(it.notice.slice(5), { size: size, color: C.dim, mono: true })],
-    { gap: 2, align: 'center' }
+    { gap: 2, align: 'center', w: w }
   );
 }
-
 function stockRow(it, compact) {
+  const c = compact ? COL.small : COL.medium;
   const color = pctColor(it.pct);
   if (compact) {
     return S(
       [
-        T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7 }),
-        T(it.code, { size: 7.5, color: C.dim, mono: true }),
+        T(it.name, { size: 9.5, weight: 'semibold', color: C.ink, min: 0.7, w: c.name }),
+        T(it.code, { size: 7.5, color: C.dim, mono: true, w: c.code }),
         SP(),
-        T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: 36, align: 'right' }),
-        T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: 41, align: 'right' }),
+        T(fmtPrice(it.price), { size: 9.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+        T(fmtPct(it.pct), { size: 9.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
       ],
       { gap: 3, align: 'center' }
     );
   }
   return S(
     [
-      tagChips(it.tags),
-      T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
-      SP(2),
-      T(it.code, { size: 8, color: C.dim, mono: true }),
-      SP(6),
-      dateBadge(it, 8),
+      chipsCol(it, 'medium'),
+      T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+      T(it.code, { size: 8, color: C.dim, mono: true, w: c.code }),
+      dateBadge(it, 8, c),
       SP(),
-      T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
-      T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: 50, align: 'right' }),
+      T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+      T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
     ],
-    { gap: 3, align: 'center' }
+    { gap: 4, align: 'center' }
   );
 }
-
-// 大尺寸专用：每只一张玻璃卡，两行（主行 + 推荐日期/行业/累计收益率）
 function stockCard(it, three) {
+  const c = COL.large;
   const color = pctColor(it.pct);
   const main = S(
     [
-      tagChips(it.tags),
-      T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8 }),
-      T(it.code, { size: 9.5, color: C.dim, mono: true }),
+      chipsCol(it, 'large'),
+      T(it.name, { size: 15, weight: 'semibold', color: C.ink, min: 0.8, w: c.name }),
+      T(it.code, { size: 9.5, color: C.dim, mono: true, w: c.code }),
       SP(),
-      T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true }),
-      T(fmtPct(it.pct), { size: 14, weight: 'semibold', color: color, mono: true }),
+      T(fmtPrice(it.price), { size: 15, weight: 'semibold', color: C.ink, mono: true, w: c.price, align: 'right' }),
+      T(fmtPct(it.pct), { size: 14, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }),
     ],
     { gap: 5, align: 'center' }
   );
   if (!three) {
     const right = [];
-    if (it.notice) right.push(T('推荐 ' + it.notice.slice(5), { size: 9.5, color: C.dim }));
+    if (it.notice) right.push(dateBadge(it, 9.5, null));
     if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
-    const meta = metaNodes(it, 9.5, true).concat([SP()], right);
+    const meta = metaNodes(it, 9.5, true, c).concat([SP()], right);
     return S([main, S([SP()].concat(meta), { gap: 5, align: 'center' })], {
       dir: 'column',
       gap: 5,
@@ -588,14 +600,13 @@ function stockCard(it, three) {
   }
   // 三行卡：主行 / 成本·收益·调仓 / 推荐日期·行业
   const foot = [];
-  if (it.notice) foot.push(dateBadge(it, 9));
+  if (it.notice) foot.push(dateBadge(it, 9, c));
   if (it.industry) foot.push(T('· ' + it.industry, { size: 9, color: C.dim, min: 0.7 }));
   return S(
-    [main, S(metaNodes(it, 10, true), { gap: 10, align: 'center' }), S(foot, { gap: 3, align: 'center' })],
+    [main, S(metaNodes(it, 10, true, c), { gap: 8, align: 'center' }), S(foot, { gap: 3, align: 'center' })],
     { dir: 'column', gap: 5, pad: [10, 12, 10, 12], bg: C.glass, radius: 12 }
   );
 }
-
 function legend(size) {
   const sz = 8;
   const item = (label, name, fg, bgc) =>
