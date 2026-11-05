@@ -620,7 +620,7 @@ function rowGapFor(size, n, rowH, hasLegend) {
   const fixed = 24 + 16.5 + 12 + (hasLegend ? 12.6 : 0); // padding + 头部 + widget 间隙 + 图例
   if (n <= 1) return 3;
   const g = Math.floor((H - fixed - n * rowH) / (n - 1));
-  return Math.max(2, Math.min(16, g));
+  return Math.max(2, Math.min(11, g));
 }
 
 function buildWidget(data, size, cfg) {
@@ -630,24 +630,17 @@ function buildWidget(data, size, cfg) {
   const useCards = size === 'large' && list.length <= 5;
   const dual = (size === 'small' || size === 'medium') && list.length <= 3;
   let body;
-  // 条目之间用弹性 spacer 均分剩余高度：标的少时自然铺开，多了自动压回最小间距
-  const spaced = [];
-  const push = (node, i) => {
-    if (i > 0) spaced.push(SP());
-    spaced.push(node);
-  };
+// 标的按正常间距紧凑排列，位置不被拉伸
   if (useCards) {
-    list.forEach((it, i) => push(stockCard(it), i));
-    body = S(spaced, { dir: 'column', gap: 3, flex: 1 });
+    body = S(list.map(stockCard), { dir: 'column', gap: 8 });
   } else {
     const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
-    const baseGap = rowGapFor(size, list.length, rowH, hasLegend);
-    list.forEach((it, i) => push(stockEntry(it, size, dual), i));
-    body = S(spaced, { dir: 'column', gap: Math.max(2, Math.min(4, baseGap)), flex: 1 });
+    const gap = rowGapFor(size, list.length, rowH, hasLegend);
+    body = S(list.map((it) => stockEntry(it, size, dual)), { dir: 'column', gap: gap });
   }
-  // 头部紧贴内容；body 用 flex 吃掉全部剩余高度（内部弹性间距均分），图例因而钉在最底部
-  const children = [header(list, data, cfg), body];
-  if (hasLegend) children.push(S([SP(), legend(size), SP()], { align: 'center' }));
+  // 头部 → 标的列表 → （弹性留白）→ 图例，图例固定左下角
+  const children = [header(list, data, cfg), body, SP()];
+  if (hasLegend) children.push(legend(size));
   return widgetRoot(children, hasLegend ? 4 : 10);
 }
 
