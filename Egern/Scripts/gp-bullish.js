@@ -531,10 +531,10 @@ function stockEntry(it, size, dual) {
         { gap: 4, align: 'center' }
       ),
       S(
-        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct, align: 'right' }), SP()].concat(
+        [T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: c.pct })].concat(
           metaNodes(it, 9, true, c)
         ),
-        { gap: 5, align: 'center' }
+        { gap: 6, align: 'center' }
       ),
     ],
     { dir: 'column', gap: 1 }
@@ -592,8 +592,8 @@ function stockCard(it, three) {
     const right = [];
     if (it.notice) right.push(dateBadge(it, 9.5, null));
     if (it.industry) right.push(T('· ' + it.industry, { size: 9.5, color: C.dim, min: 0.7 }));
-    const meta = metaNodes(it, 9.5, true, c).concat([SP()], right);
-    return S([main, S([SP()].concat(meta), { gap: 5, align: 'center' })], {
+    const meta = metaNodes(it, 9.5, true, c).concat(right);
+    return S([main, S(meta, { gap: 5, align: 'center' })], {
       dir: 'column',
       gap: 5,
       pad: [10, 12, 10, 12],
