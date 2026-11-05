@@ -1,5 +1,5 @@
 name: 看多标的
-description: 极力推荐 / 强烈看多 / 重仓绩优 —— 股票名称 · 代码 · 现价 · 当日涨幅（数据源 gp.xsian.top）
+description: 展示「极力推荐 / 强烈看多 / 重仓绩优」标的：名称 · 代码 · 推荐日期 · 现价 · 当日涨幅，并附资本家成本价 / 收益率 / 调仓变动；只保留最近 N 天（默认 7）推荐，按推荐日期倒序（数据源 gp.xsian.top）
 author: Minis
 
 # 模块设置页的三个输入框（对应脚本里的 ctx.env.GP_SITE / GP_USER / GP_PASS）
