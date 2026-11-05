@@ -15,12 +15,6 @@ env_schema:
     name: 密码
     description: 登录密码（填错会在小组件上直接提示，不会静默）
 
-# 站点与行情接口直连，不走代理（避免登录 IP 漂移）
-rules:
-  - domain_suffix:
-      match: "xsian.top"
-      policy: DIRECT
-
 scriptings:
   - generic:
       name: gp-bullish
