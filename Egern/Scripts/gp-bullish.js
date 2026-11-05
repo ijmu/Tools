@@ -115,7 +115,7 @@ function readEnv(ctx) {
     site,
     user: pick('GP_USER', 'USERNAME', 'USER', 'gp_user'),
     pass: pick('GP_PASS', 'PASSWORD', 'PASS', 'gp_pass'),
-    sort: (pick('GP_SORT') || 'pct').toLowerCase(),
+    sort: (pick('GP_SORT') || 'date').toLowerCase(),
     max: parseInt(pick('GP_MAX'), 10),
     days: (() => {
       const v = parseInt(pick('GP_DAYS'), 10);
