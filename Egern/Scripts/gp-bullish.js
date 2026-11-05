@@ -502,6 +502,8 @@ function stockEntry(it, size, dual) {
           tagChips(it.tags),
           T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
           T(it.code, { size: 8, color: C.dim, mono: true }),
+          SP(6),
+          dateBadge(it, 8),
           SP(),
           T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
         ],
@@ -515,6 +517,15 @@ function stockEntry(it, size, dual) {
       ),
     ],
     { dir: 'column', gap: 1 }
+  );
+}
+
+// 推荐日期：日历图标 + MM-DD，作为辅助信息轴
+function dateBadge(it, size) {
+  if (!it.notice) return null;
+  return S(
+    [symbol('calendar', size, C.dim), T(it.notice.slice(5), { size: size, color: C.dim, mono: true })],
+    { gap: 2, align: 'center' }
   );
 }
 
@@ -538,6 +549,8 @@ function stockRow(it, compact) {
       T(it.name, { size: 11.5, weight: 'semibold', color: C.ink, min: 0.8 }),
       SP(2),
       T(it.code, { size: 8, color: C.dim, mono: true }),
+      SP(6),
+      dateBadge(it, 8),
       SP(),
       T(fmtPrice(it.price), { size: 11.5, weight: 'semibold', color: C.ink, mono: true, w: 46, align: 'right' }),
       T(fmtPct(it.pct), { size: 11.5, weight: 'semibold', color: color, mono: true, w: 50, align: 'right' }),
@@ -575,7 +588,7 @@ function stockCard(it, three) {
   }
   // 三行卡：主行 / 成本·收益·调仓 / 推荐日期·行业
   const foot = [];
-  if (it.notice) foot.push(T('推荐 ' + it.notice.slice(5), { size: 9, color: C.dim }));
+  if (it.notice) foot.push(dateBadge(it, 9));
   if (it.industry) foot.push(T('· ' + it.industry, { size: 9, color: C.dim, min: 0.7 }));
   return S(
     [main, S(metaNodes(it, 10, true), { gap: 10, align: 'center' }), S(foot, { gap: 3, align: 'center' })],
@@ -648,8 +661,14 @@ function buildWidget(data, size, cfg) {
     body = S(list.map((it) => stockCard(it, three)), { dir: 'column', gap: 10 });
   } else {
     const rowH = dual ? (size === 'small' ? 29 : 32.5) : 14.5;
-    const gap = rowGapFor(size, list.length, rowH, hasLegend);
-    body = S(list.map((it) => stockEntry(it, size, dual)), { dir: 'column', gap: gap });
+    const gap = Math.max(2, Math.floor(rowGapFor(size, list.length, rowH, hasLegend) / 2));
+    // 行间加 1pt 分隔线，列表更表格化
+    const kids = [];
+    list.forEach((it, i) => {
+      if (i > 0) kids.push(S([], { h: 1, bg: C.line }));
+      kids.push(stockEntry(it, size, dual));
+    });
+    body = S(kids, { dir: 'column', gap: gap });
   }
   // 头部 → 标的列表 → （弹性留白）→ 图例，图例固定左下角
   const children = [header(list, data, cfg), body, SP()];
