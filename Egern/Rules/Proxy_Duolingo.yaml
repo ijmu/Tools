@@ -1,9 +1,0 @@
-# Proxy / Duolingo（国际版）
-# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Proxy_Duolingo.yaml
-# 来源: blackmatrix7/ios_rule_script · MetaCubeX/meta-rules-dat · v2fly/domain-list-community
-# 补充: d35aaqx5ub95lt.cloudfront.net 为 Duolingo 静态资源 CDN（www.duolingo.com 页面实测 12 处引用）
-# 注意: 中国版 duolingo.cn 不在此文件，见 Direct_Duolingo_CN.yaml
-
-domain_suffix_set:
-  - duolingo.com
-  - d35aaqx5ub95lt.cloudfront.net

@@ -1,0 +1,47 @@
+# Duolingo 分流模块（Egern）
+# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
+#
+# 一个文件搞定三件事：
+#   1. 国际版 duolingo.com + 静态 CDN → 代理（PROXY 参数，默认 Manual）
+#   2. 中国版 duolingo.cn → 直连（阿里云国内节点 110.75.170.67）
+#   3. 广告/遥测子域 → REJECT（必须在 duolingo.com 之前，否则被后缀吃掉）
+#
+# 数据来源：blackmatrix7/ios_rule_script · MetaCubeX/meta-rules-dat ·
+#          v2fly/domain-list-community · www.duolingo.com 页面实测（CDN 引用 12 处）
+name: Duolingo
+description: 多邻国：国际版走代理、中国版直连、广告与埋点拦截
+author: ijmu
+homepage: https://github.com/ijmu/Tools
+icon: books.vertical.fill
+
+compat_arguments:
+  PROXY: "Manual"
+
+rules:
+  # 中国版直连
+  - domain_suffix:
+      match: duolingo.cn
+      policy: DIRECT
+      name: Duolingo CN
+  # 广告 / 埋点（精确子域，先于国际版后缀）
+  - domain_suffix:
+      match: ads-api.duolingo.com
+      policy: REJECT
+      name: Duolingo Ads
+  - domain_suffix:
+      match: analytics.vpc.duolingo.com
+      policy: REJECT
+      name: Duolingo Telemetry
+  - domain_suffix:
+      match: metrics.duolingo.com
+      policy: REJECT
+      name: Duolingo Metrics
+  # 国际版 + 静态资源 CDN
+  - domain_suffix:
+      match: duolingo.com
+      policy: "{{{PROXY}}}"
+      name: Duolingo Global
+  - domain_suffix:
+      match: d35aaqx5ub95lt.cloudfront.net
+      policy: "{{{PROXY}}}"
+      name: Duolingo CDN

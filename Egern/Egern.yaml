@@ -388,6 +388,11 @@ mitm:
     - raw.githubusercontent.com
     - github.com
 modules:
+- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
+  compat_arguments:
+    PROXY: Manual
+  update_interval: 86400
+  enabled: true
 - url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Egern-YouTube.yaml
   compat_arguments:
     blockUpload: 'true'
