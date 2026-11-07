@@ -58,7 +58,7 @@ env_schema:
 scriptings:
 - generic:
     name: 节日倒计时
-    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js?v=20261018
+    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js
     timeout: 30
 widgets:
 - name: 节日倒计时

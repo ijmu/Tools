@@ -2,14 +2,11 @@ name: 天气·黄历
 description: 中国天气网免 Key · Hark 玻璃卡风格 · 农历/干支/黄道黑道 · 宜忌 · 无节日倒计时
 author: Minis
 icon: https://raw.githubusercontent.com/SIJULY/egern-radar/main/weather-icon.png
-compat_arguments:
-  weatherCity: ''
-compat_arguments_schema:
-  weatherCity:
+env_schema:
+  CITY:
     name: 城市
     description: 要查询的城市，例如 莆田、北京、阳江；留空或填"自动"则按 IP 自动定位
     default_value: ''
-dns: {}
 rules:
   - domain_suffix:
       match: "weather.com.cn"
@@ -32,7 +29,6 @@ scriptings:
     script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/WeatherWdg-almanac.js
     timeout: 15
     env:
-      CITY: '{{{weatherCity}}}'
       ALM_STYLE: hark
       SHOW_ALM: '1'
       SHOW_FESTIVAL: '0'
