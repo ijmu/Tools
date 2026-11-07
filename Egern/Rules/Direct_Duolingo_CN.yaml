@@ -1,0 +1,7 @@
+# Direct / Duolingo 中国版
+# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Duolingo_CN.yaml
+# duolingo.cn 解析到阿里云国内节点（110.75.170.67 / NS vip3.alidns.com），直连即可
+# 注意: 必须排在 Proxy_Duolingo.yaml 之前，否则会被国际版规则一并代理
+
+domain_suffix_set:
+  - duolingo.cn

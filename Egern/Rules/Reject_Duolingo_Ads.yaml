@@ -1,0 +1,9 @@
+# Reject / Duolingo 广告与遥测（可选）
+# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Reject_Duolingo_Ads.yaml
+# 来源: v2fly/domain-list-community 的 @ads / @telemetry 标注
+# 说明: 仅拦广告下发与埋点，不影响课程与打卡；不需要可不在 Egern.yaml 里引用
+
+domain_suffix_set:
+  - ads-api.duolingo.com
+  - analytics.vpc.duolingo.com
+  - metrics.duolingo.com
