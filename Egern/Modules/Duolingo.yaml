@@ -16,7 +16,7 @@ name: Duolingo
 description: 多邻国：国际版走代理、中国版直连、广告与埋点默认拦截
 author: ijmu
 homepage: https://github.com/ijmu/Tools
-icon: books.vertical.fill
+icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/Duolingo.png
 
 compat_arguments:
   PROXY: "Proxy"
