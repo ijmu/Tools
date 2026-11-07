@@ -1,21 +1,27 @@
-# Duolingo 分流模块（Egern）
+# Duolingo 分流模块（Egern · 通用版）
 # URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
 #
 # 一个文件搞定三件事：
-#   1. 国际版 duolingo.com + 静态 CDN → 代理（PROXY 参数，默认 Manual）
+#   1. 国际版 duolingo.com + 静态 CDN → 代理（策略由 PROXY 参数指定）
 #   2. 中国版 duolingo.cn → 直连（阿里云国内节点 110.75.170.67）
-#   3. 广告/遥测子域 → REJECT（必须在 duolingo.com 之前，否则被后缀吃掉）
+#   3. 广告/遥测子域 → 默认拦截，可用 ADS_POLICY 改成放行
+#
+# 安装：Egern → 模块 → 添加本 URL，然后在模块设置里把 PROXY 填成你配置中的
+#      策略组名（如 Proxy / 节点选择 / 某节点名），不填则回退默认值 "Proxy"。
+# 注意：子域 REJECT 必须排在 duolingo.com 后缀之前，否则会被后缀规则吞掉。
 #
 # 数据来源：blackmatrix7/ios_rule_script · MetaCubeX/meta-rules-dat ·
 #          v2fly/domain-list-community · www.duolingo.com 页面实测（CDN 引用 12 处）
 name: Duolingo
-description: 多邻国：国际版走代理、中国版直连、广告与埋点拦截
+description: 多邻国：国际版走代理、中国版直连、广告与埋点默认拦截
 author: ijmu
 homepage: https://github.com/ijmu/Tools
 icon: books.vertical.fill
 
 compat_arguments:
-  PROXY: "Manual"
+  PROXY: "Proxy"
+  ADS_POLICY: "REJECT"
+compat_arguments_desc: "PROXY：国际版 duolingo.com 与静态 CDN 使用的策略，填你配置里的代理组名或节点名（默认 Proxy）。ADS_POLICY：广告/埋点 ads-api / analytics.vpc / metrics 的处理方式，默认 REJECT，改成 DIRECT 或某个代理组名即放行。"
 
 rules:
   # 中国版直连
@@ -26,15 +32,15 @@ rules:
   # 广告 / 埋点（精确子域，先于国际版后缀）
   - domain_suffix:
       match: ads-api.duolingo.com
-      policy: REJECT
+      policy: "{{{ADS_POLICY}}}"
       name: Duolingo Ads
   - domain_suffix:
       match: analytics.vpc.duolingo.com
-      policy: REJECT
+      policy: "{{{ADS_POLICY}}}"
       name: Duolingo Telemetry
   - domain_suffix:
       match: metrics.duolingo.com
-      policy: REJECT
+      policy: "{{{ADS_POLICY}}}"
       name: Duolingo Metrics
   # 国际版 + 静态资源 CDN
   - domain_suffix:

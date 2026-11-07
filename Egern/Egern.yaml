@@ -388,6 +388,7 @@ mitm:
     - raw.githubusercontent.com
     - github.com
 modules:
+# Duolingo：模块本体保持通用（默认 Proxy），个人策略绑定只写在下面这一行
 - url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
   compat_arguments:
     PROXY: Manual
