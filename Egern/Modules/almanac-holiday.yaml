@@ -11,7 +11,7 @@ name: 黄历与节日
 description: 每日黄历（农历 · 干支 · 建除值神 · 冲煞 · 宜忌）与节日倒计时（国内 / 节气 / 国际）；纯本地计算，时间基准 UTC+8，日界自动刷新
 author: Minis
 homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/almanac-holiday.yaml
-icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/Duolingo.png
+icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/AlmanacHoliday.svg
 
 env_schema:
   SHOW_ALMANAC:
