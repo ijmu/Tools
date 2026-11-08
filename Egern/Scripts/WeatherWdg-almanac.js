@@ -4859,6 +4859,19 @@ function hMetric(symbol, label, value, color) {
   ], { gap: 2 })
 }
 
+// 节日倒数行：仅 SHOW_FESTIVAL=1 且 14 天内确有节日时出现（与 classic 同一取数）
+function hFestRow(data, size, center) {
+  if (!envOn('SHOW_FESTIVAL', false)) return null
+  const f = dateFestival(data).festival
+  if (!f) return null
+  const row = hRow([
+    hI('calendar', HC.orange(), Math.max(8, size || 9)),
+    hSp(3),
+    hT(f, size || 9.5, HC.orange(), 'semibold', { minScale: 0.8 }),
+  ], { gap: 0 })
+  return center ? hCenter([row]) : row
+}
+
 // 用 spacer 把若干列均匀铺开（Egern/Hark 常用手法）
 function hSpread(items) {
   const out = []
@@ -4929,53 +4942,57 @@ function hProgressRow(width, ratio, color) {
   ], { gap: 0 })
 }
 
-// ── 小尺寸：天气 Hero 卡 + 黄历卡 ──
+// ── 小尺寸：天气 Hero 卡（+ 黄历卡；SHOW_ALM=0 时只留天气）──
 function harkSmall(data, A) {
   const cond = clean(data.now.text) || '\u2014'
   const now = data.now || {}
   const day = getToday(data)
-  const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+  const kids = [
+    hRow([
+      hI('location.fill', HC.sky(), 10),
+      hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 11.5, HC.text(), 'semibold', { minScale: 1 }),
+      hSp(),
+      hT(updated(data), 9, HC.dim(), 'regular', { minScale: 1 }),
+    ]),
+    hGlass([
+      hRow([
+        hT(temp(now.temp), 34, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
+        hSp(5),
+        hE(weatherEmoji(now.icon, isNight(data)), 22),
+        hSp(),
+        hCol([
+          hT(cond, 11, HC.text(), 'medium', { minScale: 0.75 }),
+          hSp(2),
+          hT('\u9ad8' + temp(day && day.tempMax) + ' \u4f4e' + temp(day && day.tempMin), 9.5, HC.dim(), 'medium', { mono: true, minScale: 0.75 }),
+        ], { gap: 0 }),
+      ], { gap: 0, alignItems: 'center' }),
+    ], { gap: 0, padding: [7, 10], borderRadius: 16, flex: 1 }),
+  ]
+  if (A) {
+    const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+    kids.push(hGlass([
+      hRow([
+        hT(A.lunarText, 11.5, HC.gold(), 'bold', { minScale: 0.75 }),
+        hSp(5),
+        hDot(luckCol, 5),
+        hT(A.dao || '\u5e73', 9, luckCol, 'semibold', { minScale: 1 }),
+        hSp(),
+        hT(A.lunarYearGZ + '\u5e74 \u00b7 ' + A.dayGZ + '\u65e5', 8.5, HC.dim(), 'medium', { minScale: 0.6 }),
+      ]),
+      hYiJiBlock(A, { size: 9, perLine: 15, maxLines: 2, labelW: 11, gap: 4, rowGap: 2, groupGap: 3 }),
+      hFestRow(data, 8.5),
+    ], { gap: 4, padding: [6, 10], borderRadius: 16 }))
+  }
   return {
     type: 'widget', padding: [10, 12], gap: 6,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 10),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 11.5, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 9, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass([
-        hRow([
-          hT(temp(now.temp), 34, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
-          hSp(5),
-          hE(weatherEmoji(now.icon, isNight(data)), 22),
-          hSp(),
-          hCol([
-            hT(cond, 11, HC.text(), 'medium', { minScale: 0.75 }),
-            hSp(2),
-            hT('\u9ad8' + temp(day && day.tempMax) + ' \u4f4e' + temp(day && day.tempMin), 9.5, HC.dim(), 'medium', { mono: true, minScale: 0.75 }),
-          ], { gap: 0 }),
-        ], { gap: 0, alignItems: 'center' }),
-      ], { gap: 0, padding: [7, 10], borderRadius: 16, flex: 1 }),
-      hGlass([
-        hRow([
-          hT(A.lunarText, 11.5, HC.gold(), 'bold', { minScale: 0.75 }),
-          hSp(5),
-          hDot(luckCol, 5),
-          hT(A.dao || '\u5e73', 9, luckCol, 'semibold', { minScale: 1 }),
-          hSp(),
-          hT(A.lunarYearGZ + '\u5e74 \u00b7 ' + A.dayGZ + '\u65e5', 8.5, HC.dim(), 'medium', { minScale: 0.6 }),
-        ]),
-        hYiJiBlock(A, { size: 9, perLine: 15, maxLines: 2, labelW: 11, gap: 4, rowGap: 2, groupGap: 3 }),
-      ], { gap: 4, padding: [6, 10], borderRadius: 16 }),
-    ],
+    children: kids,
   }
 }
 
-// ── 中尺寸：天气 Hero 卡 + 指标行 + 黄历底栏 ──
+// ── 中尺寸：天气 Hero 卡 + 指标行 + 黄历底栏（SHOW_ALM=0 时只留天气）──
 function harkMedium(data, A) {
   const cond = clean(data.now.text) || '\u2014'
   const now = data.now || {}
@@ -4984,52 +5001,56 @@ function harkMedium(data, A) {
   const hum = humRaw == null ? null : Math.max(0, Math.min(100, humRaw))
   const aqiTxt = data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014'
   const windTxt = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''].filter(Boolean).join('') || '\u2014'
-  const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+  const kids = [
+    hRow([
+      hI('location.fill', HC.sky(), 11),
+      hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 12, HC.text(), 'semibold', { minScale: 1 }),
+      hSp(),
+      hT(updated(data), 9, HC.dim(), 'regular', { minScale: 1 }),
+    ]),
+    hGlass([
+      hRow([
+        hT(temp(now.temp), 32, HC.text(), 'bold', { mono: true, minScale: 0.7 }),
+        hSp(7),
+        hE(weatherEmoji(now.icon, isNight(data)), 24),
+        hSp(),
+        hCol([
+          hT(cond, 11.5, HC.text(), 'medium', { minScale: 0.8 }),
+          hSp(2),
+          hT('\u9ad8' + temp(day && day.tempMax) + '  \u4f4e' + temp(day && day.tempMin), 9.5, HC.dim(), 'medium', { mono: true, minScale: 0.8 }),
+        ], { gap: 0 }),
+      ], { gap: 0, alignItems: 'center' }),
+      hRow([
+        hMetric('wind', '\u98ce', windTxt),
+        hSp(),
+        hMetric('aqi.medium', 'AQI', aqiTxt, hAqiColor(data.aqi && data.aqi.label)),
+        hSp(),
+        hMetric('humidity.fill', '\u6e7f\u5ea6', hum == null ? '\u2014' : Math.round(hum) + '%'),
+      ]),
+      hProgressRow(150, hDayRatio(), HC.blue()),
+    ], { gap: 4, padding: [7, 10], borderRadius: 16, flex: 1 }),
+  ]
+  if (A) {
+    const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+    kids.push(hGlass([
+      hRow([
+        hT(A.lunarText, 12.5, HC.gold(), 'bold', { minScale: 0.8 }),
+        hSp(5),
+        hDot(luckCol, 5),
+        hT(A.dao || '\u5e73', 9, luckCol, 'semibold', { minScale: 1 }),
+        hSp(),
+        hT(A.dayGZ + ' \u00b7 ' + A.tianShen + ' \u00b7 ' + A.zhiXing + '\u65e5', 8.8, HC.dim(), 'medium', { minScale: 0.6 }),
+      ]),
+      hYiJiBlock(A, { size: 9.5, perLine: 29, maxLines: 2, labelW: 12, gap: 5, rowGap: 2, groupGap: 2 }),
+      hFestRow(data, 9),
+    ], { gap: 3, padding: [6, 10], borderRadius: 16 }))
+  }
   return {
     type: 'widget', padding: [10, 12], gap: 6,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 11),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 12, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 9, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass([
-        hRow([
-          hT(temp(now.temp), 32, HC.text(), 'bold', { mono: true, minScale: 0.7 }),
-          hSp(7),
-          hE(weatherEmoji(now.icon, isNight(data)), 24),
-          hSp(),
-          hCol([
-            hT(cond, 11.5, HC.text(), 'medium', { minScale: 0.8 }),
-            hSp(2),
-            hT('\u9ad8' + temp(day && day.tempMax) + '  \u4f4e' + temp(day && day.tempMin), 9.5, HC.dim(), 'medium', { mono: true, minScale: 0.8 }),
-          ], { gap: 0 }),
-        ], { gap: 0, alignItems: 'center' }),
-        hRow([
-          hMetric('wind', '\u98ce', windTxt),
-          hSp(),
-          hMetric('aqi.medium', 'AQI', aqiTxt, hAqiColor(data.aqi && data.aqi.label)),
-          hSp(),
-          hMetric('humidity.fill', '\u6e7f\u5ea6', hum == null ? '\u2014' : Math.round(hum) + '%'),
-        ]),
-        hProgressRow(150, hDayRatio(), HC.blue()),
-      ], { gap: 4, padding: [7, 10], borderRadius: 16, flex: 1 }),
-      hGlass([
-        hRow([
-          hT(A.lunarText, 12.5, HC.gold(), 'bold', { minScale: 0.8 }),
-          hSp(5),
-          hDot(luckCol, 5),
-          hT(A.dao || '\u5e73', 9, luckCol, 'semibold', { minScale: 1 }),
-          hSp(),
-          hT(A.dayGZ + ' \u00b7 ' + A.tianShen + ' \u00b7 ' + A.zhiXing + '\u65e5', 8.8, HC.dim(), 'medium', { minScale: 0.6 }),
-        ]),
-        hYiJiBlock(A, { size: 9.5, perLine: 29, maxLines: 2, labelW: 12, gap: 5, rowGap: 2, groupGap: 2 }),
-      ], { gap: 3, padding: [6, 10], borderRadius: 16 }),
-    ],
+    children: kids,
   }
 }
 
@@ -5042,65 +5063,69 @@ function harkLarge(data, A) {
   const humRaw = numeric(now.humidity)
   const hum = humRaw == null ? null : Math.max(0, Math.min(100, humRaw))
   const days = getForecast(data)
-  const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+  const kids = [
+    hRow([
+      hI('location.fill', HC.sky(), 12),
+      hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 13.5, HC.text(), 'semibold', { minScale: 1 }),
+      hSp(),
+      hT(updated(data), 9.5, HC.dim(), 'regular', { minScale: 1 }),
+    ]),
+    hGlass([
+      hRow([
+        hT(temp(now.temp), 36, HC.text(), 'bold', { mono: true, minScale: 0.8 }),
+        hSp(8),
+        hE(weatherEmoji(now.icon, isNight(data)), 22),
+        hSp(),
+        hCol([
+          hT(cond, 12, HC.text(), 'medium', { minScale: 0.9 }),
+          hSp(3),
+          hRow([
+            hT('\u9ad8 ' + temp(day && day.tempMax), 9.5, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
+            hSp(6),
+            hT('\u4f4e ' + temp(day && day.tempMin), 9.5, HC.lo(), 'regular', { mono: true, minScale: 1 }),
+          ], { gap: 0 }),
+        ], { gap: 0 }),
+      ], { gap: 0, alignItems: 'center' }),
+      hRow([
+        hMetric('thermometer.medium', '\u4f53\u611f', temp(now.feelsLike)),
+        hSp(),
+        hMetric('wind', '\u98ce', wind),
+        hSp(),
+        hMetric('aqi.medium', 'AQI', data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014', hAqiColor(data.aqi && data.aqi.label)),
+        hSp(),
+        hMetric('humidity.fill', '\u6e7f\u5ea6', hum == null ? '\u2014' : Math.round(hum) + '%'),
+        hSp(),
+        hMetric('eye.fill', '\u80fd\u89c1\u5ea6', unit(now.vis, 'km')),
+      ]),
+      hHoursRow(data),
+      hProgressRow(190, hDayRatio(), HC.blue()),
+    ], { gap: 5, padding: [8, 12], borderRadius: 16 }),
+  ]
+  if (A) {
+    const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+    kids.push(hGlass([
+      hRow([
+        hT(A.lunarText, 14.5, HC.gold(), 'bold', { minScale: 0.85 }),
+        hSp(6),
+        hDot(luckCol, 5),
+        hT((A.dao || '\u5e73') + '\u65e5', 9.5, luckCol, 'semibold', { minScale: 1 }),
+        hSp(),
+        hT(A.dayGZ + ' \u00b7 ' + A.tianShen + ' \u00b7 ' + A.zhiXing + '\u65e5 \u00b7 ' + A.xiu + '\u5bbf' + A.xiuLuck, 9, HC.dim(), 'medium', { minScale: 0.6 }),
+      ]),
+      hCenter([hYiJiBlock(A, { size: 11, perLine: 26, maxLines: 3, labelW: 14, gap: 6, rowGap: 3, groupGap: 4 })]),
+      hFestRow(data, 9.5, true),
+      hCenter([hT(A.yearGZ + '\u5e74' + A.monthGZ + '\u6708 \u00b7 ' + A.footerText + (A.jieQi ? ' \u00b7 \u4eca\u65e5' + A.jieQi : ''), 9, HC.dim(), 'regular', { minScale: 0.5 })]),
+    ], { gap: 5, padding: [8, 12], borderRadius: 16 }))
+  }
+  kids.push(hGlass([
+    hRow(days.slice(0, 5).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, { name: 9, icon: 13, temp: 9.5 }))),
+  ], { gap: 3, padding: [6, 12], borderRadius: 16 }))
   return {
     type: 'widget', padding: [12, 14], gap: 7,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 12),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 13.5, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 9.5, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass([
-        hRow([
-          hT(temp(now.temp), 36, HC.text(), 'bold', { mono: true, minScale: 0.8 }),
-          hSp(8),
-          hE(weatherEmoji(now.icon, isNight(data)), 22),
-          hSp(),
-          hCol([
-            hT(cond, 12, HC.text(), 'medium', { minScale: 0.9 }),
-            hSp(3),
-            hRow([
-              hT('\u9ad8 ' + temp(day && day.tempMax), 9.5, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
-              hSp(6),
-              hT('\u4f4e ' + temp(day && day.tempMin), 9.5, HC.lo(), 'regular', { mono: true, minScale: 1 }),
-            ], { gap: 0 }),
-          ], { gap: 0 }),
-        ], { gap: 0, alignItems: 'center' }),
-        hRow([
-          hMetric('thermometer.medium', '\u4f53\u611f', temp(now.feelsLike)),
-          hSp(),
-          hMetric('wind', '\u98ce', wind),
-          hSp(),
-          hMetric('aqi.medium', 'AQI', data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014', hAqiColor(data.aqi && data.aqi.label)),
-          hSp(),
-          hMetric('humidity.fill', '\u6e7f\u5ea6', hum == null ? '\u2014' : Math.round(hum) + '%'),
-          hSp(),
-          hMetric('eye.fill', '\u80fd\u89c1\u5ea6', unit(now.vis, 'km')),
-        ]),
-        hHoursRow(data),
-        hProgressRow(190, hDayRatio(), HC.blue()),
-      ], { gap: 5, padding: [8, 12], borderRadius: 16 }),
-      hGlass([
-        hRow([
-          hT(A.lunarText, 14.5, HC.gold(), 'bold', { minScale: 0.85 }),
-          hSp(6),
-          hDot(luckCol, 5),
-          hT((A.dao || '\u5e73') + '\u65e5', 9.5, luckCol, 'semibold', { minScale: 1 }),
-          hSp(),
-          hT(A.dayGZ + ' \u00b7 ' + A.tianShen + ' \u00b7 ' + A.zhiXing + '\u65e5 \u00b7 ' + A.xiu + '\u5bbf' + A.xiuLuck, 9, HC.dim(), 'medium', { minScale: 0.6 }),
-        ]),
-        hCenter([hYiJiBlock(A, { size: 11, perLine: 26, maxLines: 3, labelW: 14, gap: 6, rowGap: 3, groupGap: 4 })]),
-        hCenter([hT(A.yearGZ + '\u5e74' + A.monthGZ + '\u6708 \u00b7 ' + A.footerText + (A.jieQi ? ' \u00b7 \u4eca\u65e5' + A.jieQi : ''), 9, HC.dim(), 'regular', { minScale: 0.5 })]),
-      ], { gap: 5, padding: [8, 12], borderRadius: 16 }),
-      hGlass([
-        hRow(days.slice(0, 5).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, { name: 9, icon: 13, temp: 9.5 }))),
-      ], { gap: 3, padding: [6, 12], borderRadius: 16 }),
-    ],
+    children: kids,
   }
 }
 
@@ -5119,11 +5144,12 @@ function hHoursRow(data) {
   }))
 }
 
+// hark 版式入口：ALM_STYLE=hark（默认）才走这里；SHOW_ALM=0 仍用新版式，只是不出黄历卡
 function harkRender(data, family) {
-  if (!envOn('SHOW_ALM', true)) return null
   if (String(envStr('ALM_STYLE', 'hark')).toLowerCase() !== 'hark') return null
-  const A = almanacOf(data)
-  if (!A) return null
+  const showAlm = envOn('SHOW_ALM', true)
+  const A = showAlm ? almanacOf(data) : null
+  if (showAlm && !A) return null
   const fam = String(family || '')
   try {
     if (fam === 'small' || fam === 'systemSmall') return harkSmall(data, A)
