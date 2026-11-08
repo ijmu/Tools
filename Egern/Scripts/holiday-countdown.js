@@ -386,21 +386,21 @@ const PROFILES = {
 function chip(sec, o, season) {
   return STACK('row', { alignItems: 'center', gap: 3 }, [
     IMG(sec.icon, o.icon, sec.key === 'jq' ? SEASON[season] : sec.accent),
-    T(sec.label, { font: { size: o.label, weight: 'semibold' }, textColor: sec.accent, lineLimit: 1 }),
+    T(sec.label, { font: { size: o.label, weight: 'semibold' }, textColor: sec.accent, maxLines: 1 }),
   ]);
 }
 function cell(it, sec, o) {
-  const nameText = T(it.name, { font: { size: o.name, weight: 'medium' }, textColor: C.primary, lineLimit: 1, minScale: 0.6 });
+  const nameText = T(it.name, { font: { size: o.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 });
   const left = o.twoLine
     ? STACK('column', { gap: 1 }, [nameText,
-        T(fmtMD(it.serial), { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1, minScale: 0.7 })])
+        T(fmtMD(it.serial), { font: { size: o.sub }, textColor: C.tertiary, maxLines: 1, minScale: 0.7 })])
     : nameText;
   return STACK('row', { alignItems: 'center', flex: 1, padding: [o.padV, o.padH, o.padV, o.padH],
                         borderRadius: o.radius, backgroundColor: cardBg(it.days, it.tone) }, [
     left,
     { type: 'spacer' },
     T(daysText(it.days), { font: { size: o.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone),
-                           textAlign: 'right', lineLimit: 1, minScale: 0.7 }),
+                           textAlign: 'right', maxLines: 1, minScale: 0.7 }),
   ]);
 }
 function footer(data, o, env) {
@@ -409,7 +409,7 @@ function footer(data, o, env) {
   const pct = (data.today - Date.UTC(y, 0, 1)) / (Date.UTC(y + 1, 0, 1) - Date.UTC(y, 0, 1));
   const tone = SEASON[data.season] || TONE.red;
   return STACK('row', { alignItems: 'center', gap: 6 }, [
-    T(`${y} 年已过 ${Math.round(pct * 100)}%`, { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1 }),
+    T(`${y} 年已过 ${Math.round(pct * 100)}%`, { font: { size: o.sub }, textColor: C.tertiary, maxLines: 1 }),
     { type: 'spacer' },
     { type: 'image', src: barSvg(pct, tone.light, o.barW, 5), width: o.barW, height: 5 },
   ]);
@@ -425,9 +425,9 @@ function header(data, o, env, fam) {
     (showLunar ? (o.twoLine ? ` · ${lunarTail}` : ` · 农历${MONTH_CN[lunar.month - 1]}月${DAY_CN[lunar.day - 1]}`) : '');
   return STACK('row', { alignItems: 'center', gap: 4 }, [
     IMG('calendar', o.icon + 2, C.cal),
-    T(title, { font: { size: o.title, weight: 'bold' }, textColor: C.primary, lineLimit: 1, minScale: 0.7 }),
+    T(title, { font: { size: o.title, weight: 'bold' }, textColor: C.primary, maxLines: 1, minScale: 0.7 }),
     { type: 'spacer' },
-    T(right, { font: { size: o.date }, textColor: C.secondary, textAlign: 'right', lineLimit: 1, minScale: 0.6 }),
+    T(right, { font: { size: o.date }, textColor: C.secondary, textAlign: 'right', maxLines: 1, minScale: 0.6 }),
   ]);
 }
 function rowsOf(data, o, env) {
@@ -478,16 +478,16 @@ export default async function (ctx) {
       all.sort((a, b) => a.days - b.days || a.serial - b.serial);
       const n = all[0];
       return { type: 'widget', refreshAfter,
-        children: [T(`${n.name} ${daysText(n.days)}`, { font: { size: 'caption1', weight: 'semibold' }, lineLimit: 1 })] };
+        children: [T(`${n.name} ${daysText(n.days)}`, { font: { size: 'caption1', weight: 'semibold' }, maxLines: 1 })] };
     }
     if (fam === 'accessoryCircular') {
       const kids = SECTIONS.map((sec) => {
         const it = data.buckets[sec.key][0];
         return STACK('row', { alignItems: 'center', gap: 3 }, [
           IMG(sec.icon, 9, sec.key === 'jq' ? SEASON[data.season] : sec.accent),
-          T(it ? it.name.slice(0, 3) : '—', { font: { size: 10, weight: 'medium' }, lineLimit: 1, minScale: 0.6 }),
+          T(it ? it.name.slice(0, 3) : '—', { font: { size: 10, weight: 'medium' }, maxLines: 1, minScale: 0.6 }),
           { type: 'spacer' },
-          T(it ? daysText(it.days) : '', { font: { size: 10, weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), lineLimit: 1, minScale: 0.6 }),
+          T(it ? daysText(it.days) : '', { font: { size: 10, weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), maxLines: 1, minScale: 0.6 }),
         ]);
       });
       return { type: 'widget', padding: 4, gap: 2, refreshAfter, children: kids };
@@ -497,9 +497,9 @@ export default async function (ctx) {
         const it = data.buckets[sec.key][0];
         return STACK('row', { alignItems: 'center', gap: 4 }, [
           IMG(sec.icon, 10, sec.key === 'jq' ? SEASON[data.season] : sec.accent),
-          T(it ? it.name : '—', { font: { size: 'caption1', weight: 'semibold' }, textColor: C.primary, lineLimit: 1, minScale: 0.7 }),
+          T(it ? it.name : '—', { font: { size: 'caption1', weight: 'semibold' }, textColor: C.primary, maxLines: 1, minScale: 0.7 }),
           { type: 'spacer' },
-          T(it ? daysText(it.days) : '', { font: { size: 'caption1', weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), lineLimit: 1, minScale: 0.7 }),
+          T(it ? daysText(it.days) : '', { font: { size: 'caption1', weight: 'bold' }, textColor: dayColor(it ? it.days : 99, it && it.tone), maxLines: 1, minScale: 0.7 }),
         ]);
       });
       return { type: 'widget', padding: [4, 6, 4, 6], gap: 3, refreshAfter, children: kids };
@@ -533,9 +533,9 @@ export default async function (ctx) {
       children: [
         STACK('row', { alignItems: 'center', gap: 5 }, [
           IMG('exclamationmark.triangle.fill', 14, C.warm),
-          T('节日倒计时出错', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, lineLimit: 1 }),
+          T('节日倒计时出错', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, maxLines: 1 }),
         ]),
-        T(String((e && e.message) || e), { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 2 }),
+        T(String((e && e.message) || e), { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 2 }),
       ],
     };
   }

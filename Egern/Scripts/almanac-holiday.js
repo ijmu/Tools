@@ -554,21 +554,21 @@ const cardBg = (days, t) => {
 function chip(sec, o, season) {
   return STACK('row', { alignItems: 'center', gap: 3 }, [
     IMG(sec.icon, o.icon, sec.key === 'jq' ? SEASON[season] : sec.accent),
-    T(sec.label, { font: { size: o.label, weight: 'semibold' }, textColor: sec.accent, lineLimit: 1 }),
+    T(sec.label, { font: { size: o.label, weight: 'semibold' }, textColor: sec.accent, maxLines: 1 }),
   ]);
 }
 function cell(it, sec, o) {
-  const nameText = T(it.name, { font: { size: o.name, weight: 'medium' }, textColor: C.primary, lineLimit: 1, minScale: 0.6 });
+  const nameText = T(it.name, { font: { size: o.name, weight: 'medium' }, textColor: C.primary, maxLines: 1, minScale: 0.6 });
   const left = o.twoLine
     ? STACK('column', { gap: 1 }, [nameText,
-        T(fmtMD(it.serial), { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1, minScale: 0.7 })])
+        T(fmtMD(it.serial), { font: { size: o.sub }, textColor: C.tertiary, maxLines: 1, minScale: 0.7 })])
     : nameText;
   return STACK('row', { alignItems: 'center', flex: 1, padding: [o.padV, o.padH, o.padV, o.padH],
                         borderRadius: o.radius, backgroundColor: cardBg(it.days, it.tone) }, [
     left,
     { type: 'spacer' },
     T(daysText(it.days), { font: { size: o.day, weight: 'bold' }, textColor: dayColor(it.days, it.tone),
-                           textAlign: 'right', lineLimit: 1, minScale: 0.7 }),
+                           textAlign: 'right', maxLines: 1, minScale: 0.7 }),
   ]);
 }
 function footer(data, o, env) {
@@ -577,7 +577,7 @@ function footer(data, o, env) {
   const pct = (data.today - Date.UTC(y, 0, 1)) / (Date.UTC(y + 1, 0, 1) - Date.UTC(y, 0, 1));
   const tone = SEASON[data.season] || TONE.red;
   return STACK('row', { alignItems: 'center', gap: 6 }, [
-    T(`${y} 年已过 ${Math.round(pct * 100)}%`, { font: { size: o.sub }, textColor: C.tertiary, lineLimit: 1 }),
+    T(`${y} 年已过 ${Math.round(pct * 100)}%`, { font: { size: o.sub }, textColor: C.tertiary, maxLines: 1 }),
     { type: 'spacer' },
     { type: 'image', src: barSvg(pct, tone.light, o.barW, 5), width: o.barW, height: 5 },
   ]);
