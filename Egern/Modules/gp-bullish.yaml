@@ -7,7 +7,7 @@
 # 参数：GP_SITE 网站；GP_USER/GP_PASS 登录信息；GP_DAYS 日期范围；GP_SORT 排序；GP_MAX 最大显示数。
 name: 看多标的
 description: 展示“极力推荐 / 强烈看多 / 重仓绩优”标的：名称 · 代码 · 推荐日期 · 现价 · 当日涨幅，并附成本价 / 收益率 / 调仓变动；支持日期、涨幅和收益率排序
- author: Minis
+author: Minis
 homepage: https://github.com/ijmu/Tools
 icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/Duolingo.png
 
@@ -26,9 +26,9 @@ env_schema:
     default_value: ""
   GP_DAYS:
     name: 最近天数
-    description: 只保留最近 N 天推荐的标的；0 表示不限制
+    description: 只保留最近 N 天推荐的标的；0 表示不限制，可填任意正整数
     default_value: "7"
-    options: ["0", "1", "7", "30"]
+    options: []
   GP_SORT:
     name: 排序方式
     description: pct=当日涨幅，date=推荐日期，pnl=累计收益率
