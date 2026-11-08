@@ -5188,27 +5188,37 @@ function ahwYijiBar(tag, words, color, background) {
     type: 'stack', direction: 'row', alignItems: 'center', gap: 7,
     borderRadius: 8, padding: [1, 8, 1, 8], backgroundColor: background,
     children: [
-      hT(tag, 13, color, 'bold', { minScale: 1 }),
-      hT(text || '诸事不宜', 12, AHW.primary(), 'regular', { minScale: 0.55 }),
+      { type: 'text', text: tag, font: { size: 13, weight: 'bold' }, textColor: color, maxLines: 1 },
+      { type: 'text', text: text || '诸事不宜', font: { size: 12 }, textColor: AHW.primary(), maxLines: 1, minScale: 0.55 },
     ],
   }
 }
 
+// 严格复制 almanac-holiday.js 的 Medium 左栏节点；不设置 alignItems，保留原组件默认居中行为。
 function ahwAlmanacMedium(A) {
-  if (!A) return hCol([
-    hT('黄历暂缺', 11, AHW.secondary(), 'semibold'),
-    hT('天气数据仍可用', 9.5, AHW.secondary(), 'regular'),
-  ], { gap: 5, flex: 64, alignItems: 'start' })
-  return hCol([
-    hRow([
-      hT(A.lunarText, 17, AHW.primary(), 'heavy', { minScale: 0.6 }),
-      hT(A.dayGZ, 10.5, AHW.almanac(), 'semibold', { minScale: 0.7 }),
-    ], { gap: 9, alignItems: 'center' }),
-    hT(A.lunarYearGZ + A.sx + '年 · ' + A.zhiXing + '日 · ' + A.tianShen, 10, AHW.almanac(), 'regular', { minScale: 0.65 }),
-    hT('冲' + A.chongSX + '煞' + A.sha, 9.5, AHW.secondary(), 'regular', { minScale: 0.7 }),
-    ahwYijiBar('宜', A.yi, AHW.yi(), AHW.yiBg()),
-    ahwYijiBar('忌', A.ji, AHW.ji(), AHW.jiBg()),
-  ], { gap: 5, flex: 64, alignItems: 'start' })
+  if (!A) return {
+    type: 'stack', direction: 'column', gap: 5, flex: 64,
+    children: [
+      { type: 'text', text: '黄历暂缺', font: { size: 11, weight: 'semibold' }, textColor: AHW.secondary(), maxLines: 1 },
+      { type: 'text', text: '天气数据仍可用', font: { size: 9.5 }, textColor: AHW.secondary(), maxLines: 1 },
+    ],
+  }
+  return {
+    type: 'stack', direction: 'column', gap: 5, flex: 64,
+    children: [
+      {
+        type: 'stack', direction: 'row', alignItems: 'center', gap: 9,
+        children: [
+          { type: 'text', text: A.lunarText, font: { size: 17, weight: 'heavy' }, textColor: AHW.primary(), maxLines: 1, minScale: 0.6 },
+          { type: 'text', text: A.dayGZ, font: { size: 10.5, weight: 'semibold' }, textColor: AHW.almanac(), maxLines: 1, minScale: 0.7 },
+        ],
+      },
+      { type: 'text', text: A.lunarYearGZ + A.sx + '年 · ' + A.zhiXing + '日 · ' + A.tianShen, font: { size: 10 }, textColor: AHW.almanac(), maxLines: 1, minScale: 0.65 },
+      { type: 'text', text: '冲' + A.chongSX + '煞' + A.sha, font: { size: 9.5 }, textColor: AHW.secondary(), maxLines: 1, minScale: 0.7 },
+      ahwYijiBar('宜', A.yi, AHW.yi(), AHW.yiBg()),
+      ahwYijiBar('忌', A.ji, AHW.ji(), AHW.jiBg()),
+    ],
+  }
 }
 
 function ahwWeatherSymbol(cond, night) {
@@ -5233,12 +5243,12 @@ function ahwWeatherMedium(data) {
   const fourth = alert
     ? hRow([
         hI(alert.icon, AHW.alert(), 10), hSp(4),
-        hT(alert.text, 9, AHW.alert(), 'semibold', { minScale: 0.55 }),
-      ], { gap: 0, padding: [4, 7, 4, 7], borderRadius: 8, backgroundColor: AHW.alertBg() })
+        hT(alert.text, 10, AHW.alert(), 'semibold', { minScale: 0.5 }),
+      ], { gap: 0, padding: [4, 6, 4, 6], borderRadius: 8, backgroundColor: AHW.alertBg() })
     : hRow([
-        hI('humidity.fill', AHW.weather(), 9), hSp(3), hT(humidity, 9, AHW.secondary(), 'medium', { minScale: 0.7 }),
-        hSp(6), hI('wind', AHW.weather(), 9), hSp(3), hT(wind, 9, AHW.secondary(), 'medium', { minScale: 0.6 }),
-      ], { gap: 0, padding: [4, 7, 4, 7], borderRadius: 8, backgroundColor: AHW.statusBg() })
+        hI('humidity.fill', AHW.weather(), 10), hSp(3), hT(humidity, 10, AHW.secondary(), 'medium', { minScale: 0.65 }),
+        hSp(5), hI('wind', AHW.weather(), 10), hSp(3), hT(wind, 10, AHW.secondary(), 'medium', { minScale: 0.5 }),
+      ], { gap: 0, padding: [4, 6, 4, 6], borderRadius: 8, backgroundColor: AHW.statusBg() })
   return hCol([
     hRow([
       hT(temp(now.temp), 26, AHW.primary(), 'light', { mono: true, minScale: 0.7 }),
