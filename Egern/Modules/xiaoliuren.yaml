@@ -8,7 +8,7 @@
 name: 小六壬
 description: 农历月/日/时辰起课的马前课占测：六宫圆盘、落宫断语与三宫来路，支持主屏四尺寸与锁屏三态
 author: Minis
-homepage: https://github.com/ijmu/Tools
+homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/xiaoliuren.yaml
 icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/Duolingo.png
 
 env_schema:
