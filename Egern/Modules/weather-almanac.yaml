@@ -23,6 +23,10 @@ rules:
       policy: DIRECT
       name: 中国天气网
   - domain_suffix:
+      match: api.live.bilibili.com
+      policy: DIRECT
+      name: Bilibili IP 定位
+  - domain_suffix:
       match: useragentinfo.com
       policy: DIRECT
       name: UserAgentInfo 定位
@@ -39,7 +43,7 @@ scriptings:
   - generic:
       name: weather-almanac
       script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/WeatherWdg-almanac.js
-      timeout: 15
+      timeout: 60
       env:
         ALM_STYLE: hark
         SHOW_ALM: "1"
