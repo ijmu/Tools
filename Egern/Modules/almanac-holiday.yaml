@@ -46,7 +46,7 @@ env_schema:
     options: ["1", "0"]
   PER_ROW:
     name: 每栏条数
-    description: 每栏显示节日条数（0 为按尺寸自动：小/中 3，大 3）
+    description: 每栏显示节日条数（0 为按尺寸自动：小 1、中 6、大/加大 3）
     default_value: ""
     options: ["", "1", "2", "3", "4", "5", "6"]
   TITLE:
