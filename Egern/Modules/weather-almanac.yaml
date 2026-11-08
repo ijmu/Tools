@@ -1,10 +1,10 @@
-# 天气·黄历
-# 中国天气网免 Key 天气 + 本地农历 / 干支 / 黄道黑道 / 宜忌，Hark 玻璃卡版式。
-# 安装：Egern → 模块 → 添加下方 URL，再在桌面添加「天气·黄历」小组件。
-# URL:  https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/weather-almanac.yaml
+# 晨曦天气·黄历
+# 中国天气网免 Key 天气 + 本地农历 / 干支 / 宜忌；单张渐变玻璃卡，三档自适应。
+# 安装：Egern → 模块 → 添加下方 URL，再在桌面添加「晨曦天气·黄历」小组件。
+# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/weather-almanac.yaml
 # 数据：天气来自中国天气网，定位按 IP 自动判断；黄历为脚本本地推算，1900–2100 可用。
-name: 天气·黄历
-description: 天气主视觉 + 黄历辅助层，玻璃卡版式；免 Key，无需第三方账号
+name: 晨曦天气·黄历
+description: 温度、湿度、天气状况、风雨提醒与本地黄历；单卡三档自适应，免 Key
 author: Minis
 homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/weather-almanac.yaml
 icon: https://raw.githubusercontent.com/SIJULY/egern-radar/main/weather-icon.png
@@ -16,8 +16,8 @@ env_schema:
     default_value: ""
   ALM_STYLE:
     name: 版式
-    description: hark 为玻璃卡新版式（默认）；classic 可切回上一版纯天气排版
-    default_value: hark
+    description: aurora 为晨曦单卡版式（默认）；hark 为兼容别名；classic 可切回旧版排版
+    default_value: aurora
   SHOW_ALM:
     name: 显示黄历
     description: 填 0 关闭黄历，只保留天气版式
@@ -56,5 +56,5 @@ scriptings:
       timeout: 60
 
 widgets:
-  - name: 天气·黄历
+  - name: 晨曦天气·黄历
     script_name: weather-almanac
