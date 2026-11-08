@@ -23,17 +23,14 @@ dns:
   bootstrap:
     - system
     - 223.5.5.5
-
   upstreams:
     Encrypted-DNS:
       - https://dns.alidns.com/dns-query
       - https://doh.pub/dns-query
-
   forward:
     - domain_wildcard:
         match: "*"
         value: Encrypted-DNS
-
   proxy_nameservers:
     - Encrypted-DNS
 bypass_tunnel_proxy:
