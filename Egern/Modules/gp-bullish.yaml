@@ -28,7 +28,6 @@ env_schema:
     name: 最近天数
     description: 只保留最近 N 天推荐的标的；0 表示不限制，可填任意正整数
     default_value: "7"
-    options: []
   GP_SORT:
     name: 排序方式
     description: pct=当日涨幅，date=推荐日期，pnl=累计收益率
@@ -38,7 +37,6 @@ env_schema:
     name: 最大显示数量
     description: 最多显示几只，留空按组件尺寸自动适配
     default_value: ""
-    options: []
 
 scriptings:
   - generic:
