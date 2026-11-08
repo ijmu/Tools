@@ -1,5 +1,7 @@
 name: 节日倒计时
 description: 国内节日 / 24 节气 / 国际节日 三栏倒数日 —— 农历与节气精确计算，支持主屏四尺寸与锁屏三态
+author: Minis
+homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/holiday-countdown.yaml
 env_schema:
   SHOW_CN:
     name: 国内节日

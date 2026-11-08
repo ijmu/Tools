@@ -4720,7 +4720,7 @@ function hT(text, size, color, weight, extra) {
   return Object.assign({
     type: 'text', text: String(text == null ? '' : text), font: font,
     textColor: color || HC.text(), maxLines: 1, minScale: 0.7,
-  }, o.mono ? { } : {}, o.lineLimit ? { maxLines: o.lineLimit } : {}, o.minScale ? { minScale: o.minScale } : {})
+  }, o.mono ? { } : {}, o.maxLines ? { maxLines: o.maxLines } : {}, o.minScale ? { minScale: o.minScale } : {})
 }
 
 function hI(name, color, size) {
@@ -5157,7 +5157,7 @@ function addText(parent, str, opts = {}) {
     type: 'text',
     text: String(str),
     font,
-    maxLines: opts.lineLimit != null ? opts.lineLimit : 1,
+    maxLines: opts.maxLines != null ? opts.maxLines : 1,
   }
   if (opts.color) t.textColor = opts.color
   if (opts.minScale) t.minScale = opts.minScale
@@ -5179,9 +5179,9 @@ function addSymbol(parent, name, size, tintColor) {
 function addWeatherIcon(parent, code, size, night = false) {
   const emoji = weatherEmoji(code, night)
   if (emoji) {
-    return addText(parent, emoji, { size, lineLimit: 1 })
+    return addText(parent, emoji, { size, maxLines: 1 })
   }
-  return addText(parent, '—', { size: Math.round(size * 0.65), color: COLORS.quiet(), lineLimit: 1 })
+  return addText(parent, '—', { size: Math.round(size * 0.65), color: COLORS.quiet(), maxLines: 1 })
 }
 
 function addProgressBar(parent, width, height, ratio, trackColor, fillColor) {
@@ -5917,7 +5917,7 @@ function createErrorWidget(errMsg) {
   addText(
     w,
     clean(errMsg) || '请检查网络连接或模块中的位置参数设置（如 合肥、北京 或 自动）。',
-    { size: 10, color: COLORS.secondary(), lineLimit: 3 }
+    { size: 10, color: COLORS.secondary(), maxLines: 3 }
   )
   return w.toDSL()
 }

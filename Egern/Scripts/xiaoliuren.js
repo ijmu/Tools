@@ -151,7 +151,7 @@ function bg() {
   };
 }
 const T = (text, size, color, weight = 'regular', extra = {}) =>
-  Object.assign({ type: 'text', text: String(text == null ? '' : text), font: { size, weight }, textColor: color, lineLimit: 1, minScale: 0.7 }, extra);
+  Object.assign({ type: 'text', text: String(text == null ? '' : text), font: { size, weight }, textColor: color, maxLines: 1, minScale: 0.7 }, extra);
 const ICON = (name, color, size = 12) => ({ type: 'image', src: `sf-symbol:${name}`, width: size, height: size, color });
 // 居中一律用「左右各一个 flex 空位」：Egern 不认 justifyContent，spacer 的 flex 才是可用机制
 const SP = () => ({ type: 'spacer', flex: 1 });
@@ -167,7 +167,7 @@ function errorWidget(e) {
     children: [
       ICON('exclamationmark.triangle.fill', { light: '#C77700', dark: '#FFD60A' }, 18),
       T('起课失败', 14, TXT.primary, 'semibold'),
-      T(String((e && e.message) || e), 10, TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.8 }),
+      T(String((e && e.message) || e), 10, TXT.secondary, 'regular', { maxLines: 3, minScale: 0.8 }),
     ],
   };
 }
@@ -235,7 +235,7 @@ export default async function (ctx) {
     const c = pcol(p);
     const d = active ? ballSize : ballSize - 4;   // 当前宫略大，其余退后：盘的视觉重量降下来，焦点只在落宫
     const extra = {
-      alignItems: 'center', justifyContent: 'center', gap: 0,
+      alignItems: 'center', gap: 0,
       width: d, height: d, borderRadius: d / 2,
       backgroundColor: active ? c : tint(p, isLarge ? '29' : '1F'),
     };
@@ -283,7 +283,7 @@ export default async function (ctx) {
     T(`第${hour.num}宫 · ${hour.wuxing} · ${hour.dir}` + (isSmall ? '' : ` · 宜往${POSITION_HINT[hourIdx]}`),
       isSmall ? 'caption1' : 'footnote', TXT.secondary, 'medium', { minScale: 0.7 }),
   ];
-  if (!isSmall) heroSub.push(T(path, 'caption2', TXT.tertiary, 'regular', { minScale: 0.65, lineLimit: 1 }));
+  if (!isSmall) heroSub.push(T(path, 'caption2', TXT.tertiary, 'regular', { minScale: 0.65, maxLines: 1 }));
   const heroName = T(hour.name, isLarge ? 'largeTitle' : (isSmall ? 'title' : 34), pcol(hour), 'heavy', { minScale: 0.6 });
   // 小尺寸窄：名称与信息竖排，避免横向被裁
   const heroBlock = isSmall
@@ -291,7 +291,7 @@ export default async function (ctx) {
     : ROW([SP(), heroName, COL(heroSub, { alignItems: 'start', gap: 0 }), SP()], { gap: 7 });
 
   const shortPill = CENTER(glass(
-    [T(hour.short, 'footnote', TXT.secondary, 'medium', { lineLimit: isSmall ? 2 : 1, minScale: 0.72 })],
+    [T(hour.short, 'footnote', TXT.secondary, 'medium', { maxLines: isSmall ? 2 : 1, minScale: 0.72 })],
     { alignItems: 'center', padding: isSmall ? [4, 11] : [6, 15], gap: 0, borderRadius: 999 }));
 
   const children = [head];
@@ -302,9 +302,9 @@ export default async function (ctx) {
     const panel = [
       ROW([ICON('text.book.closed.fill', TXT.tertiary, 10), T('落宫断语', 'caption2', TXT.tertiary, 'semibold'),
         { type: 'spacer' }, T('仅供玩味', 'caption2', TXT.tertiary, 'regular')], { gap: 5 }),
-      T(hour.brief, 'footnote', TXT.primary, 'medium', { lineLimit: 2, minScale: 0.8 }),
+      T(hour.brief, 'footnote', TXT.primary, 'medium', { maxLines: 2, minScale: 0.8 }),
     ];
-    if (SHOW_MEANING) panel.push(T(hour.ju, 'caption1', TXT.secondary, 'regular', { lineLimit: 3, minScale: 0.5 }));
+    if (SHOW_MEANING) panel.push(T(hour.ju, 'caption1', TXT.secondary, 'regular', { maxLines: 3, minScale: 0.5 }));
     children.push(
       { type: 'spacer' },
       discRow,

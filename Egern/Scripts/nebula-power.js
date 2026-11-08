@@ -485,9 +485,9 @@ function header(sub) {
     type: 'stack', direction: 'row', alignItems: 'center', gap: 4,
     children: [
       { type: 'image', src: 'sf-symbol:bolt.fill', width: 12, height: 12, color: C.gold },
-      T('星云电力', { font: { size: 'subheadline', weight: 'bold' }, textColor: C.primary, lineLimit: 1 }),
+      T('星云电力', { font: { size: 'subheadline', weight: 'bold' }, textColor: C.primary, maxLines: 1 }),
       { type: 'spacer' },
-      T(sub, { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'right', lineLimit: 1, minScale: 0.6 }),
+      T(sub, { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'right', maxLines: 1, minScale: 0.6 }),
     ],
   };
 }
@@ -497,7 +497,7 @@ function foot(parts) {
     type: 'stack', direction: 'row', alignItems: 'center', gap: 4,
     children: parts.map((p, i) => T(p, {
       font: { size: 'caption2' }, textColor: C.tertiary,
-      lineLimit: 1, minScale: 0.6, ...(i ? { textAlign: 'right' } : {}),
+      maxLines: 1, minScale: 0.6, ...(i ? { textAlign: 'right' } : {}),
     })).reduce((acc, el) => (acc.length ? acc.concat([{ type: 'spacer' }, el]) : [el]), []),
   };
 }
@@ -508,21 +508,21 @@ function rowLine(r, wide, first, mode, idx) {
   const isUse = mode === 'usage';
   const priceColor = r.active ? C.gold : C.tertiary;
   const kids = [
-    T((r.isNew ? '新 ' : '') + (isUse ? `${(idx || 0) + 1}. ` : (first ? '首推 ' : '')) + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, lineLimit: 1, minScale: 0.65 }),
+    T((r.isNew ? '新 ' : '') + (isUse ? `${(idx || 0) + 1}. ` : (first ? '首推 ' : '')) + m.display_name, { font: { size: 'footnote', weight: 'semibold' }, textColor: r.active ? C.primary : C.secondary, maxLines: 1, minScale: 0.65 }),
     { type: 'spacer' },
   ];
   if (isUse) {
-    kids.push(T(r.useTxt || '0', { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1, minScale: 0.7 }));
+    kids.push(T(r.useTxt || '0', { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, maxLines: 1, minScale: 0.7 }));
   } else if (wide) {
-    kids.push(T(windowLabel(m) || '全天', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }));
+    kids.push(T(windowLabel(m) || '全天', { font: { size: 'caption2' }, textColor: C.tertiary, maxLines: 1 }));
   }
-  kids.push(T(`⚡${fmtPower(r.eff)}`, { font: { size: 'footnote', weight: 'heavy' }, textColor: priceColor, lineLimit: 1 }));
-  kids.push(T(`-${pct(r.depthEff)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, lineLimit: 1 }));
+  kids.push(T(`⚡${fmtPower(r.eff)}`, { font: { size: 'footnote', weight: 'heavy' }, textColor: priceColor, maxLines: 1 }));
+  kids.push(T(`-${pct(r.depthEff)}%`, { font: { size: 'caption2', weight: 'semibold' }, textColor: r.active ? C.accent : C.tertiary, maxLines: 1 }));
   if (wide) {
     // 额度池只是信息位：耗尽（计数封顶）不改实扣价，黄字提示「池满」即可
     const qt = r.q.unlimited ? '∞' : (r.q.depleted ? '池满' : '剩' + fmtPower(r.q.left));
     const ratio = r.q.total ? r.q.left / r.q.total : 1;
-    kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted || ratio < 0.15 ? C.warn : C.tertiary, lineLimit: 1 }));
+    kids.push(T(qt, { font: { size: 'caption2' }, textColor: r.q.depleted || ratio < 0.15 ? C.warn : C.tertiary, maxLines: 1 }));
   }
   return { type: 'stack', direction: 'row', alignItems: 'center', gap: 5, children: kids };
 }
@@ -569,8 +569,8 @@ async function renderWidget(ctx) {
       type: 'widget', refreshAfter, padding: 14, gap: 4, backgroundColor: C.bg,
       children: [
         header('离线'),
-        T('补贴数据获取失败', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, lineLimit: 1 }),
-        T(String(err || '未知错误'), { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 2, minScale: 0.7 }),
+        T('补贴数据获取失败', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, maxLines: 1 }),
+        T(String(err || '未知错误'), { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 2, minScale: 0.7 }),
         { type: 'spacer' },
         foot(['将在 10 分钟后重试', 'ai.ipix.ink']),
       ],
@@ -590,8 +590,8 @@ async function renderWidget(ctx) {
       type: 'widget', refreshAfter, padding: 14, gap: 4, backgroundColor: C.bg,
       children: [
         header('暂无数据'),
-        T('官网模型表是空的', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, lineLimit: 1 }),
-        T('可能正在维护或接口改版，10 分钟后自动重试', { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 2, minScale: 0.7 }),
+        T('官网模型表是空的', { font: { size: 'footnote', weight: 'semibold' }, textColor: C.primary, maxLines: 1 }),
+        T('可能正在维护或接口改版，10 分钟后自动重试', { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 2, minScale: 0.7 }),
         { type: 'spacer' },
         foot(['无缓存可回放', 'ai.ipix.ink']),
       ],
@@ -612,15 +612,15 @@ async function renderWidget(ctx) {
     return {
       type: 'widget', refreshAfter,
       children: [T(`星云 ${best.active ? '补贴 ' + priceTxt : priceTxt} ${cheapest}`,
-        { font: { size: 'caption1', weight: 'semibold' }, textColor: C.gold, lineLimit: 1, minScale: 0.8 })],
+        { font: { size: 'caption1', weight: 'semibold' }, textColor: C.gold, maxLines: 1, minScale: 0.8 })],
     };
   }
   if (fam === 'accessoryCircular') {
     return {
       type: 'widget', refreshAfter, padding: 2, gap: 0,
       children: [
-        T(fmtPower(best.eff), { font: { size: 'headline', weight: 'heavy' }, textColor: C.gold, textAlign: 'center', lineLimit: 1, minScale: 0.5 }),
-        T(onN ? `补贴 ${onN}` : '无补贴', { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center', lineLimit: 1, minScale: 0.6 }),
+        T(fmtPower(best.eff), { font: { size: 'headline', weight: 'heavy' }, textColor: C.gold, textAlign: 'center', maxLines: 1, minScale: 0.5 }),
+        T(onN ? `补贴 ${onN}` : '无补贴', { font: { size: 'caption2' }, textColor: C.secondary, textAlign: 'center', maxLines: 1, minScale: 0.6 }),
       ],
     };
   }
@@ -630,13 +630,13 @@ async function renderWidget(ctx) {
       children: [
         {
           type: 'stack', direction: 'row', alignItems: 'center', gap: 5, children: [
-            T('星云电力', { font: { size: 'caption1', weight: 'bold' }, textColor: C.primary, lineLimit: 1 }),
+            T('星云电力', { font: { size: 'caption1', weight: 'bold' }, textColor: C.primary, maxLines: 1 }),
             { type: 'spacer' },
-            T(onN ? `补贴中 ${onN} 档` : '当前无补贴', { font: { size: 'caption1' }, textColor: onN ? C.accent : C.secondary, lineLimit: 1 }),
+            T(onN ? `补贴中 ${onN} 档` : '当前无补贴', { font: { size: 'caption1' }, textColor: onN ? C.accent : C.secondary, maxLines: 1 }),
           ],
         },
         T(`${cheapest} ${priceTxt}${best.active ? ' -' + pct(best.depth) + '%' : ''}`,
-          { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.65 }),
+          { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 1, minScale: 0.65 }),
       ],
     };
   }
@@ -659,21 +659,21 @@ async function renderWidget(ctx) {
     const isUse = order === 'usage';
     children.push(
       { type: 'spacer', length: 2 },
-      T(cheapest, { font: { size: 'title3', weight: 'heavy' }, textColor: best.active ? C.gold : C.primary, lineLimit: 1, minScale: 0.55 }),
+      T(cheapest, { font: { size: 'title3', weight: 'heavy' }, textColor: best.active ? C.gold : C.primary, maxLines: 1, minScale: 0.55 }),
       {
         type: 'stack', direction: 'row', alignItems: 'baseline', gap: 5, children: [
-          T(isUse ? (best.useTxt || priceTxt) : priceTxt, { font: { size: 'headline', weight: 'heavy' }, textColor: isUse ? C.accent : C.primary, lineLimit: 1 }),
-          T(isUse ? '今日用量' : '/100K', { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }),
+          T(isUse ? (best.useTxt || priceTxt) : priceTxt, { font: { size: 'headline', weight: 'heavy' }, textColor: isUse ? C.accent : C.primary, maxLines: 1 }),
+          T(isUse ? '今日用量' : '/100K', { font: { size: 'caption2' }, textColor: C.tertiary, maxLines: 1 }),
           { type: 'spacer' },
           best.active
-            ? T(`-${pct(best.depth)}%`, { font: { size: 'caption1', weight: 'semibold' }, textColor: C.accent, lineLimit: 1 })
-            : T(`¥${fmtCny(best.eff * data.rate)}/100K`, { font: { size: 'caption2' }, textColor: C.tertiary, lineLimit: 1 }),
+            ? T(`-${pct(best.depth)}%`, { font: { size: 'caption1', weight: 'semibold' }, textColor: C.accent, maxLines: 1 })
+            : T(`¥${fmtCny(best.eff * data.rate)}/100K`, { font: { size: 'caption2' }, textColor: C.tertiary, maxLines: 1 }),
         ],
       },
       T(isUse
         ? `原 ⚡${fmtPower(best.m.price)}${best.hasSubsidy ? (best.active ? ` · 补贴 ⚡${fmtPower(best.m.discount_price)}` : ' · 补贴待启') : ' · 无补贴'}`
         : (best.active ? `原 ⚡${fmtPower(best.m.price)}${win ? ' · ' + win : ' · 全天'}` : (next ? `下一档 ${next.ds}-${next.de} ${next.name}` : '全天无补贴时段')),
-        { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.65 }),
+        { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 1, minScale: 0.65 }),
       { type: 'spacer' },
       foot(isUse ? [`${data.usedN} 个在用`, now.hm]
         : (deep ? [`最深-${pct(deep.depth)}%`, usageParts.length ? usageParts[0] : `${data.total} 模型`] : [`${data.total} 模型`, now.hm]))
@@ -725,7 +725,7 @@ export default async function (ctx) {
         refreshAfter: nextRefresh(),
         children: [
           header('超时'),
-          T('本次刷新超时，下个周期自动重试', { font: { size: 'caption2' }, textColor: C.secondary, lineLimit: 1, minScale: 0.7 }),
+          T('本次刷新超时，下个周期自动重试', { font: { size: 'caption2' }, textColor: C.secondary, maxLines: 1, minScale: 0.7 }),
         ],
       }), 11000)),
     ]);
