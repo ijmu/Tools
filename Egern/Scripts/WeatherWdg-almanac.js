@@ -5092,8 +5092,11 @@ function hAlertRow(data, compact) {
   const alerts = hWeatherAlerts(data)
   if (!alerts.length) return null
   return hRow(alerts.map((a, i) => {
-    if (i) return hRow([hSp(6), hI(a.icon, a.color, compact ? 9 : 10), hSp(3), hT(a.text, compact ? 8.5 : 9.5, a.color, 'semibold', { minScale: 0.58 })], { gap: 0 })
-    return hRow([hI(a.icon, a.color, compact ? 9 : 10), hSp(3), hT(a.text, compact ? 8.5 : 9.5, a.color, 'semibold', { minScale: 0.58 })], { gap: 0 })
+    const label = compact
+      ? a.text.replace('强降雨提醒 · ', '强雨 ').replace('大风提醒 · ', '大风 ')
+      : a.text
+    if (i) return hRow([hSp(6), hI(a.icon, a.color, 9), hSp(3), hT(label, 8.5, a.color, 'semibold', { minScale: 0.55 })], { gap: 0 })
+    return hRow([hI(a.icon, a.color, compact ? 9 : 10), hSp(3), hT(label, compact ? 8.5 : 9.5, a.color, 'semibold', { minScale: compact ? 0.55 : 0.58 })], { gap: 0 })
   }), { gap: 0 })
 }
 
@@ -5116,107 +5119,101 @@ function hForecastCol(day, label, first, size, compact) {
 // ── 小尺寸：单卡（Hero + 农历大字 + 宜忌胶囊 + 一行倒数）──
 function harkSmall(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const fest = hUpcoming(data, 2)
-  const card = [
-    hHead(data, { city: 10, time: 8.5, icon: 9 }),
-    hHeroMini(data, { temp: 30, icon: 18, cond: 10, small: 8.5, miniIcon: 8, metaGap: 2 }),
-  ]
-  const alert = hAlertRow(data, true)
-  if (alert) { card.push(alert); card.push(hDiv()) }
+  const day = getToday(data)
+  const card = [hHead(data, { city: 10, time: 8.5, icon: 9 })]
+  const weather = hRow([
+    hCol([
+      hT(temp(data.now.temp), 31, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
+      hT(cond, 10, HC.text(), 'semibold', { minScale: 0.65 }),
+    ], { gap: 1, alignItems: 'start' }),
+    hSp(),
+    hCol([
+      hMetric('humidity.fill', '湿度', unit(data.now.humidity, '%'), HC.sky(), 9),
+      hMetric('wind', '风力', clean(data.now.windScale) ? clean(data.now.windScale) + '级' : '—', HC.teal ? HC.teal() : HC.dim(), 9),
+    ], { gap: 3, alignItems: 'start' }),
+  ], { gap: 0, alignItems: 'center' })
+  card.push(weather)
+  card.push(hRow([hT('高 ' + temp(day && day.tempMax), 8.5, HC.hi(), 'semibold', { mono: true }), hSp(8), hT('低 ' + temp(day && day.tempMin), 8.5, HC.lo(), 'regular', { mono: true })], { gap: 0 }))
+  card.push(hDiv())
   if (A) {
-    card.push(hDiv())
-    card.push(hAlmTitle(A, { lunar: 15, gz: 8.5, small: 8, luck: true }))
-    card.push(hPill('\u5b9c', A.yi, 3, ALMC.yi(), ALMC.yiBg(), 8.5, [1, 6], 9))
-    card.push(hPill('\u5fcc', A.ji, 3, ALMC.ji(), ALMC.jiBg(), 8.5, [1, 6], 9))
+    card.push(hRow([hT('今日黄历', 9, HC.gold(), 'semibold'), hSp(), hT(A.lunarText + ' · ' + A.dayGZ, 8.5, HC.dim(), 'medium', { minScale: 0.6 })], { gap: 0 }))
+    card.push(hPill('宜', A.yi, 2, ALMC.yi(), ALMC.yiBg(), 8.5, [1, 6], 8))
+    card.push(hPill('忌', A.ji, 2, ALMC.ji(), ALMC.jiBg(), 8.5, [1, 6], 8))
   }
-  const fl = hFestInline(fest, { icon: 9, name: 8.5, day: 8.5 })
-  if (fl) card.push(fl)
-  if (!A) {
-    // 没有黄历时不留空玻璃：补一段逐时（或明细行）填满卡内
-    const hrs = hHoursRow(data, 4, { hour: 8.5, icon: 12, temp: 9 }) || hDetailRow(data, 9)
-    if (hrs) { card.push(hDiv()); card.push(hrs) }
-  }
+  const alert = hAlertRow(data, true)
+  if (alert) card.push(alert)
   return {
-    type: 'widget', padding: [6, 8], gap: 2,
+    type: 'widget', padding: [7, 9], gap: 2,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [hGlass(card, { gap: 2, padding: [6, 9], borderRadius: 16, flex: 1 })],
+    children: card,
   }
 }
 
 // ── 中尺寸：单卡（Hero + 黄历大字块｜右侧带图标倒数列表）──
 function harkMedium(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const fest = hUpcoming(data, 5)
-  const card = [
-    hHead(data, { city: 10.5, time: 9, icon: 9.5 }),
-    hHero(data, { temp: 32, icon: 21, cond: 11, small: 8.5, miniIcon: 8.5, metaGap: 1 }),
-  ]
+  const card = [hHead(data, { city: 10.5, time: 9, icon: 9.5 })]
+  const weather = hCol([
+    hT(temp(data.now.temp), 34, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
+    hRow([hE(weatherEmoji(data.now.icon, isNight(data)), 18), hSp(4), hT(cond, 10.5, HC.text(), 'semibold', { minScale: 0.65 })], { gap: 0 }),
+    hRow([hMetric('humidity.fill', '湿度', unit(data.now.humidity, '%'), HC.sky(), 9), hSp(), hMetric('wind', '风', clean(data.now.windScale) ? clean(data.now.windScale) + '级' : '—', HC.dim(), 9)], { gap: 0 }),
+  ], { gap: 3, alignItems: 'start', flex: 45 })
+  const alm = A ? hAlmCol(A, { lunar: 16, gz: 8.5, meta: 8, chong: 7.5, small: 8, pill: 8.5, pillPad: [1, 6], maxChars: 10, yi: 3, ji: 3, gap: 2, flex: 55 }) : hCol([hT('黄历暂缺', 10, HC.dim(), 'medium'), hT('天气数据仍可用', 8.5, HC.dim())], { gap: 3, flex: 55 })
+  card.push(hDiv())
+  card.push(hRow([weather, hSp(10), alm], { gap: 0, alignItems: 'start' }))
   const alert = hAlertRow(data, false)
-  if (alert) { card.push(alert); card.push(hDiv()) }
-  if (A) {
-    card.push(hDiv())
-    const left = hAlmCol(A, {
-      lunar: 16.5, gz: 9, meta: 8.5, chong: 8, small: 8.5,
-      pill: 9.5, pillPad: [1, 7], maxChars: 12, yi: 5, ji: 5, gap: 1.5, flex: 60,
-    })
-    const right = hFestCol(fest, { icon: 10, name: 9.5, day: 9.5, nameW: 44, dayW: 38, gap: 1.5, flex: 40 })
-    card.push(right ? hRow([left, hSp(8), right], { gap: 0, alignItems: 'start' }) : left)
-  } else {
-    card.push(hMetrics(data, 10))
-    const grid = hFestGrid(fest.slice(0, 2), { icon: 10, name: 10, day: 10, nameW: 46, dayW: 38, gap: 2 }, 2)
-    if (grid) { card.push(hDiv()); card.push(grid) }
-    const hrs = hHoursRow(data, 6, { hour: 9, icon: 13, temp: 9.5 })
-    if (hrs) { card.push(hDiv()); card.push(hrs) }
-  }
+  card.push(hDiv())
+  card.push(alert || hT('天气平稳 · 暂无风雨提醒', 8.5, HC.green(), 'medium'))
+  card.push(hDiv())
+  const hours = hHoursRow(data, 5, { hour: 8, icon: 11, temp: 8.5 })
+  if (hours) card.push(hours)
   return {
-    type: 'widget', padding: [5, 9], gap: 1.5,
+    type: 'widget', padding: [4, 9], gap: 1.5,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [hGlass(card, { gap: 1.5, padding: [4, 9], borderRadius: 16, flex: 1 })],
+    children: card,
   }
 }
 
 // ── 大尺寸：单卡（Hero + 指标 + 黄历大字块｜右侧倒数 + 页脚 + 逐时 + 五日）──
 function harkLarge(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const fest = hUpcoming(data, 7)
   const days = getForecast(data)
   const card = [
     hHead(data, { city: 11.5, time: 9.5, icon: 10 }),
-    hHero(data, { temp: 42, icon: 25, cond: 13, small: 10.5, miniIcon: 10, metaGap: 2 }),
-    hMetrics(data, 10.5),
+    hRow([
+      hCol([
+        hT(temp(data.now.temp), 40, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
+        hRow([hE(weatherEmoji(data.now.icon, isNight(data)), 25), hSp(5), hT(cond, 12, HC.text(), 'semibold', { minScale: 0.7 })], { gap: 0 }),
+      ], { gap: 2, alignItems: 'start', flex: 42 }),
+      hSp(),
+      hMetrics(data, 8.5),
+    ], { gap: 0, alignItems: 'center' }),
   ]
   const alert = hAlertRow(data, false)
-  if (alert) { card.push(alert) }
   card.push(hDiv())
-  if (A) {
-    const left = hAlmCol(A, {
-      lunar: 22, gz: 10.5, meta: 10, chong: 9.5, small: 10,
-      pill: 11, pillPad: [2, 8], maxChars: 14, yi: 5, ji: 5, gap: 3, flex: 58,
-    })
-    const right = hFestCol(fest, { icon: 11, name: 10.5, day: 10.5, nameW: 52, dayW: 44, gap: 3, flex: 42 })
-    card.push(right ? hRow([left, hSp(10), right], { gap: 0, alignItems: 'start' }) : left)
-    card.push(hT(A.yearGZ + A.monthGZ + ' \u00b7 ' + A.footerText + (A.jieQi ? ' \u00b7 \u4eca\u65e5' + A.jieQi : ''),
-      9, HC.dim(), 'regular', { minScale: 0.5 }))
-  } else {
-    const detail = hDetailRow(data, 10.5)
-    if (detail) card.push(detail)
-    const grid = hFestGrid(fest, { icon: 10.5, name: 10.5, day: 10.5, nameW: 52, dayW: 44, gap: 3 }, 2)
-    if (grid) card.push(grid)
-  }
-  const hours = hHoursRow(data, 6, A ? { hour: 8.5, icon: 12, temp: 9 } : { hour: 10, icon: 15, temp: 10.5 })
-  if (hours) { card.push(hDiv()); card.push(hours) }
+  card.push(alert || hT('今日暂无明显风雨风险', 9.5, HC.green(), 'medium'))
   card.push(hDiv())
-  card.push(hRow(days.slice(0, 5).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, A ? { name: 9, icon: 13, temp: 9.5 } : { name: 10, icon: 17, temp: 11 }))))
+  const forecast = hCol([
+    hT('未来走势', 9.5, HC.dim(), 'semibold'),
+    hHoursRow(data, 5, { hour: 8, icon: 12, temp: 8.5 }) || hT('逐时预报暂缺', 8.5, HC.dim()),
+    hRow(days.slice(0, 4).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, { name: 8.5, icon: 13, temp: 9 })), { gap: 0 }),
+  ], { gap: 4, alignItems: 'start', flex: 53 })
+  const alm = A ? hCol([
+    hT('今日黄历', 9.5, HC.gold(), 'semibold'),
+    hAlmCol(A, { lunar: 18, gz: 8.5, meta: 8, chong: 7.5, small: 8, pill: 9, pillPad: [1, 6], maxChars: 10, yi: 3, ji: 3, gap: 2 }),
+    hT(A.footerText + (A.jieQi ? ' · 今日' + A.jieQi : ''), 7.5, HC.dim(), 'regular', { minScale: 0.5 }),
+  ], { gap: 3, alignItems: 'start', flex: 47 }) : hCol([hT('黄历暂缺', 9, HC.dim())], { gap: 3, flex: 47 })
+  card.push(hRow([forecast, hSp(6), alm], { gap: 0, alignItems: 'start' }))
   return {
     type: 'widget', padding: [9, 11], gap: 3,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [hGlass(card, { gap: 2, padding: [7, 11], borderRadius: 16, flex: 1 })],
+    children: card,
   }
 }
 
