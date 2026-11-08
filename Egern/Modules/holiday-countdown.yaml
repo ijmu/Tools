@@ -1,67 +1,69 @@
+# 节日倒计时模块（Egern · 通用版）
+# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/holiday-countdown.yaml
+#
+# 安装：Egern → 模块 → 添加本 URL；添加“节日倒计时”脚本组件即可使用。
+# 用途：显示国内节日、24 节气和国际节日倒计时，支持主屏四种尺寸与锁屏三种形态。
+# 注意：农历与节气在本地计算（1900–2100），时间基准固定 UTC+8；PLAINBG=1 是渐变白屏时的纯色回退。
+# 参数：SHOW_CN/SHOW_JIEQI/SHOW_INTL 控制栏目；PER_ROW 控制数量；LUNAR/TITLE/URL/PLAINBG 控制显示。
 name: 节日倒计时
-description: 国内节日 / 24 节气 / 国际节日 三栏倒数日 —— 农历与节气精确计算，支持主屏四尺寸与锁屏三态
+description: 国内节日 / 24 节气 / 国际节日三栏倒数日；本地计算农历与节气，支持主屏四尺寸与锁屏三态
 author: Minis
 homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/holiday-countdown.yaml
+icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/Duolingo.png
+
 env_schema:
   SHOW_CN:
     name: 国内节日
-    description: 显示国内节日栏（1=显示 / 0=隐藏）
-    default_value: '1'
-    options:
-      - '1'
-      - '0'
+    description: 显示国内节日栏（1=显示，0=隐藏）
+    default_value: "1"
+    options: ["1", "0"]
   SHOW_JIEQI:
     name: 二十四节气
-    description: 显示节气栏（1=显示 / 0=隐藏）
-    default_value: '1'
-    options:
-      - '1'
-      - '0'
+    description: 显示节气栏（1=显示，0=隐藏）
+    default_value: "1"
+    options: ["1", "0"]
   SHOW_INTL:
     name: 国际节日
-    description: 显示国际节日栏（1=显示 / 0=隐藏）
-    default_value: '1'
-    options:
-      - '1'
-      - '0'
+    description: 显示国际节日栏（1=显示，0=隐藏）
+    default_value: "1"
+    options: ["1", "0"]
   PER_ROW:
     name: 每栏条数
-    description: 每栏取最近几条，1-6；留空按尺寸默认（小 1 / 中 3 / 大 3 / 加大 4）
-    default_value: ''
+    description: 每栏取最近几条（1–6）；留空按尺寸自动（小 1、中 3、大 3、加大 4）
+    default_value: ""
+    options: ["", "1", "2", "3", "4", "5", "6"]
   LUNAR:
     name: 头部农历
-    description: 头部显示农历（1=显示 / 0=隐藏）
-    default_value: '1'
-    options:
-      - '1'
-      - '0'
+    description: 头部显示农历（1=显示，0=隐藏）
+    default_value: "1"
+    options: ["1", "0"]
   QINGMING:
     name: 清明归属
-    description: cn=列入国内节日（默认）；jq=按纯节气列入节气栏
-    default_value: 'cn'
-    options:
-      - 'cn'
-      - 'jq'
+    description: 清明归属（cn=国内节日，jq=节气）
+    default_value: "cn"
+    options: [cn, jq]
   TITLE:
     name: 标题
-    description: 自定义标题，留空显示「节日倒计时」（小尺寸为「倒计时」）
-    default_value: ''
+    description: 自定义标题，留空使用“节日倒计时”（小尺寸为“倒计时”）
+    default_value: ""
+    options: []
   URL:
     name: 点击跳转
-    description: 点按组件打开的 URL，留空使用系统日历 calshow://
-    default_value: ''
+    description: 点击组件打开的 URL，留空使用系统日历 calshow://
+    default_value: ""
+    options: []
   PLAINBG:
-    name: 纯色底
-    description: 渐变背景异常（白屏）时的保险开关（1=纯色 / 0=渐变）
-    default_value: '0'
-    options:
-      - '1'
-      - '0'
+    name: 纯色背景
+    description: 渐变背景异常时的保险开关（1=纯色，0=渐变）
+    default_value: "0"
+    options: ["1", "0"]
+
 scriptings:
-- generic:
-    name: 节日倒计时
-    script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js
-    timeout: 30
+  - generic:
+      name: 节日倒计时
+      script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/holiday-countdown.js
+      timeout: 30
+
 widgets:
-- name: 节日倒计时
-  script_name: 节日倒计时
+  - name: 节日倒计时
+    script_name: 节日倒计时
