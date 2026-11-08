@@ -1,0 +1,11 @@
+# Bilibili PCDN
+# Egern 引用时将 policy 设为 REJECT
+
+domain_wildcard_set:
+  - "*pcdn*.biliapi.net"
+
+domain_suffix_set:
+  - mcdn.bilivideo.cn
+  - mcdn.bilivideo.com
+  - szbdyd.com
+  - mountaintoys.cn
