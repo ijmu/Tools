@@ -4682,7 +4682,7 @@ function addAlmCard(parent, A) {
 const HC = {
   text: () => dynColor('#000000', '#FFFFFF'),
   dim: () => dynColor('#3C3C4399', '#EBEBF599'),
-  glass: () => dynColor('#FFFFFFA6', '#FFFFFF1A'),
+  glass: () => dynColor('#FFFFFFC4', '#FFFFFF1F'),
   gold: () => dynColor('#C07A00', '#FFB340'),
   green: () => dynColor('#1E8E45', '#30D158'),
   red: () => dynColor('#D93A2F', '#FF453A'),
@@ -4705,11 +4705,11 @@ function hbg(cond, night) {
     stops: [0, 0.55, 1], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
   })
   const s = String(cond || '')
-  if (night) return L(['#EEF1FF', '#1A1338', '#F4F0FF', '#0F0C22', '#EEF6FF', '#070C1A'])
-  if (/雪/.test(s)) return L(['#F0F6FF', '#243244', '#EDF1FA', '#18212E', '#E9EEF8', '#0C1119'])
-  if (/雨|雷/.test(s)) return L(['#EAF2FB', '#0F2233', '#E7EEF8', '#0C1A2A', '#E3EBF6', '#07101C'])
-  if (/晴/.test(s)) return L(['#FFF1E0', '#2A1A08', '#F6F0FF', '#150F26', '#EAF4FF', '#08121F'])
-  return L(['#F2F4F9', '#1C2430', '#EEF1F8', '#141A24', '#E9EDF6', '#0A0E15'])
+  if (night) return L(['#E7E9FB', '#1A1338', '#EFE8FF', '#0F0C22', '#E3ECFB', '#070C1A'])
+  if (/雪/.test(s)) return L(['#EAF2FF', '#243244', '#F0EDFF', '#18212E', '#E3F0FD', '#0C1119'])
+  if (/雨|雷/.test(s)) return L(['#E5EEFA', '#0F2233', '#ECEBFA', '#0C1A2A', '#DEEAF7', '#07101C'])
+  if (/晴/.test(s)) return L(['#FFF0E0', '#2A1A08', '#F6EEFF', '#150F26', '#E6F2FF', '#08121F'])
+  return L(['#FFEFF4', '#1C2430', '#F1EEFF', '#141A24', '#E8F3FF', '#0A0E15'])
 }
 
 // ── DSL 原语（Hark 语法）──
@@ -4790,50 +4790,6 @@ function wrapWords(items, perLine, maxLines) {
   return lines.length ? lines : ['\u2014']
 }
 
-// 宜忌：标签列（宜/忌 同列）+ 事项自动折行、左对齐；整块交给 hCenter 居中
-function hYiJiBlock(A, o) {
-  const lw = o.labelW || 13
-  const linesOf = (arr) => wrapWords(arr, o.perLine || 12, o.maxLines || 4)
-  const mk = (label, color, arr) => hRow([
-    hCol([hT(label, o.size, color, 'medium', { minScale: 0.8 })], { width: lw, alignItems: 'start' }),
-    hSp(o.gap || 5),
-    hCol(linesOf(arr).map((l) => hT(l, o.size, HC.text(), 'medium', { minScale: o.scale || 0.45 })), { gap: o.rowGap || 2, alignItems: 'start' }),
-  ], { gap: 0, alignItems: 'start' })
-  return hCol([
-    mk('\u5b9c', HC.green(), A.yi),
-    mk('\u5fcc', HC.red(), A.ji),
-  ], { gap: o.groupGap || 4, alignItems: 'start' })
-}
-
-// 实况行：大温度 + 天气图标（+ 右侧 天气/高低温；可选上下两行形态）
-function hNowRow(data, o) {
-  const now = data.now || {}
-  const day = getToday(data)
-  const cond = clean(now.text) || '实况暂缺'
-  const hl = '高 ' + temp(day && day.tempMax) + ' 低 ' + temp(day && day.tempMin)
-  const emoji = hE(weatherEmoji(now.icon, isNight(data)), o.icon)
-  if (o.stacked) {
-    return hCol([
-      hRow([hT(temp(now.temp), o.temp, HC.text(), 'bold', { mono: true, minScale: 0.75 }), hSp(), emoji]),
-      hRow([
-        hT(cond, o.cond, HC.text(), 'medium', { minScale: 0.9 }),
-        hT(' · ', o.hl, HC.dim(), 'regular'),
-        hT(hl, o.hl, HC.dim(), 'medium', { mono: true, minScale: 0.9 }),
-      ]),
-    ], { gap: 2 })
-  }
-  return hRow([
-    hT(temp(now.temp), o.temp, HC.text(), 'bold', { mono: true, minScale: 0.75 }),
-    hSp(6),
-    emoji,
-    hSp(),
-    hCol([
-      hRow([hSp(), hT(cond, o.cond, HC.text(), 'medium', { minScale: 1 })]),
-      hRow([hSp(), hT(hl, o.hl, HC.dim(), 'medium', { mono: true, minScale: 1 })]),
-    ], { gap: 3 }),
-  ])
-}
-
 function hMetric(symbol, label, value, color, size) {
   const s = size || 9.5
   return hRow([
@@ -4844,56 +4800,265 @@ function hMetric(symbol, label, value, color, size) {
   ], { gap: 2 })
 }
 
-// 窄尺寸用：图标 + 数值，省掉文字标签（158pt 宽放不下三组「标签+数值」）
-function hMetricMini(symbol, value, color, size) {
-  const s = size || 8.5
-  return hRow([
-    hI(symbol, color || HC.dim(), Math.max(7, Math.round(s - 0.5))),
-    hSp(2),
-    hT(value, s, HC.text(), 'semibold', { minScale: 0.8 }),
-  ], { gap: 2 })
+/* ── 节日倒数（结构照 almanac-holiday 的 festLine：图标 + 定宽名称 + 定宽天数）──
+ * 仅在 SHOW_FESTIVAL=1 时取数；节气由 termSerial 推算，公历/农历节日沿用模块内既有函数。
+ * 纯展示层取数，不改动 classic 版式的 dateFestival 行为。 */
+const HF_ICON = [
+  ['除夕', 'gift.fill'], ['春节', 'gift.fill'], ['平安夜', 'gift.fill'], ['圣诞', 'gift.fill'],
+  ['元宵', 'moon.stars.fill'], ['中秋', 'moon.stars.fill'], ['中元', 'moon.stars.fill'], ['下元', 'moon.stars.fill'],
+  ['清明', 'cloud.rain.fill'], ['端午', 'water.waves'], ['腊八', 'cup.and.saucer.fill'],
+  ['七夕', 'heart.fill'], ['情人', 'heart.fill'], ['母亲', 'heart.fill'], ['父亲', 'heart.fill'], ['重阳', 'heart.fill'],
+  ['元旦', 'sparkles'], ['小年', 'sparkles'], ['跨年', 'sparkles'],
+  ['劳动', 'hammer.fill'], ['儿童', 'balloon.fill'], ['感恩', 'fork.knife'], ['万圣', 'theatermasks.fill'],
+  ['国庆', 'flag.fill'], ['教师', 'graduationcap.fill'], ['建军', 'flag.fill'], ['建党', 'flag.fill'],
+  ['龙抬头', 'leaf.fill'], ['植树', 'leaf.fill'], ['寒衣', 'flame.fill'],
+]
+
+function hFestIcon(name) {
+  const s = String(name || '')
+  if (/雪|冬至|小寒|大寒/.test(s)) return 'snowflake'
+  if (/夏至|小暑|大暑|立夏|小满|芒种|立秋|处暑|白露/.test(s)) return 'sun.max.fill'
+  if (/春分|惊蛰|谷雨|雨水|立春/.test(s)) return 'leaf.fill'
+  for (let i = 0; i < HF_ICON.length; i++) if (s.indexOf(HF_ICON[i][0]) >= 0) return HF_ICON[i][1]
+  return 'sparkles'
 }
 
-// 节日倒数行：仅 SHOW_FESTIVAL=1 且 14 天内确有节日时出现（与 classic 同一取数）
-function hFestRow(data, size, center) {
-  if (!envOn('SHOW_FESTIVAL', false)) return null
-  const f = dateFestival(data).festival
-  if (!f) return null
-  const row = hRow([
-    hI('calendar', HC.orange(), Math.max(8, size || 9)),
-    hSp(3),
-    hT(f, size || 9.5, HC.orange(), 'semibold', { minScale: 0.8 }),
+// 倒数越近颜色越热（≤3 红 / ≤7 橙 / 其余次级灰）
+function hFestColor(days) {
+  return days <= 3 ? HC.red() : days <= 7 ? HC.orange() : HC.dim()
+}
+
+// 近 60 天内：24 节气 + 公历/农历节日，按天数排序去重取前 n 条
+function hUpcoming(data, n) {
+  try {
+    if (!envOn('SHOW_FESTIVAL', false)) return []
+    const iso = baseDate(data)
+    const p = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''))
+    if (!p) return []
+    const y = Number(p[1]), m = Number(p[2]), d = Number(p[3])
+    const base = Date.UTC(y, m - 1, d)
+    const items = []
+    const add = (name, ms) => {
+      const days = Math.round((ms - base) / DAY_MS)
+      if (name && days >= 0 && days <= 60) items.push({ name: String(name), days: days })
+    }
+    for (let yy = y; yy <= y + 1; yy++) for (let i = 0; i < 24; i++) add(TERM_NAMES[i], termSerial(yy, i))
+    for (const yy of [y, y + 1]) {
+      add('感恩节', nthWeekdayOfMonth(yy, 10, 4, 4).getTime())
+      add('平安夜', Date.UTC(yy, 11, 24))
+      add('万圣夜', Date.UTC(yy, 9, 31))
+      add('跨年夜', Date.UTC(yy, 11, 31))
+    }
+    for (const next of [getNextFestivalInfo, getNextLunarFestivalInfo]) {
+      let cursor = new Date(y, m - 1, d, 12)
+      for (let i = 0; i < 6 && cursor; i++) {
+        const f = next(cursor)
+        if (!f) break
+        const t = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + f.daysLeft, 12)
+        add(f.name, Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()))
+        cursor = new Date(t.getTime() + DAY_MS)
+      }
+    }
+    items.sort((a, b) => a.days - b.days)
+    const seen = {}
+    const out = []
+    for (let i = 0; i < items.length && out.length < n; i++) {
+      if (seen[items[i].name]) continue
+      seen[items[i].name] = 1
+      out.push(items[i])
+    }
+    return out
+  } catch (e) {
+    return []
+  }
+}
+
+// 单条倒数：图标 + 名称（定宽）+ 天数（定宽右对齐），竖排时列线不漂
+function hFestLine(it, o) {
+  return hRow([
+    hI(hFestIcon(it.name), hFestColor(it.days), o.icon),
+    hSp(4),
+    hCol([hT(it.name, o.name, HC.text(), 'medium', { minScale: 0.6 })], { width: o.nameW, alignItems: 'start' }),
+    hCol([hT(it.days === 0 ? '\u4eca\u5929' : it.days + '\u5929', o.day, hFestColor(it.days), 'bold', { mono: true, minScale: 0.7 })], { width: o.dayW, alignItems: 'start' }),
   ], { gap: 0 })
-  return center ? hCenter([row]) : row
+}
+
+function hFestCol(items, o) {
+  if (!items || !items.length) return null
+  return hCol(items.map((it) => hFestLine(it, o)), { gap: o.gap, alignItems: 'start', flex: o.flex })
+}
+
+// 横排倒数：小尺寸一行两条（条目少、不占行高）
+function hFestInline(items, o) {
+  if (!items || !items.length) return null
+  const kids = []
+  items.forEach((it, i) => {
+    if (i) kids.push(hSp(7))
+    kids.push(hRow([
+      hI(hFestIcon(it.name), hFestColor(it.days), o.icon),
+      hSp(3),
+      hT(it.name, o.name, HC.text(), 'medium', { minScale: 0.6 }),
+      hT(it.days === 0 ? '\u4eca\u5929' : it.days + '\u5929', o.day, hFestColor(it.days), 'bold', { mono: true, minScale: 0.7 }),
+    ], { gap: 0 }))
+  })
+  return hRow(kids, { gap: 0 })
+}
+
+// 两列倒数（SHOW_ALM=0 的天气独占版式用）
+function hFestGrid(items, o, cols) {
+  if (!items || !items.length) return null
+  const c = Math.max(1, cols || 2)
+  const n = Math.ceil(items.length / c)
+  const parts = []
+  for (let i = 0; i < c; i++) {
+    const slice = items.slice(i * n, (i + 1) * n)
+    if (slice.length) parts.push(hCol(slice.map((it) => hFestLine(it, o)), { gap: o.gap, alignItems: 'start', flex: 1 }))
+  }
+  const kids = []
+  parts.forEach((p, i) => { if (i) kids.push(hSp(o.gapX || 10)); kids.push(p) })
+  return hRow(kids, { gap: 0, alignItems: 'start' })
+}
+
+// 宜/忌胶囊条（结构照 almanac-holiday 的 yijiBar：圆角底色 + 粗体单字 + 事项，单行截断）
+function hPill(tag, words, n, tagCol, tagBg, size, pad, maxChars) {
+  const list = (words || []).map((w) => String(w == null ? '' : w).trim()).filter((w) => w && w !== '\u65e0')
+  const out = []
+  let len = 0
+  for (const w of list) {
+    if (out.length >= n) break
+    const add = out.length ? w.length + 1 : w.length
+    if (maxChars && out.length && len + add > maxChars) break
+    out.push(w)
+    len += add
+  }
+  return {
+    type: 'stack', direction: 'row', alignItems: 'center', gap: 6, borderRadius: 8,
+    padding: pad || [1, 7, 1, 7], backgroundColor: tagBg,
+    children: [
+      hT(tag, size + 1, tagCol, 'bold', { minScale: 0.9 }),
+      hT(out.length ? out.join(' ') : '\u8bf8\u4e8b\u4e0d\u5b9c', size, HC.text(), 'medium', { minScale: 0.5 }),
+    ],
+  }
+}
+
+// 农历大字行：右侧挂黄道/黑道 + 干支（照 almanac-holiday 的 almTitleRow）
+function hAlmTitle(A, o) {
+  const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
+  const kids = [hT(A.lunarText, o.lunar, HC.gold(), 'heavy', { minScale: 0.55 })]
+  if (o.right !== false) {
+    kids.push(o.tight ? hSp(o.gapLunar || 8) : hSp())
+    if (o.luck) {
+      kids.push(hDot(luckCol, 5), hSp(3), hT(A.dao ? A.dao + '\u65e5' : '', o.small, luckCol, 'semibold', { minScale: 0.8 }), hSp(6))
+    }
+    kids.push(hT(A.dayGZ, o.gz, HC.dim(), 'semibold', { minScale: 0.7 }))
+  }
+  return hRow(kids, { gap: 0, alignItems: 'center' })
+}
+
+function hAlmMeta(A, size) {
+  return hT(A.lunarYearGZ + A.sx + '\u5e74 \u00b7 ' + A.zhiXing + '\u65e5 \u00b7 ' + A.tianShen + (A.dao ? '\u00b7' + A.dao : ''),
+    size, HC.dim(), 'medium', { minScale: 0.55 })
+}
+
+// 黄历整块（竖排）：农历大字 + 干支/值神 + 冲煞 + 宜忌胶囊
+function hAlmCol(A, o) {
+  const kids = [hAlmTitle(A, o), hAlmMeta(A, o.meta)]
+  if (o.chong) kids.push(hT('\u51b2' + A.chongSX + '(' + A.chongGZ + ')\u715e' + A.sha, o.chong, HC.dim(), 'regular', { minScale: 0.55 }))
+  kids.push(hPill('\u5b9c', A.yi, o.yi, ALMC.yi(), ALMC.yiBg(), o.pill, o.pillPad, o.maxChars))
+  kids.push(hPill('\u5fcc', A.ji, o.ji, ALMC.ji(), ALMC.jiBg(), o.pill, o.pillPad, o.maxChars))
+  return hCol(kids, { gap: o.gap, alignItems: 'start', flex: o.flex })
+}
+
+// 卡内头部：定位 + 更新时间（原来挂在卡外，现在收进卡里省一层留白）
+function hHead(data, o) {
+  return hRow([
+    hI('location.fill', HC.sky(), o.icon),
+    hSp(3),
+    hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', o.city, HC.text(), 'semibold', { minScale: 0.7 }),
+    hSp(),
+    hT(updated(data), o.time, HC.dim(), 'regular', { minScale: 0.8 }),
+  ], { gap: 0 })
+}
+
+// 天气 Hero：大温度 + 天气图标 + 右侧（天气 / 高低温 / 湿度·AQI·风）
+function hHero(data, o) {
+  const now = data.now || {}
+  const day = getToday(data)
+  const cond = clean(now.text) || '\u5b9e\u51b5\u6682\u7f3a'
+  const wind = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''].filter(Boolean).join('') || ''
+  const humRaw = numeric(now.humidity)
+  const hum = humRaw == null ? '' : Math.round(Math.max(0, Math.min(100, humRaw))) + '%'
+  const right = [
+    hRow([hSp(), hT(cond, o.cond, HC.text(), 'semibold', { minScale: 0.7 })]),
+    hRow([hSp(), hT('\u2191' + temp(day && day.tempMax) + '  \u2193' + temp(day && day.tempMin), o.small, HC.dim(), 'medium', { mono: true, minScale: 0.7 })]),
+  ]
+  const metaKids = []
+  const pushMeta = (node) => { if (metaKids.length) metaKids.push(hSp(5)); metaKids.push(node) }
+  if (hum) pushMeta(hRow([hI('humidity.fill', HC.sky(), o.miniIcon), hSp(2), hT(hum, o.small, HC.dim(), 'medium', { mono: true, minScale: 0.8 })]))
+  if (data.aqi && clean(data.aqi.value)) pushMeta(hRow([hI('aqi.medium', hAqiColor(data.aqi.label), o.miniIcon), hSp(2), hT(clean(data.aqi.label) + ' ' + clean(data.aqi.value), o.small, hAqiColor(data.aqi.label), 'semibold', { minScale: 0.7 })]))
+  if (wind) pushMeta(hRow([hI('wind', HC.dim(), o.miniIcon), hSp(2), hT(wind, o.small, HC.dim(), 'medium', { minScale: 0.7 })]))
+  if (metaKids.length) right.push(hRow([hSp()].concat(metaKids), { gap: 0 }))
+  return hRow([
+    hT(temp(now.temp), o.temp, HC.text(), 'bold', { mono: true, minScale: 0.55 }),
+    hSp(3),
+    hE(weatherEmoji(now.icon, isNight(data)), o.icon),
+    hSp(5),
+    hCol(right, { gap: o.metaGap || 1, alignItems: 'start', flex: 1 }),
+  ], { gap: 0, alignItems: 'center' })
+}
+
+// 小尺寸 Hero：温度 + 图标 + 天气/高低温一行；湿度·AQI·风 折成第二行铺满宽度
+// （158pt 窄卡里，三行右栏会和温度抢宽，宁可换行）
+function hHeroMini(data, o) {
+  const now = data.now || {}
+  const day = getToday(data)
+  const cond = clean(now.text) || '\u5b9e\u51b5\u6682\u7f3a'
+  const humRaw = numeric(now.humidity)
+  const hum = humRaw == null ? '' : Math.round(Math.max(0, Math.min(100, humRaw))) + '%'
+  const wind = clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''
+  const meta = []
+  if (hum) meta.push(hRow([hI('humidity.fill', HC.sky(), o.miniIcon), hSp(2), hT(hum, o.small, HC.dim(), 'medium', { mono: true, minScale: 0.7 })]))
+  if (data.aqi && clean(data.aqi.value)) meta.push(hRow([hI('aqi.medium', hAqiColor(data.aqi.label), o.miniIcon), hSp(2), hT(clean(data.aqi.label) + ' ' + clean(data.aqi.value), o.small, hAqiColor(data.aqi.label), 'semibold', { minScale: 0.7 })]))
+  if (wind) meta.push(hRow([hI('wind', HC.dim(), o.miniIcon), hSp(2), hT(wind, o.small, HC.dim(), 'medium', { minScale: 0.7 })]))
+  const out = [hRow([
+    hT(temp(now.temp), o.temp, HC.text(), 'bold', { mono: true, minScale: 0.6 }),
+    hSp(3),
+    hE(weatherEmoji(now.icon, isNight(data)), o.icon),
+    hSp(5),
+    hCol([
+      hRow([hSp(), hT(cond, o.cond, HC.text(), 'semibold', { minScale: 0.65 })]),
+      hRow([hSp(), hT('\u2191' + temp(day && day.tempMax) + ' \u2193' + temp(day && day.tempMin), o.small, HC.dim(), 'medium', { mono: true, minScale: 0.65 })]),
+    ], { gap: 0, alignItems: 'start', flex: 1 }),
+  ], { gap: 0, alignItems: 'center' })]
+  if (meta.length) {
+    const kids = []
+    meta.forEach((m, i) => { if (i) kids.push(hSp(6)); kids.push(m) })
+    out.push(hRow(kids, { gap: 0 }))
+  }
+  return hCol(out, { gap: o.metaGap || 2 })
+}
+
+// 指标行：图标 + 标签 + 数值（大尺寸 / 无黄历时用）
+function hMetrics(data, size) {
+  const now = data.now || {}
+  const humRaw = numeric(now.humidity)
+  const hum = humRaw == null ? '\u2014' : Math.round(Math.max(0, Math.min(100, humRaw))) + '%'
+  const wind = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''].filter(Boolean).join('') || '\u2014'
+  const aqiTxt = data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014'
+  return hRow([
+    hMetric('thermometer.medium', '\u4f53\u611f', temp(now.feelsLike), null, size),
+    hSp(),
+    hMetric('wind', '\u98ce', wind, null, size),
+    hSp(),
+    hMetric('aqi.medium', 'AQI', aqiTxt, hAqiColor(data.aqi && data.aqi.label), size),
+    hSp(),
+    hMetric('humidity.fill', '\u6e7f\u5ea6', hum, null, size),
+  ])
 }
 
 // 1pt 分隔线：spacer 撑满宽度，保证是整条线
 function hDiv() {
   return { type: 'stack', direction: 'row', height: 1, gap: 0, backgroundColor: HC.track(), children: [{ type: 'spacer' }] }
-}
-
-// 黄历压成一行/两行：按宽预算挑选显示哪几段（158pt 宽约只放得下 11 个汉字）
-function hAlmLine(A, s, o) {
-  const opt = o || {}
-  const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
-  const out = []
-  if (opt.lunar !== false) out.push(hT(A.lunarText, s + 1, HC.gold(), 'bold', { minScale: 0.6 }))
-  if (opt.dao) {
-    out.push(hSp(4), hDot(luckCol, 4), hT(A.dao || '\u5e73', s, luckCol, 'semibold', { minScale: 1 }))
-  }
-  if (opt.gz) out.push(hSp(4), hT(A.dayGZ + '\u65e5', s - 0.5, HC.dim(), 'medium', { minScale: 1 }))
-  const yi = (A.yi || []).slice(0, opt.yi || 0)
-  const ji = (A.ji || []).slice(0, opt.ji || 0)
-  if (yi.length) out.push(hSp(4), hT('\u5b9c ' + yi.join(' '), s - 0.5, HC.green(), 'medium', { minScale: 0.6 }))
-  if (ji.length) out.push(hSp(4), hT('\u5fcc ' + ji.join(' '), s - 0.5, HC.red(), 'medium', { minScale: 0.6 }))
-  return hRow(out, { gap: 0, alignItems: 'center' })
-}
-
-// 用 spacer 把若干列均匀铺开（Egern/Hark 常用手法）
-function hSpread(items) {
-  const out = []
-  items.forEach((it, i) => { if (i) out.push({ type: 'spacer' }); out.push(it) })
-  return out
 }
 
 // AQI 语义色
@@ -4922,191 +5087,138 @@ function hForecastCol(day, label, first, size, compact) {
   return col
 }
 
-// ── 天气摘要行（温度 + 图标 + 天气·高低温，一行搞定）──
-function hWeatherLine(data, o) {
-  const now = data.now || {}
-  const day = getToday(data)
-  return hRow([
-    hT(temp(now.temp), o.temp, HC.text(), 'bold', { mono: true, minScale: 0.85 }),
-    hSp(5),
-    hE(weatherEmoji(now.icon, isNight(data)), o.icon),
-    hSp(5),
-    hT([clean(now.text) || '\u2014', '\u9ad8' + temp(day && day.tempMax), '\u4f4e' + temp(day && day.tempMin)].join(' '), o.cond, HC.dim(), 'regular', { minScale: 0.7 }),
-  ], { gap: 0, alignItems: 'center' })
-}
-
-// ── 仪表盘区块标题：彩色圆点 + 半粗标签（Hark 风格）──
-// ── 小尺寸：单张玻璃卡（天气 Hero + 一行黄历）──
+// ── 小尺寸：单卡（Hero + 农历大字 + 宜忌胶囊 + 一行倒数）──
 function harkSmall(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const now = data.now || {}
-  const day = getToday(data)
+  const fest = hUpcoming(data, 2)
   const card = [
-    hRow([
-      hT(temp(now.temp), 28, HC.text(), 'bold', { mono: true, minScale: 0.6 }),
-      hSp(4),
-      hE(weatherEmoji(now.icon, isNight(data)), 18),
-      hSp(),
-      hT(cond, 10.5, HC.text(), 'medium', { minScale: 0.7 }),
-    ], { gap: 0, alignItems: 'center' }),
-    hT('\u9ad8' + temp(day && day.tempMax) + ' \u4f4e' + temp(day && day.tempMin), 8.5, HC.dim(), 'medium', { mono: true, minScale: 0.7 }),
+    hHead(data, { city: 10, time: 8.5, icon: 9 }),
+    hHeroMini(data, { temp: 30, icon: 18, cond: 10, small: 8.5, miniIcon: 8, metaGap: 2 }),
   ]
   if (A) {
     card.push(hDiv())
-    card.push(hAlmLine(A, 8.5, { yi: 1, ji: 1 }))
+    card.push(hAlmTitle(A, { lunar: 15, gz: 8.5, small: 8, luck: true }))
+    card.push(hPill('\u5b9c', A.yi, 3, ALMC.yi(), ALMC.yiBg(), 8.5, [1, 6], 9))
+    card.push(hPill('\u5fcc', A.ji, 3, ALMC.ji(), ALMC.jiBg(), 8.5, [1, 6], 9))
   }
-  card.push(hFestRow(data, 8))
+  const fl = hFestInline(fest, { icon: 9, name: 8.5, day: 8.5 })
+  if (fl) card.push(fl)
+  if (!A) {
+    // 没有黄历时不留空玻璃：补一段逐时（或明细行）填满卡内
+    const hrs = hHoursRow(data, 4, { hour: 8.5, icon: 12, temp: 9 }) || hDetailRow(data, 9)
+    if (hrs) { card.push(hDiv()); card.push(hrs) }
+  }
   return {
-    type: 'widget', padding: [8, 10], gap: 5,
+    type: 'widget', padding: [6, 8], gap: 2,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 10),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 11, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 8.5, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass(card, { gap: 4, padding: [6, 9], borderRadius: 16, flex: 1 }),
-    ],
+    children: [hGlass(card, { gap: 2, padding: [6, 9], borderRadius: 16, flex: 1 })],
   }
 }
 
-// ── 中尺寸：单张玻璃卡（天气 Hero + 指标行 + 一行黄历）──
+// ── 中尺寸：单卡（Hero + 黄历大字块｜右侧带图标倒数列表）──
 function harkMedium(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const now = data.now || {}
-  const day = getToday(data)
-  const humRaw = numeric(now.humidity)
-  const hum = humRaw == null ? null : Math.max(0, Math.min(100, humRaw))
-  const aqiTxt = data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014'
-  const windTxt = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''].filter(Boolean).join('') || '\u2014'
+  const fest = hUpcoming(data, 5)
   const card = [
-    hRow([
-      hT(temp(now.temp), 28, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
-      hSp(5),
-      hE(weatherEmoji(now.icon, isNight(data)), 18),
-      hSp(),
-      hCol([
-        hT(cond, 10, HC.text(), 'medium', { minScale: 0.75 }),
-        hSp(1),
-        hT(windTxt, 8, HC.dim(), 'regular', { minScale: 0.6 }),
-      ], { gap: 0 }),
-    ], { gap: 0, alignItems: 'center' }),
-    hRow([
-      hT('\u2191' + temp(day && day.tempMax) + ' \u2193' + temp(day && day.tempMin), 8, HC.dim(), 'medium', { mono: true, minScale: 0.7 }),
-      hSp(),
-      hMetricMini('aqi.medium', aqiTxt, hAqiColor(data.aqi && data.aqi.label), 8),
-      hSp(),
-      hMetricMini('humidity.fill', hum == null ? '\u2014' : Math.round(hum) + '%', null, 8),
-    ], { gap: 0 }),
+    hHead(data, { city: 10.5, time: 9, icon: 9.5 }),
+    hHero(data, { temp: 32, icon: 21, cond: 11, small: 8.5, miniIcon: 8.5, metaGap: 1 }),
   ]
   if (A) {
     card.push(hDiv())
-    card.push(hAlmLine(A, 8.5, { yi: 1, ji: 1 }))
+    const left = hAlmCol(A, {
+      lunar: 16.5, gz: 9, meta: 8.5, chong: 8, small: 8.5,
+      pill: 9.5, pillPad: [1, 7], maxChars: 12, yi: 5, ji: 5, gap: 1.5, flex: 60,
+    })
+    const right = hFestCol(fest, { icon: 10, name: 9.5, day: 9.5, nameW: 44, dayW: 38, gap: 1.5, flex: 40 })
+    card.push(right ? hRow([left, hSp(8), right], { gap: 0, alignItems: 'start' }) : left)
+  } else {
+    card.push(hMetrics(data, 10))
+    const grid = hFestGrid(fest.slice(0, 2), { icon: 10, name: 10, day: 10, nameW: 46, dayW: 38, gap: 2 }, 2)
+    if (grid) { card.push(hDiv()); card.push(grid) }
+    const hrs = hHoursRow(data, 6, { hour: 9, icon: 13, temp: 9.5 })
+    if (hrs) { card.push(hDiv()); card.push(hrs) }
   }
-  card.push(hFestRow(data, 9))
   return {
-    type: 'widget', padding: [7, 9], gap: 4,
+    type: 'widget', padding: [5, 9], gap: 1.5,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 10),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 11, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 8.5, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass(card, { gap: 3, padding: [5, 9], borderRadius: 16, flex: 1 }),
-    ],
+    children: [hGlass(card, { gap: 1.5, padding: [4, 9], borderRadius: 16, flex: 1 })],
   }
 }
 
-// ── 大尺寸：单张玻璃卡（Hero + 指标 + 逐时 + 黄历 + 五日）──
+// ── 大尺寸：单卡（Hero + 指标 + 黄历大字块｜右侧倒数 + 页脚 + 逐时 + 五日）──
 function harkLarge(data, A) {
   const cond = clean(data.now.text) || '\u2014'
-  const now = data.now || {}
-  const day = getToday(data)
-  const wind = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '\u7ea7' : ''].filter(Boolean).join('') || '\u2014'
-  const humRaw = numeric(now.humidity)
-  const hum = humRaw == null ? null : Math.max(0, Math.min(100, humRaw))
+  const fest = hUpcoming(data, 7)
   const days = getForecast(data)
   const card = [
-    hRow([
-      hT(temp(now.temp), 34, HC.text(), 'bold', { mono: true, minScale: 0.8 }),
-      hSp(7),
-      hE(weatherEmoji(now.icon, isNight(data)), 22),
-      hSp(),
-      hCol([
-        hT(cond, 12, HC.text(), 'medium', { minScale: 0.9 }),
-        hSp(2),
-        hRow([
-          hT('\u9ad8 ' + temp(day && day.tempMax), 9.5, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
-          hSp(6),
-          hT('\u4f4e ' + temp(day && day.tempMin), 9.5, HC.lo(), 'regular', { mono: true, minScale: 1 }),
-        ], { gap: 0 }),
-      ], { gap: 0 }),
-    ], { gap: 0, alignItems: 'center' }),
-    hRow([
-      hMetric('thermometer.medium', '\u4f53\u611f', temp(now.feelsLike)),
-      hSp(),
-      hMetric('wind', '\u98ce', wind),
-      hSp(),
-      hMetric('aqi.medium', 'AQI', data.aqi && clean(data.aqi.value) ? clean(data.aqi.label) + ' ' + clean(data.aqi.value) : '\u2014', hAqiColor(data.aqi && data.aqi.label)),
-      hSp(),
-      hMetric('humidity.fill', '\u6e7f\u5ea6', hum == null ? '\u2014' : Math.round(hum) + '%'),
-    ]),
-    hHoursRow(data),
+    hHead(data, { city: 11.5, time: 9.5, icon: 10 }),
+    hHero(data, { temp: 42, icon: 25, cond: 13, small: 10.5, miniIcon: 10, metaGap: 2 }),
+    hMetrics(data, 10.5),
+    hDiv(),
   ]
   if (A) {
-    const luckCol = A.luck === '\u51f6' ? HC.red() : HC.green()
-    card.push(hDiv())
-    card.push(hRow([
-      hT(A.lunarText, 13.5, HC.gold(), 'bold', { minScale: 0.8 }),
-      hSp(5),
-      hDot(luckCol, 5),
-      hT((A.dao || '\u5e73') + '\u65e5', 9.5, luckCol, 'semibold', { minScale: 1 }),
-      hSp(),
-      hT(A.dayGZ + ' \u00b7 ' + A.tianShen + ' \u00b7 ' + A.zhiXing + '\u65e5 \u00b7 ' + A.xiu + '\u5bbf' + A.xiuLuck, 8.5, HC.dim(), 'medium', { minScale: 0.55 }),
-    ]))
-    card.push(hCenter([hYiJiBlock(A, { size: 10, perLine: 28, maxLines: 2, labelW: 13, gap: 5, rowGap: 2, groupGap: 3 })]))
-    card.push(hCenter([hT(A.yearGZ + '\u5e74' + A.monthGZ + '\u6708 \u00b7 ' + A.footerText + (A.jieQi ? ' \u00b7 \u4eca\u65e5' + A.jieQi : ''), 8.5, HC.dim(), 'regular', { minScale: 0.5 })]))
+    const left = hAlmCol(A, {
+      lunar: 22, gz: 10.5, meta: 10, chong: 9.5, small: 10,
+      pill: 11, pillPad: [2, 8], maxChars: 14, yi: 5, ji: 5, gap: 3, flex: 58,
+    })
+    const right = hFestCol(fest, { icon: 11, name: 10.5, day: 10.5, nameW: 52, dayW: 44, gap: 3, flex: 42 })
+    card.push(right ? hRow([left, hSp(10), right], { gap: 0, alignItems: 'start' }) : left)
+    card.push(hT(A.yearGZ + A.monthGZ + ' \u00b7 ' + A.footerText + (A.jieQi ? ' \u00b7 \u4eca\u65e5' + A.jieQi : ''),
+      9, HC.dim(), 'regular', { minScale: 0.5 }))
+  } else {
+    const detail = hDetailRow(data, 10.5)
+    if (detail) card.push(detail)
+    const grid = hFestGrid(fest, { icon: 10.5, name: 10.5, day: 10.5, nameW: 52, dayW: 44, gap: 3 }, 2)
+    if (grid) card.push(grid)
   }
-  card.push(hFestRow(data, 9, true))
+  const hours = hHoursRow(data, 6, A ? { hour: 8.5, icon: 12, temp: 9 } : { hour: 10, icon: 15, temp: 10.5 })
+  if (hours) { card.push(hDiv()); card.push(hours) }
   card.push(hDiv())
-  card.push(hRow(days.slice(0, 5).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, { name: 8.5, icon: 12, temp: 9 }))))
+  card.push(hRow(days.slice(0, 5).map(({ date, day: d }, i) => hForecastCol(d, i === 0 ? '\u660e\u5929' : dayLabel(date), i === 0, A ? { name: 9, icon: 13, temp: 9.5 } : { name: 10, icon: 17, temp: 11 }))))
   return {
-    type: 'widget', padding: [10, 12], gap: 5,
+    type: 'widget', padding: [9, 11], gap: 3,
     backgroundGradient: hbg(cond, isNight(data)),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: [
-      hRow([
-        hI('location.fill', HC.sky(), 11),
-        hT(clean(data.place) || '\u5f53\u524d\u4f4d\u7f6e', 12, HC.text(), 'semibold', { minScale: 1 }),
-        hSp(),
-        hT(updated(data), 9, HC.dim(), 'regular', { minScale: 1 }),
-      ]),
-      hGlass(card, { gap: 4, padding: [7, 11], borderRadius: 16, flex: 1 }),
-    ],
+    children: [hGlass(card, { gap: 2, padding: [7, 11], borderRadius: 16, flex: 1 })],
   }
 }
 
-// 逐时行（大尺寸，嵌在实况卡里）
-function hHoursRow(data) {
-  const hours = (data.hourly || []).slice(0, 6)
+// 逐时行（大尺寸嵌在实况卡里；SHOW_ALM=0 或小尺寸留白时补位）
+function hHoursRow(data, count, o) {
+  const opt = o || {}
+  const hours = (data.hourly || []).slice(0, count || 6)
   if (!hours.length) return null
   return hRow(hours.map((h) => {
     const hStr = h.hourText ? String(h.hourText).slice(0, 2) : String(h.fxTime).slice(11, 13)
     const hr = Number(hStr)
     return hCol([
-      hT(hStr + '\u65f6', 8.5, HC.dim(), 'regular', { minScale: 1 }),
-      hE(weatherEmoji(h.icon, /^n/i.test(String(h.icon || '')) || hr < 6 || hr >= 18), 12),
-      hT(temp(h.temp), 9, HC.text(), 'semibold', { mono: true, minScale: 1 }),
+      hT(hStr + '\u65f6', opt.hour || 8.5, HC.dim(), 'regular', { minScale: 1 }),
+      hE(weatherEmoji(h.icon, /^n/i.test(String(h.icon || '')) || hr < 6 || hr >= 18), opt.icon || 12),
+      hT(temp(h.temp), opt.temp || 9, HC.text(), 'semibold', { mono: true, minScale: 1 }),
     ], { gap: 1, alignItems: 'center', flex: 1 })
   }))
+}
+
+// 明细行：日出 / 日落 / 降水 / 气压（数据来自数据层已有字段，无则不显示）
+function hDetailRow(data, size) {
+  const now = data.now || {}
+  const day = getToday(data) || {}
+  const s = size || 10
+  const items = []
+  const push = (sym, label, value) => { if (clean(value)) items.push(hMetric(sym, label, clean(value), null, s)) }
+  push('sunrise.fill', '\u65e5\u51fa', day.sunrise)
+  push('sunset.fill', '\u65e5\u843d', day.sunset)
+  push('cloud.rain.fill', '\u964d\u6c34', clean(now.precip) ? clean(now.precip) + 'mm' : '')
+  push('barometer', '\u6c14\u538b', day.pressure)
+  if (!items.length) return null
+  const kids = []
+  items.forEach((it, i) => { if (i) kids.push(hSp()); kids.push(it) })
+  return hRow(kids, { gap: 0 })
 }
 
 // hark 版式入口：ALM_STYLE=hark（默认）才走这里；SHOW_ALM=0 仍用新版式，只是不出黄历卡
