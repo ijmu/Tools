@@ -9,7 +9,7 @@ name: 看多标的
 description: 展示“极力推荐 / 强烈看多 / 重仓绩优”标的：名称 · 代码 · 推荐日期 · 现价 · 当日涨幅，并附成本价 / 收益率 / 调仓变动；支持日期、涨幅和收益率排序
 author: Minis
 homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/gp-bullish.yaml
-icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/GPBullish.svg
+icon: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Icons/GPBullish.png
 
 env_schema:
   GP_SITE:
