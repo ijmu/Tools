@@ -16,7 +16,6 @@ env_schema:
     name: 城市
     description: 要查询的城市名或 9 位城市代码，例如莆田、北京、阳江；留空或填“自动”按 IP 自动定位
     default_value: ""
-    options: []
 
 rules:
   - domain_suffix:

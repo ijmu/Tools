@@ -53,12 +53,10 @@ env_schema:
     name: 标题
     description: 组件标题，留空使用“黄历与节日”
     default_value: ""
-    options: []
   URL:
     name: 点击跳转
     description: 点击组件跳转的地址，留空打开系统日历 calshow://
     default_value: ""
-    options: []
   PLAINBG:
     name: 纯色背景
     description: 纯色背景（1=关闭渐变，0=使用渐变）

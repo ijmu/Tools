@@ -46,12 +46,10 @@ env_schema:
     name: 标题
     description: 自定义标题，留空使用“节日倒计时”（小尺寸为“倒计时”）
     default_value: ""
-    options: []
   URL:
     name: 点击跳转
     description: 点击组件打开的 URL，留空使用系统日历 calshow://
     default_value: ""
-    options: []
   PLAINBG:
     name: 纯色背景
     description: 渐变背景异常时的保险开关（1=纯色，0=渐变）
