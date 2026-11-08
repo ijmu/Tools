@@ -4674,8 +4674,8 @@ function addAlmCard(parent, A) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════
- *  Hark 风格渲染层
- *  ─ 设计原语取自 zhaohantao1360-hash/Hark（GasPrice-hark / Lottery-hark）：
+ *  晨曦天气·黄历渲染层
+ *  ─ 单卡信息层级：天气主区 → 风雨提醒 → 黄历摘要 → 预报：
  *    对角三段渐变底 · 半透明玻璃卡（#FFFFFF1A/26 + 大圆角）· iOS 系统色
  *    · 迷你色点 · 满宽表头（左图标+标题 / 右时间）· 靠 spacer 撑开的留白
  * ══════════════════════════════════════════════════════════════════════ */
@@ -5071,6 +5071,32 @@ function hAqiColor(label) {
   return HC.dim()
 }
 
+// 将天气预警、强风和强降水统一成短提醒；没有风险时不占位。
+function hWeatherAlerts(data) {
+  const now = data.now || {}
+  const out = []
+  const official = (data.warnings || []).map((x) => clean(x && x.title)).filter(Boolean)
+  official.slice(0, 2).forEach((x) => out.push({ text: x, color: HC.red(), icon: 'exclamationmark.triangle.fill' }))
+  const windLevel = numeric(String(now.windScale || '').match(/\d+(?:\.\d+)?/)?.[0])
+  if (windLevel != null && windLevel >= 6 && !out.some((x) => /风/.test(x.text))) {
+    out.push({ text: '大风提醒 · ' + windLevel + '级', color: HC.orange(), icon: 'wind' })
+  }
+  const rain = numeric(now.precip)
+  if (rain != null && rain >= 10 && !out.some((x) => /雨/.test(x.text))) {
+    out.push({ text: '强降雨提醒 · ' + rain + 'mm', color: HC.blue(), icon: 'cloud.rain.fill' })
+  }
+  return out.slice(0, 2)
+}
+
+function hAlertRow(data, compact) {
+  const alerts = hWeatherAlerts(data)
+  if (!alerts.length) return null
+  return hRow(alerts.map((a, i) => {
+    if (i) return hRow([hSp(6), hI(a.icon, a.color, compact ? 9 : 10), hSp(3), hT(a.text, compact ? 8.5 : 9.5, a.color, 'semibold', { minScale: 0.58 })], { gap: 0 })
+    return hRow([hI(a.icon, a.color, compact ? 9 : 10), hSp(3), hT(a.text, compact ? 8.5 : 9.5, a.color, 'semibold', { minScale: 0.58 })], { gap: 0 })
+  }), { gap: 0 })
+}
+
 function hForecastCol(day, label, first, size, compact) {
   const temps = hRow([
     hT(temp(day && day.tempMax), size.temp, HC.hi(), 'semibold', { mono: true, minScale: 1 }),
@@ -5095,6 +5121,8 @@ function harkSmall(data, A) {
     hHead(data, { city: 10, time: 8.5, icon: 9 }),
     hHeroMini(data, { temp: 30, icon: 18, cond: 10, small: 8.5, miniIcon: 8, metaGap: 2 }),
   ]
+  const alert = hAlertRow(data, true)
+  if (alert) { card.push(alert); card.push(hDiv()) }
   if (A) {
     card.push(hDiv())
     card.push(hAlmTitle(A, { lunar: 15, gz: 8.5, small: 8, luck: true }))
@@ -5125,6 +5153,8 @@ function harkMedium(data, A) {
     hHead(data, { city: 10.5, time: 9, icon: 9.5 }),
     hHero(data, { temp: 32, icon: 21, cond: 11, small: 8.5, miniIcon: 8.5, metaGap: 1 }),
   ]
+  const alert = hAlertRow(data, false)
+  if (alert) { card.push(alert); card.push(hDiv()) }
   if (A) {
     card.push(hDiv())
     const left = hAlmCol(A, {
@@ -5158,8 +5188,10 @@ function harkLarge(data, A) {
     hHead(data, { city: 11.5, time: 9.5, icon: 10 }),
     hHero(data, { temp: 42, icon: 25, cond: 13, small: 10.5, miniIcon: 10, metaGap: 2 }),
     hMetrics(data, 10.5),
-    hDiv(),
   ]
+  const alert = hAlertRow(data, false)
+  if (alert) { card.push(alert) }
+  card.push(hDiv())
   if (A) {
     const left = hAlmCol(A, {
       lunar: 22, gz: 10.5, meta: 10, chong: 9.5, small: 10,
@@ -5223,7 +5255,8 @@ function hDetailRow(data, size) {
 
 // hark 版式入口：ALM_STYLE=hark（默认）才走这里；SHOW_ALM=0 仍用新版式，只是不出黄历卡
 function harkRender(data, family) {
-  if (String(envStr('ALM_STYLE', 'hark')).toLowerCase() !== 'hark') return null
+  const style = String(envStr('ALM_STYLE', 'aurora')).toLowerCase()
+  if (style !== 'aurora' && style !== 'hark') return null
   const showAlm = envOn('SHOW_ALM', true)
   const A = showAlm ? almanacOf(data) : null
   if (showAlm && !A) return null
