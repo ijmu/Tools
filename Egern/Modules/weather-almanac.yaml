@@ -1,12 +1,10 @@
-# 天气·黄历模块（Egern · 通用版）
-# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/weather-almanac.yaml
-#
-# 安装：Egern → 模块 → 添加本 URL；添加“天气·黄历”脚本组件即可使用。
-# 用途：中国天气网免 Key 天气 + 本地农历/干支/黄道黑道/宜忌；默认使用 Hark 玻璃卡样式。
-# 参数：CITY 可填城市名、9 位城市代码或“自动”；留空同样按 IP 自动定位。
-# 注意：天气数据需要网络；天气网、定位服务按下方规则直连。黄历计算支持 1900–2100，脚本内部固定启用 Hark 和显示黄历。
+# 天气·黄历
+# 中国天气网免 Key 天气 + 本地农历 / 干支 / 黄道黑道 / 宜忌，Hark 玻璃卡版式。
+# 安装：Egern → 模块 → 添加下方 URL，再在桌面添加「天气·黄历」小组件。
+# URL:  https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/weather-almanac.yaml
+# 数据：天气来自中国天气网，定位按 IP 自动判断；黄历为脚本本地推算，1900–2100 可用。
 name: 天气·黄历
-description: 中国天气网免 Key 天气 + Hark 玻璃卡 + 农历/干支/黄道黑道/宜忌；无需额外密钥
+description: 天气主视觉 + 黄历辅助层，玻璃卡版式；免 Key，无需第三方账号
 author: Minis
 homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/weather-almanac.yaml
 icon: https://raw.githubusercontent.com/SIJULY/egern-radar/main/weather-icon.png
@@ -14,8 +12,20 @@ icon: https://raw.githubusercontent.com/SIJULY/egern-radar/main/weather-icon.png
 env_schema:
   CITY:
     name: 城市
-    description: 要查询的城市名或 9 位城市代码，例如莆田、北京、阳江；留空或填“自动”按 IP 自动定位
+    description: 城市名或 9 位城市代码，例如莆田、北京、阳江；留空或填「自动」按 IP 自动定位
     default_value: ""
+  ALM_STYLE:
+    name: 版式
+    description: hark 为玻璃卡新版式（默认）；classic 可切回上一版纯天气排版
+    default_value: hark
+  SHOW_ALM:
+    name: 显示黄历
+    description: 填 0 关闭黄历，只保留天气版式
+    default_value: "1"
+  SHOW_FESTIVAL:
+    name: 显示节日倒数
+    description: 填 1 在黄历卡显示「距 XX 节 N 天」
+    default_value: "0"
 
 rules:
   - domain_suffix:
@@ -44,10 +54,6 @@ scriptings:
       name: weather-almanac
       script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/WeatherWdg-almanac.js
       timeout: 60
-      env:
-        ALM_STYLE: hark
-        SHOW_ALM: "1"
-        SHOW_FESTIVAL: "0"
 
 widgets:
   - name: 天气·黄历
