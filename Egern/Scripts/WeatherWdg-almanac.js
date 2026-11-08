@@ -5151,30 +5151,133 @@ function harkSmall(data, A) {
   }
 }
 
-// ── 中尺寸：单卡（Hero + 黄历大字块｜右侧带图标倒数列表）──
-function harkMedium(data, A) {
-  const cond = clean(data.now.text) || '\u2014'
-  const card = [hHead(data, { city: 10.5, time: 9, icon: 9.5 })]
-  const weather = hCol([
-    hT(temp(data.now.temp), 34, HC.text(), 'bold', { mono: true, minScale: 0.65 }),
-    hRow([hE(weatherEmoji(data.now.icon, isNight(data)), 18), hSp(4), hT(cond, 10.5, HC.text(), 'semibold', { minScale: 0.65 })], { gap: 0 }),
-    hRow([hMetric('humidity.fill', '湿度', unit(data.now.humidity, '%'), HC.sky(), 9), hSp(), hMetric('wind', '风', clean(data.now.windScale) ? clean(data.now.windScale) + '级' : '—', HC.dim(), 9)], { gap: 0 }),
-  ], { gap: 3, alignItems: 'start', flex: 45 })
-  const alm = A ? hAlmCol(A, { lunar: 16, gz: 8.5, meta: 8, chong: 7.5, small: 8, pill: 8.5, pillPad: [1, 6], maxChars: 10, yi: 3, ji: 3, gap: 2, flex: 55 }) : hCol([hT('黄历暂缺', 10, HC.dim(), 'medium'), hT('天气数据仍可用', 8.5, HC.dim())], { gap: 3, flex: 55 })
-  card.push(hDiv())
-  card.push(hRow([weather, hSp(10), alm], { gap: 0, alignItems: 'start' }))
-  const alert = hAlertRow(data, false)
-  card.push(hDiv())
-  card.push(alert || hT('天气平稳 · 暂无风雨提醒', 8.5, HC.green(), 'medium'))
-  card.push(hDiv())
-  const hours = hHoursRow(data, 5, { hour: 8, icon: 11, temp: 8.5 })
-  if (hours) card.push(hours)
+// ── 中尺寸：复制「黄历与节日」64/36 骨架，只把右侧倒数列表替换为天气 ──
+// 原 almanac-holiday.js / YAML 始终只读；这里保留其色板、字号、间距和宜忌条形。
+const AHW = {
+  bg: () => dynColor('#FFFFFF', '#1C1C1E'),
+  primary: () => dynColor('#1A1A1A', '#FFFFFF'),
+  secondary: () => dynColor('#8A8A8E', '#98989D'),
+  almanac: () => dynColor('#8A6B2F', '#D9A94E'),
+  yi: () => dynColor('#0E7A54', '#32D74B'),
+  ji: () => dynColor('#B3261E', '#FF6B62'),
+  yiBg: () => dynColor('#0E7A5418', '#32D74B20'),
+  jiBg: () => dynColor('#B3261E18', '#FF6B6220'),
+  weather: () => dynColor('#5E7A8A', '#A3BAC6'),
+  statusBg: () => dynColor('#FFFFFFD9', '#FFFFFF18'),
+  alert: () => dynColor('#C75A18', '#FF9F5A'),
+  alertBg: () => dynColor('#FFF1E6E8', '#5A251E80'),
+  hi: () => dynColor('#D86B00', '#FF9F0A'),
+  lo: () => dynColor('#3979B9', '#64A8FF'),
+}
+
+function ahwBg() {
   return {
-    type: 'widget', padding: [4, 9], gap: 1.5,
-    backgroundGradient: hbg(cond, isNight(data)),
+    type: 'linear',
+    colors: [
+      { light: '#FFF1F0', dark: '#2A0E10' },
+      { light: '#F4F0FF', dark: '#140F26' },
+      { light: '#EEF6FF', dark: '#07121F' },
+    ],
+    stops: [0, 0.55, 1], startPoint: { x: 0, y: 0 }, endPoint: { x: 1, y: 1 },
+  }
+}
+
+function ahwYijiBar(tag, words, color, background) {
+  const text = pickWords(words, 9, 14)
+  return {
+    type: 'stack', direction: 'row', alignItems: 'center', gap: 7,
+    borderRadius: 8, padding: [1, 8, 1, 8], backgroundColor: background,
+    children: [
+      hT(tag, 13, color, 'bold', { minScale: 1 }),
+      hT(text || '诸事不宜', 12, AHW.primary(), 'regular', { minScale: 0.55 }),
+    ],
+  }
+}
+
+function ahwAlmanacMedium(A) {
+  if (!A) return hCol([
+    hT('黄历暂缺', 11, AHW.secondary(), 'semibold'),
+    hT('天气数据仍可用', 9.5, AHW.secondary(), 'regular'),
+  ], { gap: 5, flex: 64, alignItems: 'start' })
+  return hCol([
+    hRow([
+      hT(A.lunarText, 17, AHW.primary(), 'heavy', { minScale: 0.6 }),
+      hT(A.dayGZ, 10.5, AHW.almanac(), 'semibold', { minScale: 0.7 }),
+    ], { gap: 9, alignItems: 'center' }),
+    hT(A.lunarYearGZ + A.sx + '年 · ' + A.zhiXing + '日 · ' + A.tianShen, 10, AHW.almanac(), 'regular', { minScale: 0.65 }),
+    hT('冲' + A.chongSX + '煞' + A.sha, 9.5, AHW.secondary(), 'regular', { minScale: 0.7 }),
+    ahwYijiBar('宜', A.yi, AHW.yi(), AHW.yiBg()),
+    ahwYijiBar('忌', A.ji, AHW.ji(), AHW.jiBg()),
+  ], { gap: 5, flex: 64, alignItems: 'start' })
+}
+
+function ahwWeatherSymbol(cond, night) {
+  const s = String(cond || '')
+  if (/雷/.test(s)) return 'cloud.bolt.rain.fill'
+  if (/雨/.test(s)) return 'cloud.rain.fill'
+  if (/雪/.test(s)) return 'cloud.snow.fill'
+  if (/雾|霾/.test(s)) return 'cloud.fog.fill'
+  if (/阴/.test(s)) return 'cloud.fill'
+  if (/云/.test(s)) return 'cloud.sun.fill'
+  return night ? 'moon.stars.fill' : 'sun.max.fill'
+}
+
+function ahwWeatherMedium(data) {
+  const now = data.now || {}
+  const day = getToday(data) || {}
+  const cond = clean(now.text) || '天气暂缺'
+  const hum = numeric(now.humidity)
+  const humidity = hum == null ? '湿度 —' : '湿度 ' + Math.round(Math.max(0, Math.min(100, hum))) + '%'
+  const wind = [clean(now.windDir), clean(now.windScale) ? clean(now.windScale) + '级' : ''].filter(Boolean).join('') || '风力 —'
+  const alert = hWeatherAlerts(data)[0]
+  const fourth = alert
+    ? hRow([
+        hI(alert.icon, AHW.alert(), 10), hSp(4),
+        hT(alert.text, 9, AHW.alert(), 'semibold', { minScale: 0.55 }),
+      ], { gap: 0, padding: [4, 7, 4, 7], borderRadius: 8, backgroundColor: AHW.alertBg() })
+    : hRow([
+        hI('humidity.fill', AHW.weather(), 9), hSp(3), hT(humidity, 9, AHW.secondary(), 'medium', { minScale: 0.7 }),
+        hSp(6), hI('wind', AHW.weather(), 9), hSp(3), hT(wind, 9, AHW.secondary(), 'medium', { minScale: 0.6 }),
+      ], { gap: 0, padding: [4, 7, 4, 7], borderRadius: 8, backgroundColor: AHW.statusBg() })
+  return hCol([
+    hRow([
+      hT(temp(now.temp), 26, AHW.primary(), 'light', { mono: true, minScale: 0.7 }),
+      hSp(),
+      hI(ahwWeatherSymbol(cond, isNight(data)), AHW.weather(), 22),
+    ], { gap: 0, alignItems: 'center' }),
+    hRow([hSp(), hT(cond, 11.5, AHW.primary(), 'medium', { minScale: 0.65 }), hSp()], { gap: 0 }),
+    hRow([
+      hT('↑ ' + temp(day.tempMax), 11, AHW.hi(), 'medium', { mono: true, minScale: 0.7 }),
+      hSp(),
+      hT('↓ ' + temp(day.tempMin), 11, AHW.lo(), 'medium', { mono: true, minScale: 0.7 }),
+    ], { gap: 0 }),
+    fourth,
+  ], { gap: 3, flex: 36, alignItems: 'start' })
+}
+
+function harkMedium(data, A) {
+  const shifted = new Date(Date.now() + 8 * 3600000)
+  const shichen = '子丑寅卯辰巳午未申酉戌亥'[Math.floor(((shifted.getUTCHours() + 1) % 24) / 2)]
+  const week = '日一二三四五六'[(A && A.week) != null ? A.week : shifted.getUTCDay()]
+  const month = A && A.m ? A.m : shifted.getUTCMonth() + 1
+  const day = A && A.d ? A.d : shifted.getUTCDate()
+  const title = '黄历与天气'
+  const header = hRow([
+    hT(title, 11, AHW.primary(), 'semibold', { minScale: 0.7 }),
+    hSp(),
+    hT(month + '月' + day + '日 周' + week + ' · ' + shichen + '时', 10.5, AHW.secondary(), 'regular', { minScale: 0.7 }),
+  ], { gap: 4, alignItems: 'center' })
+  return {
+    type: 'widget', padding: 13, gap: 5,
+    backgroundGradient: ahwBg(),
     refreshAfter: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     url: 'https://www.weather.com.cn/',
-    children: card,
+    children: [
+      { type: 'spacer', flex: 1.5 },
+      header,
+      hRow([ahwAlmanacMedium(A), hSp(8), ahwWeatherMedium(data)], { gap: 0, alignItems: 'start' }),
+      { type: 'spacer', flex: 1 },
+    ],
   }
 }
 
