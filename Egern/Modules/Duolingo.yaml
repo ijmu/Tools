@@ -1,17 +1,33 @@
 # Duolingo 分流模块（Egern · 通用版）
-# URL: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
+# 订阅：https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
 #
-# 一个文件搞定三件事：
-#   1. 国际版 duolingo.com + 静态 CDN → 代理（策略由 PROXY 参数指定）
-#   2. 中国版 duolingo.cn → 直连（阿里云国内节点 110.75.170.67）
-#   3. 广告/遥测子域 → 默认拦截，可用 ADS_POLICY 改成放行
+# 【用途】
+# - 国际版 duolingo.com 与静态 CDN 使用 PROXY 指定的策略。
+# - 中国版 duolingo.cn 直连；广告与遥测子域默认拦截。
 #
-# 安装：Egern → 模块 → 添加本 URL，然后在模块设置里把 PROXY 填成你配置中的
-#      策略组名（如 Proxy / 节点选择 / 某节点名），不填则回退默认值 "Proxy"。
-# 注意：子域 REJECT 必须排在 duolingo.com 后缀之前，否则会被后缀规则吞掉。
+# 【安装】
+# 1. Egern → 模块 → 添加，粘贴上方订阅地址。
+# 2. 打开模块设置，将 PROXY 填为现有代理组名或节点名。
+# 3. 保存并启用模块；规则更新后重新连接一次 Egern。
 #
-# 数据来源：blackmatrix7/ios_rule_script · MetaCubeX/meta-rules-dat ·
-#          v2fly/domain-list-community · www.duolingo.com 页面实测（CDN 引用 12 处）
+# 【参数】
+# - PROXY：国际版与 CDN 使用的策略，默认 "Proxy"。
+# - ADS_POLICY：广告与遥测处理策略，默认 "REJECT"；也可填 DIRECT 或代理组名。
+#
+# 【刷新 / 缓存】
+# - 本模块不使用脚本缓存；订阅内容更新后，在模块页手动刷新即可。
+#
+# 【常见问题】
+# - 国际版无法连接：确认 PROXY 与 Egern 中的策略名称完全一致。
+# - 广告或遥测仍被放行：确认 ADS_POLICY 未被改为 DIRECT 或其他策略。
+#
+# 【注意事项】
+# - 广告与遥测子域规则必须排在 duolingo.com 后缀规则之前，避免被后缀规则先匹配。
+# - 参数名、域名及规则顺序不要随意修改。
+#
+# 【数据来源】
+# - blackmatrix7/ios_rule_script、MetaCubeX/meta-rules-dat、v2fly/domain-list-community。
+# - www.duolingo.com 页面静态资源引用核对。
 name: Duolingo
 description: 多邻国：国际版走代理、中国版直连、广告与埋点默认拦截
 author: ijmu

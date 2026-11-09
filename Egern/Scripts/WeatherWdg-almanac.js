@@ -1,21 +1,24 @@
 /**
- * 天气 · 黄历（Egern 小组件）
- * 数据：中国天气网（免 Key）＋ 本地黄历引擎（1900–2100，零网络依赖）
- * 相对「天气·晴雨」的变化：
- *   · 中部「距 XX 节 N 天」默认移除 → 换成 农历·干支·黄道/黑道
- *   · 新增三档独立宜 / 忌 布局（小 3 行、中 2 行、大 3 行，完整词条换行）
- * 黄历开关（组件 Env，全部可选）：
- *   ALM_STYLE         hark（默认，Hark 玻璃卡风格）/ classic（上一版版式）
- *   ALM_MEDIUM        仅 classic 生效：hero（默认）/ band
- *   SHOW_ALM=0        关掉黄历，回到纯天气版式
- *   SHOW_FESTIVAL=1   恢复原「距 XX 节 N 天」
- *   YI_COUNT / JI_COUNT  仅 classic 版式使用；默认 aurora 按三档可用行数动态装箱
- */
-/**
- * 和风天气·晴雨 (Egern 小组件版)
- * 数据来源：中国天气网 (weather.com.cn) 免 Key 方案（源自 WeatherWdg.js / WeatherWdg.yaml）
- * 环境变量：
- *   QWEATHER_LOCATION / CITY / LOCATION: 城市名（如 合肥、北京、阳江）、9 位城市代码，或填 "自动"（默认按 IP 自动定位）
+ * 晨曦天气·黄历 · Egern 小组件脚本（generic）
+ *
+ * 【用途 / 调用入口】
+ * 由 Egern/Modules/weather-almanac.yaml 注册为 weather-almanac，提供天气与本地黄历三档组件。
+ * 天气来自中国天气网免 Key 接口；农历、干支与宜忌在本地计算，支持 1900–2100。
+ *
+ * 【环境变量】
+ * CITY：城市名、9 位城市代码或“自动”；兼容 QWEATHER_LOCATION / LOCATION 旧别名。
+ * ALM_STYLE：aurora（默认，hark 为兼容别名）或 classic。
+ * SHOW_ALM=0：隐藏黄历；SHOW_FESTIVAL=1：显示节日倒数。
+ * ALM_MEDIUM：仅 classic 版式使用，hero（默认）或 band。
+ * YI_COUNT / JI_COUNT：仅 classic 版式使用；aurora 按三档可用行数动态装箱。
+ *
+ * 【刷新 / 缓存】
+ * 组件约 15 分钟刷新；天气缓存 20 分钟，失败时可回退至 6 小时内缓存；城市代码缓存 30 天。
+ * 缓存命名空间固定为 qweather-sunrain:v2:，不得与其他黄历组件共用。
+ *
+ * 【数据来源 / 维护边界】
+ * 天气：中国天气网及脚本中的公开定位服务；黄历数据与算法内置。
+ * 维护时保持 weather-almanac 独立入口、缓存键和三档 Widget DSL；不得改动原黄历/倒数组件。
  */
 
 const NS = 'qweather-sunrain:v2:'

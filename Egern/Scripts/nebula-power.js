@@ -1,25 +1,26 @@
 /**
- * ⚡ 星云AI 电力补贴 · Egern 小组件脚本（generic）
- * 每次刷新扫一遍官网模型表，默认按「今日用量」排行（谁在被用得多谁在前），
- * 也可切综合分/能力/省钱；填 Cookie 可加显示自己的余额。
+ * 星云AI 电力补贴 · Egern 独立小组件脚本（generic）
  *
- * 数据源（公开接口，无需登录）：POST https://ai.ipix.ink/guest/models   body {"key":"public"}
- *   → 全量模型 data[]（含 discount_* 补贴字段、price 原价、上下文、描述）+ groups + rmb_rate；
- *     接口只校验 key 非空，任意字符串即可读到与网站「模型电耗」页一致的数据。
- * 补贴口径（与站点前端逐行对齐）：discount_price 非空才算有补贴；discount_start/end 限日期区间；
- *   discount_daily_start/end 限北京时间每日时段（跨零点按环绕判定，只有一端有值则不生效）；
- *   discount_used ≥ discount_quota 视为当日额度耗尽（单列「池满」，不改实扣价）。
- * 能力分不内置模型名单：按「官网原价 + 名字里的代次与档位 + 上下文」当场算，管理员新增模型
- *   立即生效，本轮新出现的模型会标「新」。电价单位 ⚡/100K tokens（1M = ×10）；
- *   金额 = 电价 × rmb_rate（元/⚡）。
+ * 【用途 / 调用入口】
+ * 展示官网模型、电价、补贴与今日用量排行；当前 Egern/Modules 下没有对应模块文件。
+ * 手动添加 generic 脚本后，在小组件画廊中选择 nebula-power。
  *
- * 接入：
- *   ① 工具 → 脚本 → +，类型 generic、文件位置「本地」，文件名 nebula-power.js，粘贴本文件内容保存
- *   ② 分析 → 小组件画廊 → + → 脚本选 nebula-power → 主屏长按添加 Egern 组件并选中它
- * 参数（Env，全部可选）：
- *   NEBULA_COOKIE = "server_session_xxx=..."   追加显示自己的余额 / 电力包剩余
- *   NEBULA_TOP    = "6"                        大尺寸列出档数（默认 中 4 / 大 6）
- *   NEBULA_SORT   = usage(默认) | smart | power | price   今日用量榜 / 综合分 / 能力优先 / 省钱优先
+ * 【环境变量】
+ * NEBULA_TOP：显示数量，默认 Medium 4 / Large 6。
+ * NEBULA_SORT：usage（默认）/ smart / power / price。
+ * NEBULA_COOKIE：可选，仅用于显示个人余额与电力包剩余；不得写入仓库、日志或公开配置。
+ *
+ * 【刷新 / 缓存】
+ * 刷新时间由 nextRefresh() 按脚本既有规则计算；模型列表使用 nebula_power_cache 本地缓存兜底。
+ *
+ * 【数据来源】
+ * 公开模型接口：POST https://ai.ipix.ink/guest/models，返回模型、补贴、价格、上下文及汇率。
+ * 补贴有效性按日期、北京时间时段和额度字段判断；能力分由当前接口数据动态计算。
+ * 电价单位为 ⚡/100K tokens（1M = ×10），金额按接口 rmb_rate 换算。
+ *
+ * 【维护边界】
+ * 本文件为独立脚本。接口字段变化时需同时核对补贴口径、缓存兜底和展示字段；
+ * 不得借注释整理改动评分、价格换算、个人数据请求或 Widget DSL。
  */
 
 const MODELS_API = 'https://ai.ipix.ink/guest/models';

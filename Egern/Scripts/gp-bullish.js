@@ -1,15 +1,21 @@
 /**
- * 看多标的 · Egern 小组件
- * 数据源：gp.xsian.top「资本家持股分析平台」
- * 展示：标签含「极力推荐 / 强烈看多 / 重仓绩优」的个股 —— 名称 / 代码 / 现价 / 当日涨幅
+ * 看多标的 · Egern 小组件脚本（generic）
  *
- * 模块参数（Egern 模块设置页三个输入框）：
- *   GP_SITE  网站地址，站点换域名时改这里，默认 https://gp.xsian.top
- *   GP_USER  账号
- *   GP_PASS  密码
- * 可选参数：
- *   GP_SORT  pct(默认，按当日涨幅降序) | date(推荐日期新→旧) | pnl(累计收益率降序)
- *   GP_MAX   最多显示几只，留空按尺寸自适应
+ * 【用途 / 调用入口】
+ * 由 Egern/Modules/gp-bullish.yaml 注册为 gp-bullish，读取平台推荐标的并展示行情与持仓信息。
+ *
+ * 【环境变量】
+ * GP_SITE：平台地址，默认 https://gp.xsian.top；GP_USER / GP_PASS：登录信息。
+ * GP_DAYS：最近推荐天数，默认 7，填 0 不限制日期。
+ * GP_SORT：date（默认）/ pct / pnl；GP_MAX：最大显示数量，留空按尺寸适配。
+ *
+ * 【刷新 / 缓存】
+ * 交易时段约 5 分钟刷新，其他时段约 30 分钟刷新。
+ * 请求失败时可回退至 3 小时内缓存；缓存命名空间为 gp-bullish:v1:。
+ *
+ * 【数据来源 / 维护边界】
+ * 数据来自 GP_SITE 指定的平台。接口、登录流程或字段变化时需重新核对。
+ * 维护时不得记录或输出用户登录信息，不得借注释整理改动抓取、缓存、排序或 Widget DSL。
  */
 
 const NS = 'gp-bullish:v1:';
