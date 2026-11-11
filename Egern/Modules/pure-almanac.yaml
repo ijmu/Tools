@@ -1,0 +1,61 @@
+# 纯黄历 · 老黄历（Egern 小组件模块）
+# 订阅：https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/pure-almanac.yaml
+#
+# 【用途】
+# - 农历、年/月/日干支、节气、宜忌、冲煞、节气与节日倒数；不含任何天气信息。
+# - Small / Medium / Large 三档独立排版；由 HL.js 开源模板骨架精修，修正对齐与层级。
+#
+# 【安装】
+# 1. Egern → 模块 → 添加，粘贴上方订阅地址。
+# 2. 保存并启用模块；如需开关节日倒数，在模块设置中调整。
+# 3. 在 Egern 小组件画廊中添加「纯黄历 · 老黄历」并选择尺寸。
+#
+# 【参数】
+# - SHOW_FESTIVAL：填 0 隐藏节日倒数、仅保留节气倒数；默认 1（与原模板一致）。
+#
+# 【刷新 / 缓存】
+# - 组件每日 00:05（UTC+8）自动刷新；不使用本地缓存，每次刷新重新计算。
+# - 远程月度黄历不可用时，宜忌回退为本地默认文案，其余字段仍由本地算法给出。
+#
+# 【常见问题】
+# - 组件内容不更新：下拉手动刷新组件，或检查设备日期与时区。
+# - 不想看节日倒数：在模块设置中将 SHOW_FESTIVAL 设为 0。
+# - 干支或冲煞存疑：本模块沿用模板内置算法，欢迎反馈核对后修正。
+#
+# 【注意事项】
+# - 农历与节气支持 1900–2100；内容仅作传统文化参考。
+# - 本模块与「晨曦天气·黄历」「黄历与节日」完全独立，不共用入口、标识或缓存键。
+#
+# 【数据来源】
+# - 农历、节气、冲煞、节日倒数：脚本内置本地算法。
+# - 月干支与宜忌文本：zqzess/openApiData 月度黄历（GitHub Raw，直连）。
+name: 纯黄历 · 老黄历
+description: 农历、干支、宜忌冲煞、节气与节日倒数；三档自适应，无天气
+author: ijmu
+homepage: https://github.com/ijmu/Tools/tree/main/Egern/Modules/pure-almanac.yaml
+icon: scroll.fill
+
+env_schema:
+  SHOW_FESTIVAL:
+    name: 显示节日倒数
+    description: 填 0 隐藏节日倒数，仅保留节气倒数
+    default_value: "1"
+    options:
+      - "1"
+      - "0"
+
+rules:
+  - domain_suffix:
+      match: raw.githubusercontent.com
+      policy: DIRECT
+      name: GitHub Raw（月度黄历）
+
+scriptings:
+  - generic:
+      name: pure-almanac
+      script_url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Scripts/PureAlmanacWdg.js
+      timeout: 30
+
+widgets:
+  - name: 纯黄历 · 老黄历
+    script_name: pure-almanac
