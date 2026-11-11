@@ -9,86 +9,55 @@ hijack_dns:
 - '*:53'
 geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
 asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
-proxy_latency_test_url: http://connectivitycheck.gstatic.com/generate_204
-direct_latency_test_url: http://www.qq.com
-udp_latency_test_url: google.com@8.8.8.8
+proxy_latency_test_url: https://www.apple.com/library/test/success.html
+direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
 compat_route: true
 include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
-default_subscription_group: Subscription
-default_proxy_group: Manual
 dns:
   bootstrap:
-    - system
-    - 223.5.5.5
+  - system
+  - 223.5.5.5
   upstreams:
     Encrypted-DNS:
-      - https://dns.alidns.com/dns-query
-      - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
   forward:
-    - domain_wildcard:
-        match: "*"
-        value: Encrypted-DNS
+  - domain_wildcard:
+      match: '*'
+      value: Encrypted-DNS
   proxy_nameservers:
-    - Encrypted-DNS
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
+  - Encrypted-DNS
 real_ip_domains:
 - '*.lan'
 - '*.local'
 - '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
 policy_groups:
 - select:
     name: Subscription
+    policies: []
+    flatten: false
+    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
     urls:
     - 订阅地址1
-    filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
+    - 订阅地址2
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
-- smart:
+- auto_test:
     name: Automatic
     policies:
     - Subscription
     flatten: true
+    interval: 300
+    tolerance: 50
+    timeout: 5
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
     hidden: false
 - select:
-    name: Manual
+    name: Proxy
     policies:
     - Automatic
     - Subscription
@@ -130,7 +99,7 @@ policy_groups:
 - select:
     name: GitHub
     policies:
-    - Manual
+    - Proxy
     - HK
     - US
     flatten: false
@@ -139,7 +108,7 @@ policy_groups:
 - select:
     name: Google
     policies:
-    - Manual
+    - Proxy
     - HK
     - US
     - TW
@@ -152,7 +121,7 @@ policy_groups:
 - select:
     name: Media
     policies:
-    - Manual
+    - Proxy
     - HK
     - US
     - TW
@@ -172,19 +141,6 @@ policy_groups:
     - DE
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/paypal(2).png
-    hidden: false
-- select:
-    name: Spotify
-    policies:
-    - DIRECT
-    - Manual
-    - HK
-    - US
-    - TW
-    - PH
-    - Subscription
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/spotify(green).png
     hidden: false
 - select:
     name: TikTok
@@ -283,7 +239,6 @@ rules:
     policy: REJECT
     disabled: false
 - ssid:
-    name: Office Wi-Fi
     match: MLGS_5G
     policy: DIRECT
     disabled: false
@@ -313,13 +268,11 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    name: Bilibili_PCDN
     match: https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/Bilibili_PCDN.yaml
     policy: REJECT
     update_interval: 86400
     disabled: false
 - rule_set:
-    name: Douyin
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/douyin.yaml
     policy: DIRECT
     update_interval: 86400
@@ -340,6 +293,11 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
+    match: https://raw.githubusercontent.com/lixi333/muse-rules/main/MuseAI-merged.list
+    policy: AIGC
+    update_interval: 86400
+    disabled: false
+- rule_set:
     match: https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/egern/global.yaml
     policy: AIGC
     update_interval: 86400
@@ -350,28 +308,28 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/gits.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
     policy: GitHub
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/google.yaml
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/socialmedia.yaml
-    policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/spotify.yaml
-    policy: Spotify
     update_interval: 86400
     disabled: false
 - rule_set:
     match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/paypal.yaml
     policy: PayPal
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Telegram.yaml
+    policy: Media
+    update_interval: 86400
+    disabled: false
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
+    policy: Media
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -406,8 +364,12 @@ rules:
     disabled: false
 - default:
     name: Final
-    policy: Manual
+    policy: Proxy
+default_subscription_group: Subscription
+default_proxy_group: Proxy
 mitm:
+  ca_p12: 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
+  ca_passphrase: egern
   hostnames:
     excludes:
     - raw.githubusercontent.com
@@ -425,14 +387,6 @@ modules:
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
-  compat_arguments:
-    PROXY: Manual
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/Reukix/ukix/refs/heads/main/Script/Spotify.sgmodule
-  update_interval: 86400
-  enabled: true
 - url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Egern-YouTube.yaml
   compat_arguments:
     blockUpload: 'true'
@@ -445,54 +399,47 @@ modules:
     nativeDownload: 'true'
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
+- url: https://loon.103516.xyz/Plugin/Spotify_CN.lpx
   update_interval: 86400
   enabled: false
-- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adultraplus-own.sgmodule
+- url: https://loon.103516.xyz/Plugin/MeetYou.lpx
   update_interval: 86400
   enabled: true
-- url: https://raw.githubusercontent.com/bluee1111/egern-adblock/main/adblock-own.sgmodule
+- url: https://loon.103516.xyz/Plugin/Bilibili.lpx
   update_interval: 86400
   enabled: true
-- name: 黄历与节日
-  url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/almanac-holiday.yaml
+- url: https://loon.103516.xyz/Plugin/Amap.lpx
+  update_interval: 86400
+  enabled: true
+- url: https://loon.103516.xyz/Plugin/RedNote.lpx
+  update_interval: 86400
+  enabled: true
+- url: https://loon.103516.xyz/Plugin/Goofish.lpx
+  update_interval: 86400
+  enabled: true
+- url: https://loon.103516.xyz/Plugin/CoolApk.lpx
+  update_interval: 86400
+  enabled: true
+- url: https://loon.103516.xyz/Plugin/Keep.lpx
+  update_interval: 86400
+  enabled: false
+- url: https://loon.103516.xyz/Plugin/BaiduNetDisk.lpx
+  update_interval: 86400
+  enabled: false
+- url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
+  update_interval: 86400
+  enabled: true
+- url: https://egern.pages.dev/modules/xcgtb/Egern-Widgets/HL.yaml
   update_interval: 86400
   enabled: true
 - name: 小六壬
   url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
   update_interval: 3600
   enabled: true
-- name: 每日天气
-  url: https://raw.githubusercontent.com/SIJULY/egern-radar/main/WeatherWdg.yaml
-  compat_arguments:
-    weatherCity: 莆田
-  update_interval: 3600
-  enabled: false
-- name: 网络诊断
-  url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/network-radar-hark.yaml
-  update_interval: 86400
-  enabled: false
-- name: 油价查询
-  url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/GasPrice-hark.yaml
-  update_interval: 86400
-  env:
-    PROVINCE: 福建
-    CITY: 莆田
-    MY_FUEL: '95'
-    TANK_L: '66'
-  enabled: false
 - name: 彩票开奖
   url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.yaml
   update_interval: 86400
   env:
     彩票类型: 大乐透
     分析期数: '100'
-  enabled: false
-- url: https://raw.githubusercontent.com/ZLam/VPN/refs/heads/main/egern/widget/douban_ranking/douban-ranking.yaml
-  update_interval: 86400
-  enabled: false
-- url: https://github.com/158212892/QuantumultXMark/raw/refs/heads/main/My/Egern/modules/PingMe.yaml
-  compat_arguments:
-    CAPTURE_ENABLED: 'false'
-  update_interval: 86400
   enabled: false
