@@ -3,7 +3,7 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: true
 vif_only: true
-block_quic: true
+block_quic: false
 close_connections_on_policy_change: false
 hijack_dns:
 - '*:53'
@@ -105,9 +105,6 @@ real_ip_domains:
 - '*.tailscale.com'
 - tailscale.net
 - '*.tailscale.net'
-http_engine_hosts:
-  includes:
-  - '*:0'
 policy_groups:
 - select:
     name: Subscription
