@@ -3,7 +3,7 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: true
 vif_only: true
-block_quic: false
+block_quic: true
 close_connections_on_policy_change: false
 hijack_dns:
 - '*:53'
@@ -107,7 +107,7 @@ real_ip_domains:
 - '*.tailscale.net'
 policy_groups:
 - select:
-    name: Subscription
+    name: Sub
     policies: []
     flatten: false
     filter: ^(?!.*(?:套餐|订阅|到期|重置|剩余|续费|客户端|支持|流量|频道|官网|网址|时间|应急|过期|有效|失联|公告|群)).+$
@@ -118,17 +118,17 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
 - smart:
-    name: Automatic
+    name: Auto
     policies:
-    - Subscription
+    - Sub
     flatten: true
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
     hidden: false
 - select:
     name: Proxy
     policies:
-    - Automatic
-    - Subscription
+    - Auto
+    - Sub
     - DIRECT
     - HK
     - US
@@ -142,7 +142,7 @@ policy_groups:
     name: Apple
     policies:
     - DIRECT
-    - Subscription
+    - Sub
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/apple.png
     hidden: false
@@ -165,15 +165,6 @@ policy_groups:
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/Bitcoin.png
     hidden: false
 - select:
-    name: GitHub
-    policies:
-    - Proxy
-    - HK
-    - US
-    flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/github(1).png
-    hidden: false
-- select:
     name: Google
     policies:
     - Proxy
@@ -182,7 +173,7 @@ policy_groups:
     - TW
     - JP
     - SG
-    - Subscription
+    - Sub
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/google(1).png
     hidden: false
@@ -195,7 +186,7 @@ policy_groups:
     - TW
     - JP
     - SG
-    - Subscription
+    - Sub
     flatten: false
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/twitter.png
     hidden: false
@@ -220,7 +211,7 @@ policy_groups:
 - smart:
     name: HK
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇭🇰|香港|Hong Kong
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Hongkong(2).png
@@ -228,7 +219,7 @@ policy_groups:
 - smart:
     name: US
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇺🇸|美国|United States
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/US(1).png
@@ -236,7 +227,7 @@ policy_groups:
 - smart:
     name: TW
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇹🇼|台湾|Taiwan
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/taiwan(2).png
@@ -244,7 +235,7 @@ policy_groups:
 - smart:
     name: JP
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇯🇵|日本|Japan
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Japan(1).png
@@ -252,7 +243,7 @@ policy_groups:
 - smart:
     name: SG
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇸🇬|新加坡|Singapore
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/singapore(2).png
@@ -260,7 +251,7 @@ policy_groups:
 - smart:
     name: UK
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇬🇧|英国|United Kingdom
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/UnitedKingdom.png
@@ -268,7 +259,7 @@ policy_groups:
 - smart:
     name: DE
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇩🇪|德国|Germany
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Germany.png
@@ -276,7 +267,7 @@ policy_groups:
 - smart:
     name: PH
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇵🇭|菲律宾|Philippine
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/RepublicofthePhilippines(1).png
@@ -284,7 +275,7 @@ policy_groups:
 - smart:
     name: TR
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇹🇷|土耳其|Turkey
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/Turkey.png
@@ -292,7 +283,7 @@ policy_groups:
 - smart:
     name: NG
     policies:
-    - Subscription
+    - Sub
     flatten: true
     filter: 🇳🇬|尼日利亚|Nigeria
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/01Country/FederalRepublicofNigeria.png
@@ -315,7 +306,7 @@ rules:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Tailscale-Direct.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: true
+    disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
     policy: DIRECT
@@ -335,7 +326,7 @@ rules:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: true
+    disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
     policy: DIRECT
@@ -387,11 +378,6 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Github.yaml
-    policy: GitHub
-    update_interval: 86400
-    disabled: false
-- rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Google.yaml
     policy: Google
     update_interval: 86400
@@ -409,11 +395,6 @@ rules:
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/Twitter.yaml
     policy: Media
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Neverless.list
-    policy: US
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -440,7 +421,7 @@ rules:
     match: CN
     policy: DIRECT
     no_resolve: false
-    disabled: false
+    disabled: true
 - default:
     name: Final
     policy: Proxy
@@ -463,50 +444,6 @@ modules:
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-location.sgmodule
   update_interval: 86400
   enabled: false
-- name: 天气·晴雨
-  url: https://egern.pages.dev/modules/SIJULY/egern-radar/WeatherWdg.yaml
-  compat_arguments:
-    weatherCity: 莆田
-  update_interval: 86400
-  enabled: false
-- name: 七猫小说
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partQ/QiMaoNovel.yaml
-  update_interval: 86400
-  enabled: true
-- name: 小红书
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partX/Xiaohongshu.yaml
-  update_interval: 86400
-  enabled: true
-- name: 高德地图
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partG/AutoNavi.yaml
-  update_interval: 86400
-  enabled: true
-- name: 闲鱼
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partX/XianYu.yaml
-  update_interval: 86400
-  enabled: true
-- name: 美团
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partM/Meituan.yaml
-  update_interval: 86400
-  enabled: true
-- name: 美柚
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partM/Meiyou.yaml
-  update_interval: 86400
-  enabled: true
-- name: 酷安
-  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partK/Coolapk.yaml
-  update_interval: 86400
-  enabled: true
-- name: 瑟瑟视频
-  url: https://egern.pages.dev/modules/ios151/Rewrite/lsp/Ts.yaml
-  update_interval: 86400
-  enabled: true
-- url: https://egern.pages.dev/modules/Aswoth/Keek/wannianli.yaml
-  update_interval: 86400
-  enabled: true
-- url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/TestFlight.yaml
-  update_interval: 86400
-  enabled: false
 - url: https://raw.githubusercontent.com/IBL3ND/module/refs/heads/main/Egern-YouTube.yaml
   compat_arguments:
     blockUpload: 'true'
@@ -519,20 +456,36 @@ modules:
     nativeDownload: 'true'
   update_interval: 86400
   enabled: true
-- url: https://loon.103516.xyz/Plugin/Spotify_CN.lpx
+- url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
   update_interval: 86400
-  enabled: false
-- name: 小六壬
-  url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
-  update_interval: 3600
   enabled: true
 - url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
   update_interval: 86400
   enabled: true
-- name: 彩票开奖
-  url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.yaml
+- name: 天气·晴雨
+  url: https://egern.pages.dev/modules/SIJULY/egern-radar/WeatherWdg.yaml
+  compat_arguments:
+    weatherCity: 莆田
+  update_interval: 86400
+  enabled: false
+- url: https://egern.pages.dev/modules/Aswoth/Keek/wannianli.yaml
+  update_interval: 86400
+  enabled: true
+- name: 小六壬
+  url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
+  update_interval: 3600
+  enabled: true
+- url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/GasPrice-hark.yaml
+  update_interval: 86400
+  env:
+    PROVINCE: 福建
+    CITY: 莆田
+    MY_FUEL: '95'
+    TANK_L: '66'
+  enabled: true
+- url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.yaml
   update_interval: 86400
   env:
     彩票类型: 大乐透
     分析期数: '100'
-  enabled: false
+  enabled: true
