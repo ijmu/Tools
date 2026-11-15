@@ -32,6 +32,30 @@ dns:
       match: cn
       value: Domestic-DNS
   - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
+      match: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
+      match: https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/egern/cn.yaml
+      value: Domestic-DNS
+      update_interval: 86400
+  - proxy_rule_set:
       match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
       value: Domestic-DNS
       update_interval: 86400
