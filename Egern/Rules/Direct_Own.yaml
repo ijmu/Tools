@@ -2,14 +2,24 @@
 # URL:https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/Direct_Own.yaml
 
 domain_suffix_set:
+# 应用
   - egernlicense.com
   - surge-activation.com
   - cdn.jsdelivr.net
+# 组件
   - rilipro.com
   - qiyoujiage.com
   - gp.xsian.top
   - zhuying.com
   - skk.moe
+  - ai.ipix.ink
+# 机场
   - liangxin.xyz
   - m1.tohno-0.top
-  - ai.ipix.ink
+# 抖音
+  - douyin.com
+  - amemv.com
+  - snssdk.com
+  - zijiecdn.com
+  - ixigua.com
+  - huoshan.com
