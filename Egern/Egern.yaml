@@ -3,108 +3,37 @@ http_port: 3080
 socks_port: 3090
 allow_external_connections: true
 vif_only: true
-block_quic: true
 close_connections_on_policy_change: false
 hijack_dns:
 - '*:53'
-geoip_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country-without-asn.mmdb
-asn_db_url: https://raw.githubusercontent.com/Loyalsoldier/geoip/release/GeoLite2-ASN.mmdb
+geoip_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/Country-without-asn.mmdb
+asn_db_url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Assets/geoip/GeoLite2-ASN.mmdb
 proxy_latency_test_url: https://www.apple.com/library/test/success.html
-direct_latency_test_url: http://wifi.vivo.com.cn/generate_204
+direct_latency_test_url: http://connectivitycheck.gstatic.com/generate_204
 compat_route: false
 include_all_networks: false
 include_apns: false
 include_cellular_services: false
 include_local_networks: false
 dns:
-  bootstrap:
-  - 223.5.5.5
-  - 119.29.29.29
   upstreams:
-    Domestic-DNS:
-    - https://223.5.5.5/dns-query
-    - https://120.53.53.53/dns-query
-    Clean-DNS:
+    PROXY-DNS:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    - https://dns.google/dns-query
+    iBL3ND-DNS:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
     - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
   forward:
-  - domain_suffix:
-      match: cn
-      value: Domestic-DNS
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Unbreak.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://cdn.jsdelivr.net/gh/VPSDance/ai-proxy-rules@main/rules/egern/cn.yaml
-      value: Domestic-DNS
-      update_interval: 86400
-  - proxy_rule_set:
-      match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/China-Direct.yaml
-      value: Domestic-DNS
-      update_interval: 86400
   - domain_wildcard:
       match: '*'
-      value: Clean-DNS
+      value: iBL3ND-DNS
+      disabled: false
   proxy_nameservers:
-  - Domestic-DNS
-  block_ips:
-  - 0.0.0.0
-  - 127.0.0.1
-bypass_tunnel_proxy:
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
-- 100.64.0.0/10
-- fd7a:115c:a1e0::/48
-- '*.local'
-- '*.lan'
-- 192.168.0.0/16
-- 10.0.0.0/8
-- 172.16.0.0/12
-real_ip_domains:
-- '*.lan'
-- '*.local'
-- '*.push.apple.com'
-- lancache.steamcontent.com
-- '*.msftconnecttest.com'
-- '*.msftncsi.com'
-- msftncsi.com
-- msftconnecttest.com
-- '*.srv.nintendo.net'
-- '*.stun.playstation.net'
-- xbox.*.microsoft.com
-- '*.xboxlive.com'
-- stun.l.google.com
-- '*.prod.cloud.netflix.com'
-- appboot.netflix.com
-- '*.battle.net'
-- '*.blzstatic.cn'
-- '*.battlenet.com'
-- '*.battlenet.com.cn'
-- '*.ts.net'
-- tailscale.com
-- '*.tailscale.com'
-- tailscale.net
-- '*.tailscale.net'
+  - PROXY-DNS
 policy_groups:
 - select:
     name: Sub
@@ -117,11 +46,14 @@ policy_groups:
     update_interval: 10800
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/03CNSoft/mcdonalds.png
     hidden: false
-- smart:
+- auto_test:
     name: Auto
     policies:
     - Sub
     flatten: true
+    interval: 300
+    tolerance: 50
+    timeout: 5
     icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/05icon/lightning(3).png
     hidden: false
 - select:
@@ -153,7 +85,7 @@ policy_groups:
     - JP
     - SG
     flatten: false
-    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/grok.png
+    icon: https://raw.githubusercontent.com/lige47/QuanX-icon-rule/main/icon/04ProxySoft/claude(1).png
     hidden: false
 - select:
     name: Crypto
@@ -297,21 +229,29 @@ rules:
     match: gjfzpt.cn
     policy: REJECT
     disabled: false
+- domain:
+    name: 跳过农行VPN检测
+    match: msmp.abchina.com.cn
+    policy: REJECT
+    disabled: false
 - ssid:
-    name: Office Wi-Fi
     match: MLGS_5G
+    policy: DIRECT
+    disabled: false
+- ssid:
+    match: 木兰雅途酒店
     policy: DIRECT
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Tailscale-Direct.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
+    disabled: true
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Bootstrap-Direct.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
+    disabled: true
 - rule_set:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Lan.yaml
     policy: DIRECT
@@ -326,16 +266,16 @@ rules:
     match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Direct-Priority.yaml
     policy: DIRECT
     update_interval: 86400
-    disabled: false
+    disabled: true
 - rule_set:
     match: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Rules/Direct_Own.yaml
     policy: DIRECT
     update_interval: 86400
     disabled: false
-- domain:
-    name: 跳过农行检测
-    match: msmp.abchina.com.cn
-    policy: REJECT
+- rule_set:
+    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
+    policy: Apple
+    update_interval: 86400
     disabled: false
 - rule_set:
     match: https://raw.githubusercontent.com/ijmu/Tools/refs/heads/main/Egern/Rules/Bilibili_PCDN.yaml
@@ -348,13 +288,8 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/App/TikTok.yaml
+    match: https://github.com/QuixoticHeart/rule-set/raw/refs/heads/ruleset/egern/tiktok.yaml
     policy: TikTok
-    update_interval: 86400
-    disabled: false
-- rule_set:
-    match: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Routing/Foreign/AppleServers.yaml
-    policy: Apple
     update_interval: 86400
     disabled: false
 - rule_set:
@@ -398,12 +333,12 @@ rules:
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/Wise.list
+    match: https://raw.githubusercontent.com/LeiyuG/Surge/refs/heads/main/rules/Wise.list
     policy: UK
     update_interval: 86400
     disabled: false
 - rule_set:
-    match: https://raw.githubusercontent.com/LeiyuG/Surge/main/rules/iFast.list
+    match: https://raw.githubusercontent.com/LeiyuG/Surge/refs/heads/main/rules/iFast.list
     policy: UK
     update_interval: 86400
     disabled: false
@@ -421,7 +356,7 @@ rules:
     match: CN
     policy: DIRECT
     no_resolve: false
-    disabled: true
+    disabled: false
 - default:
     name: Final
     policy: Proxy
@@ -432,6 +367,46 @@ mitm:
     - raw.githubusercontent.com
     - github.com
 modules:
+- name: 哔哩哔哩
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partB/bilibili.yaml
+  update_interval: 86400
+  enabled: true
+- name: 天天基金
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partT/TianTianFund.yaml
+  update_interval: 86400
+  enabled: true
+- name: 美柚
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partM/Meiyou.yaml
+  update_interval: 86400
+  enabled: true
+- name: 高德地图
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partG/AutoNavi.yaml
+  update_interval: 86400
+  enabled: true
+- name: 美团
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partM/Meituan.yaml
+  update_interval: 86400
+  enabled: true
+- name: 闲鱼
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partX/XianYu.yaml
+  update_interval: 86400
+  enabled: true
+- name: 酷安
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partK/Coolapk.yaml
+  update_interval: 86400
+  enabled: true
+- name: 七猫小说
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partQ/QiMaoNovel.yaml
+  update_interval: 86400
+  enabled: true
+- name: 小红书
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partX/Xiaohongshu.yaml
+  update_interval: 86400
+  enabled: false
+- name: 百度网盘
+  url: https://egern.pages.dev/modules/fmz200/wool_scripts/Loon/plugin/split/partB/BaiduNetdisk.yaml
+  update_interval: 86400
+  enabled: false
 - url: https://raw.githubusercontent.com/oo226/egern-config/refs/heads/main/Modules/iringo-mitm.yaml
   update_interval: 86400
   enabled: true
@@ -458,22 +433,34 @@ modules:
   enabled: true
 - url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Surge-module.sgmodule
   update_interval: 86400
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/Duolingo.yaml
   update_interval: 86400
   enabled: true
+- name: 贵金属期货
+  url: https://egern.pages.dev/modules/jadkg/egern/guijinshuqihuo.yaml
+  update_interval: 86400
+  enabled: false
 - name: 天气·晴雨
   url: https://egern.pages.dev/modules/SIJULY/egern-radar/WeatherWdg.yaml
   compat_arguments:
     weatherCity: 莆田
-  update_interval: 86400
+  update_interval: 3600
   enabled: false
 - url: https://egern.pages.dev/modules/Aswoth/Keek/wannianli.yaml
-  update_interval: 86400
+  update_interval: 43200
   enabled: true
 - name: 小六壬
   url: https://raw.githubusercontent.com/ijmu/Tools/main/Egern/Modules/xiaoliuren.yaml
   update_interval: 3600
+  enabled: true
+- url: https://raw.githubusercontent.com/a13609y/egern-modules-hub/main/widgets/oil-price/oil-price.yaml
+  update_interval: 86400
+  env:
+    region: fujian/putian
+    FUEL: '95'
+    FULL_LITERS: '66'
+    REFRESH_HOURS: '24'
   enabled: true
 - url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/GasPrice-hark.yaml
   update_interval: 86400
@@ -482,10 +469,19 @@ modules:
     CITY: 莆田
     MY_FUEL: '95'
     TANK_L: '66'
-  enabled: true
+  enabled: false
 - url: https://raw.githubusercontent.com/zhaohantao1360-hash/Hark/main/Lottery-hark.yaml
   update_interval: 86400
   env:
     彩票类型: 大乐透
     分析期数: '100'
-  enabled: true
+  enabled: false
+- url: https://raw.githubusercontent.com/a13609y/egern-modules-hub/main/rules/pingme/pingme.yaml
+  compat_arguments:
+    CAPTURE_ENABLED: 'false'
+    SIGN_DISABLED: 'false'
+    VIDEO_DISABLED: 'false'
+  update_interval: 86400
+  enabled: false
+default_subscription_group: Sub
+default_proxy_group: Proxy
