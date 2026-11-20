@@ -260,7 +260,7 @@ rules:
     policy: DIRECT
     disabled: false
 - ssid:
-    match: 木兰雅途酒店
+    match: 酒店
     policy: DIRECT
     disabled: false
 - rule_set:
